@@ -70,3 +70,4 @@ eigen/
 Eigen/
 EIGEN3/
 gsl*
+gm2_analysis.code-workspace
