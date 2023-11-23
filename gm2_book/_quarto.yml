@@ -1,0 +1,21 @@
+project:
+  type: book
+
+book:
+  title: "gm2_book"
+  author: "MG"
+  date: "11/22/2023"
+  chapters:
+    - index.qmd
+    - MK.qmd
+    - continuum_amu_s_full.qmd
+    - references.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: default
+    html-math-method: katex
+
+

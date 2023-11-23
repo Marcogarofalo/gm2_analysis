@@ -1,0 +1,7 @@
+/.quarto/
+*.html
+*.css
+*.scss
+*.map
+*.woff
+*.dcf
