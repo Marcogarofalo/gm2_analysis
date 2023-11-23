@@ -32,6 +32,9 @@
 
 #include <gsl/gsl_integration.h>
 
+// equal=OS
+// opposite=TM
+
 constexpr double Metas_MeV = 689.89;
 constexpr double Metas_MeV_err = 0.49;
 
@@ -52,6 +55,9 @@ constexpr double Jpsi_MeV_err = 0.001 * 1000;
 
 constexpr double Metac_MeV = 2.9839 * 1000;
 constexpr double Metac_MeV_err = 0.004 * 1000;
+
+constexpr double MK_MeV = 494.2 ;
+constexpr double MK_MeV_err = 0.3;
 
 // constexpr double Mpi_MeV = 139;
 // constexpr double Mpi_MeV_err = 0.001;
@@ -166,9 +172,8 @@ public:
     }
     configuration_class() {
 
-        std::cout << "lines=" << 0 << std::endl;
-
-        std::cout << "confs=" << 0 << std::endl;
+        // std::cout << "lines=" << 0 << std::endl;
+        // std::cout << "confs=" << 0 << std::endl;
 
         to_bin = std::vector<int>(iconfs.size());
         next_to_bin = std::vector<int>(iconfs.size());
@@ -712,18 +717,18 @@ int main(int argc, char** argv) {
     // }
     // else {
         // light
-        mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_P5A0.txt", argv[3], argv[4], mu);//0
-        correlators.emplace_back(namefile);
-        mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_P5P5.txt", argv[3], argv[4], mu);//1
-        correlators.emplace_back(namefile);
-        mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_VKVK.txt", argv[3], argv[4], mu);//2
-        correlators.emplace_back(namefile);
-        mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_P5A0.txt", argv[3], argv[4], mu);//3
-        correlators.emplace_back(namefile);
-        mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_P5P5.txt", argv[3], argv[4], mu);//4
-        correlators.emplace_back(namefile);
-        mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_VKVK.txt", argv[3], argv[4], mu);//5
-        correlators.emplace_back(namefile);
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_P5A0.txt", argv[3], argv[4], mu);//0
+    correlators.emplace_back(namefile);
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_P5P5.txt", argv[3], argv[4], mu);//1
+    correlators.emplace_back(namefile);
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_VKVK.txt", argv[3], argv[4], mu);//2
+    correlators.emplace_back(namefile);
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_P5A0.txt", argv[3], argv[4], mu);//3
+    correlators.emplace_back(namefile);
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_P5P5.txt", argv[3], argv[4], mu);//4
+    correlators.emplace_back(namefile);
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_VKVK.txt", argv[3], argv[4], mu);//5
+    correlators.emplace_back(namefile);
     // }
     // stranges
     mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.3f_P5A0.txt", argv[3], argv[4], mus1);//6
@@ -752,7 +757,6 @@ int main(int argc, char** argv) {
     mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.3f_VKVK.txt", argv[3], argv[4], mus2);//17
     correlators.emplace_back(namefile);
 
-    //charms  here I mess up the names in the opposite (TM) file there are the equal (OS) correlators
     mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_P5A0.txt", argv[3], argv[4], muc1);//21
     correlators.emplace_back(namefile);
     mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_P5P5.txt", argv[3], argv[4], muc1);//22
@@ -865,7 +869,7 @@ int main(int argc, char** argv) {
         }
         else
             myconfs.emplace_back(name.c_str());
-        
+
         // myconfs[cout]=read_nconfs(name.c_str());
         if (strcmp(argv[4], "cB.72.96") != 0)
             myconfs[count].check_binnign();
@@ -914,7 +918,7 @@ int main(int argc, char** argv) {
     get_kinematic(0, 0, 1, 0, 0, 0);
 
     int var = correlators.size();
-    data = calloc_corr(bin, var + 3 + 12, file_head.l0);
+    data = calloc_corr(bin, var + 3 + 12 + 2 /*Dmeson*/, file_head.l0);
 
     for (int i = 0; i < var; i++) {
         // read correlators[i] and store in data[conf][i][t][re/im]
@@ -974,6 +978,9 @@ int main(int argc, char** argv) {
     correlators.emplace_back("bP5P5");
     correlators.emplace_back("bVKVKeq");
     correlators.emplace_back("bVKVKop");
+    myconfs.emplace_back();
+    myconfs.emplace_back();
+    myconfs.emplace_back();
 
     // var+3 l op
     // var+4 l eq
@@ -1021,10 +1028,44 @@ int main(int argc, char** argv) {
                 data[j][var + 4 + q * 2][t][0] = data[0][var + 4 + q * 2][t][0];
             }
         }
-
-
-
+        // keep myconf of the same lenght of correlators for later usage
+        myconfs.emplace_back();
+        myconfs.emplace_back();
     }
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///// adding D meson here
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // declare
+    error(var + 15 != correlators.size(), 1, "main", "wrong counting");
+    int idD = var + 15;
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_mu.%.3f_P5P5.txt", argv[3], argv[4], mu, mus1);//var+15 
+    correlators.emplace_back(namefile);
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_mu.%.3f_P5P5.txt", argv[3], argv[4], mu, mus2);//var+16
+    correlators.emplace_back(namefile);
+
+    // parse and read
+    for (int i = idD; i < idD + 2;i++) {
+        // check if file exist
+        FILE* tmp = NULL;
+        tmp = fopen(correlators[i].c_str(), "r");
+        // read if file exist
+        if (tmp != NULL) {
+            printf("reading  confs from file: %s\n", correlators[i].c_str());
+            myconfs.emplace_back(correlators[i].c_str());
+            printf("%d  %ld \n",i ,myconfs.size());
+            myconfs[i].check_binnign();
+            cout << "number of different configurations:" << myconfs[i].confs_after_binning << endl;
+            read_twopt(correlators[i].c_str(), myconfs[i], T, data, i, bin);
+            fclose(tmp);
+        }
+        
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // D meson reading end
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     // data_bin = binning(confs, var, file_head.l0, data, bin);
     // data_bin = binning_toNb(confs, var, file_head.l0, data, bin);
@@ -1173,6 +1214,8 @@ int main(int argc, char** argv) {
     double* jack_Jpsi_MeV_exp = fake_sampling(resampling, Jpsi_MeV, Jpsi_MeV_err, Njack, 1005);
     double* jack_Metac_MeV_exp = fake_sampling(resampling, Metac_MeV, Metac_MeV_err, Njack, 1006);
 
+    double* jack_MK_MeV_exp = fake_sampling(resampling, MK_MeV, MK_MeV_err, Njack, 1007);
+
     double* zeros = (double*)calloc(Njack, sizeof(double));
 
     // line_read_param(option, "ZA", mean, err, seed, namefile_plateaux);
@@ -1195,6 +1238,10 @@ int main(int argc, char** argv) {
     double* jack_aMetac_MeV_exp = (double*)malloc(sizeof(double) * Njack);
     for (int j = 0;j < Njack;j++) {
         jack_aMetac_MeV_exp[j] = jack_Metac_MeV_exp[j] * a[j] / 197.326963;
+    }
+    double* jack_aMK_MeV_exp = (double*)malloc(sizeof(double) * Njack);
+    for (int j = 0;j < Njack;j++) {
+        jack_aMK_MeV_exp[j] = jack_MK_MeV_exp[j] * a[j] / 197.326963;
     }
 
     int Nstrange = 2;
@@ -1359,7 +1406,7 @@ int main(int argc, char** argv) {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
     int_scheme = integrate_simpson38;
-    double* amu_sdeq_simp_s = compute_amu_sd(conf_jack, 2 + 6, Njack, ZVs.P[0], a, q2s, int_scheme, outfile, "amu_{sd}_simpson38(eq,s)", resampling, var + 3 +1 * 2);
+    double* amu_sdeq_simp_s = compute_amu_sd(conf_jack, 2 + 6, Njack, ZVs.P[0], a, q2s, int_scheme, outfile, "amu_{sd}_simpson38(eq,s)", resampling, var + 3 + 1 * 2);
     write_jack(amu_sdeq_simp_s, Njack, jack_file);
     check_correlatro_counter(35);
     printf("amu_sd_simpson38(eq,s) = %g  %g\n", amu_sdeq_simp_s[Njack - 1], error_jackboot(resampling, Njack, amu_sdeq_simp_s));
@@ -1787,7 +1834,7 @@ int main(int argc, char** argv) {
     double* ms_phi = interpol_Z(Nstrange, Njack, Mphi, ms, jack_aMphi_MeV_exp, outfile, "ms(phi)", resampling);
     free(ms_phi);
 
-    free_2(2, ms);
+    
 
     double** mc = (double**)malloc(sizeof(double*) * 3);
     mc[0] = fake_sampling(resampling, header.mus[3], 1e-10, Njack, 1);
@@ -2182,14 +2229,14 @@ int main(int argc, char** argv) {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     double** afull_vec = (double**)malloc(sizeof(double*) * Nstrange);
     int_scheme = integrate_simpson38;
-    double* amu_fulleq_simp_s = compute_amu_full(conf_jack, 2 + 6, Njack, ZVs.P[0], a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,s)", resampling, var + 3 +1 * 2 );
+    double* amu_fulleq_simp_s = compute_amu_full(conf_jack, 2 + 6, Njack, ZVs.P[0], a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,s)", resampling, var + 3 + 1 * 2);
     write_jack(amu_fulleq_simp_s, Njack, jack_file);
     check_correlatro_counter(136);
     printf("amu_full_simpson38(eq,s) = %g  %g\n", amu_fulleq_simp_s[Njack - 1], error_jackboot(resampling, Njack, amu_fulleq_simp_s));
 
 
     int_scheme = integrate_simpson38;
-    double* amu_fulleq_simp_s1 = compute_amu_full(conf_jack, 2 + 12, Njack, ZVs1.P[0], a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,s1)", resampling, var + 3 + 2 * 2 );
+    double* amu_fulleq_simp_s1 = compute_amu_full(conf_jack, 2 + 12, Njack, ZVs1.P[0], a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,s1)", resampling, var + 3 + 2 * 2);
     write_jack(amu_fulleq_simp_s1, Njack, jack_file);
     check_correlatro_counter(137);
     printf("amu_full_simpson38(eq,s1) = %g  %g\n", amu_fulleq_simp_s1[Njack - 1], error_jackboot(resampling, Njack, amu_fulleq_simp_s1));
@@ -2212,14 +2259,14 @@ int main(int argc, char** argv) {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
     int_scheme = integrate_simpson38;
-    double* amu_fullop_simp_s = compute_amu_full(conf_jack, 5 + 6, Njack, ZAs.P[0], a, q2s, int_scheme, outfile, "amu_{full}_simpson38(op,s)", resampling,  var + 4 + 1 * 2 );
+    double* amu_fullop_simp_s = compute_amu_full(conf_jack, 5 + 6, Njack, ZAs.P[0], a, q2s, int_scheme, outfile, "amu_{full}_simpson38(op,s)", resampling, var + 4 + 1 * 2);
     write_jack(amu_fullop_simp_s, Njack, jack_file);
     check_correlatro_counter(140);
     printf("amu_full_simpson38(op,s) = %g  %g\n", amu_fullop_simp_s[Njack - 1], error_jackboot(resampling, Njack, amu_fullop_simp_s));
 
 
     int_scheme = integrate_simpson38;
-    double* amu_fullop_simp_s1 = compute_amu_full(conf_jack, 5 + 12, Njack, ZAs1.P[0], a, q2s, int_scheme, outfile, "amu_{full}_simpson38(op,s1)", resampling,  var + 4 + 2 * 2 );
+    double* amu_fullop_simp_s1 = compute_amu_full(conf_jack, 5 + 12, Njack, ZAs1.P[0], a, q2s, int_scheme, outfile, "amu_{full}_simpson38(op,s1)", resampling, var + 4 + 2 * 2);
     write_jack(amu_fullop_simp_s1, Njack, jack_file);
     check_correlatro_counter(141);
     printf("amu_full_simpson38(op,s1) = %g  %g\n", amu_fullop_simp_s1[Njack - 1], error_jackboot(resampling, Njack, amu_fullop_simp_s1));
@@ -2232,17 +2279,49 @@ int main(int argc, char** argv) {
     check_correlatro_counter(142);
     free(amu_full_sphys);
 
- 
+
     tmp = interpol_Z(Nstrange, Njack, Mphi, afull_vec, jack_aMphi_MeV_exp, outfile, "amu_{full,simp}(op,phiphys)", resampling);
     write_jack(tmp, Njack, jack_file);
     check_correlatro_counter(143); free(tmp);
+        /////////////////
+        /// K meson
+        /////////
+    double* M_K1_op = plateau_correlator_function(option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack, namefile_plateaux, outfile, idD, "M_{K1}^{op}", M_eff_T, jack_file);
+    check_correlatro_counter(144);
+    
+    double* M_K2_op = plateau_correlator_function(option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack, namefile_plateaux, outfile, idD+1, "M_{K2}^{op}", M_eff_T, jack_file);
+    check_correlatro_counter(145);
+    
+    double** MK = (double**)malloc(sizeof(double*) * Nstrange);
+    MK[0] = M_K1_op;
+    MK[1] = M_K2_op;
+
+    //////////////////// fit at the MK
+    
+    afull_vec[0] = amu_fulleq_simp_s;
+    afull_vec[1] = amu_fulleq_simp_s1;
+    tmp = interpol_Z(Nstrange, Njack, MK, afull_vec, jack_aMK_MeV_exp, outfile, "amu_{full,simp}(eq,MK)", resampling);
+    write_jack(tmp, Njack, jack_file);
+    check_correlatro_counter(146); free(tmp);
+
+    afull_vec[0] = amu_fullop_simp_s;
+    afull_vec[1] = amu_fullop_simp_s1;
+    tmp = interpol_Z(Nstrange, Njack, MK, afull_vec, jack_aMK_MeV_exp, outfile, "amu_{full,simp}(op,MK)", resampling);
+    write_jack(tmp, Njack, jack_file);
+    check_correlatro_counter(147); free(tmp);
+
+    ///  ms from MK
+    double* ms_MK = interpol_Z(Nstrange, Njack, MK, ms, jack_aMK_MeV_exp, outfile, "ms(MK)", resampling);
+    write_jack(tmp, Njack, jack_file);
+    check_correlatro_counter(148);
+    free(ms_MK);
 
 
     free(amu_fullop_simp_s);free(amu_fullop_simp_s1);
     free(amu_fulleq_simp_s);free(amu_fulleq_simp_s1);
 
     //////////////////////
-
+    free_2(2, ms);
     for (int i = 0;i < Nstrange;i++) {
         Meta[i] = nullptr;
     }

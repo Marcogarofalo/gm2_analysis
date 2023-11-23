@@ -71,3 +71,5 @@ Eigen/
 EIGEN3/
 gsl*
 gm2_analysis.code-workspace
+.Rproj.user
+*.js

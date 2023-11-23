@@ -42,6 +42,7 @@ MESSAGE("uncomment the lines after this message")
 add_library(
     functions_gm2_analysis STATIC
     functions_gm2_analysis.hpp
+    do_analysis_charm.hpp
     functions_gm2_analysis.cpp
 )
 target_link_libraries(functions_gm2_analysis PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
@@ -54,3 +55,12 @@ IF(WITH_ARB)
   target_link_libraries(gm2_analysis PUBLIC flint-arb flint)
 ENDIF()
 target_link_libraries(gm2_analysis PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+
+
+add_executable(fit_all_gm2 fit_all_gm2.cpp)
+target_link_libraries(fit_all_gm2 PUBLIC functions_gm2_analysis)
+IF(WITH_ARB)
+  set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} ${CXXFLAGS} -DWITH_ARB   ")
+  target_link_libraries(fit_all_gm2 PUBLIC flint-arb flint)
+ENDIF()
+target_link_libraries(fit_all_gm2 PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
