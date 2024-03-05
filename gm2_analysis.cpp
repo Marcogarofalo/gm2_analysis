@@ -649,13 +649,13 @@ int main(int argc, char** argv) {
     double muc2 = atof(argv[15]);
     double muc3 = atof(argv[16]);
     double mul1;
-    if (argc > 17) { mul1 = atof(argv[17]); }
+    if (argc > 17 && strcmp(argv[17], "three_corr") != 0) { mul1 = atof(argv[17]); }
 
     generic_header header;
     header.L = file_head.l1;
     header.T = file_head.l0;
     header.mus = { mu, mus1, mus2 ,muc1, muc2, muc3 };
-    if (argc > 17)  header.mus.emplace_back(mul1);
+    if (argc > 17 && strcmp(argv[17], "three_corr") != 0)  header.mus.emplace_back(mul1);
     header.thetas = {};
 
     mysprintf(namefile, NAMESIZE, "%s_mu.%f", argv[4], mu);
@@ -797,7 +797,7 @@ int main(int argc, char** argv) {
     mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_VKVK.txt", argv[3], argv[4], muc3);//32
     correlators.emplace_back(namefile);
 
-    if (argc > 17) { // cott mu+dm
+    if (argc > 17 && strcmp(argv[17], "three_corr") != 0) { // cott mu+dm
         mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.7f_P5A0.txt", argv[3], argv[4], mul1);//36
         correlators.emplace_back(namefile);
         mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.7f_P5P5.txt", argv[3], argv[4], mul1);//37
@@ -811,11 +811,11 @@ int main(int argc, char** argv) {
         mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.7f_VKVK.txt", argv[3], argv[4], mul1);//41
         correlators.emplace_back(namefile);
     }
-    if (argc > 18) {
+    if (argc > 18 && strcmp(argv[17], "three_corr") != 0) {
         mysprintf(namefile, NAMESIZE, "%s/%s_mu.%.5f_bolla_std.txt", argv[3], argv[4], mu);//42
         correlators.emplace_back(namefile);
     }
-    if (argc > 17) { /// corr_mu+dm
+    if (argc > 17 && strcmp(argv[17], "three_corr") != 0) { /// corr_mu+dm
         mysprintf(namefile, NAMESIZE, "%s/%s_small_stat_r.equal_mu.%.5f_P5A0.txt", argv[3], argv[4], mu);//43
         correlators.emplace_back(namefile);
         mysprintf(namefile, NAMESIZE, "%s/%s_small_stat_r.equal_mu.%.5f_P5P5.txt", argv[3], argv[4], mu);//44
@@ -829,7 +829,7 @@ int main(int argc, char** argv) {
         mysprintf(namefile, NAMESIZE, "%s/%s_small_stat_r.opposite_mu.%.5f_VKVK.txt", argv[3], argv[4], mu);//48
         correlators.emplace_back(namefile);
     }
-    if (argc > 18) {
+    if (argc > 18 && strcmp(argv[17], "three_corr") != 0) {
         mysprintf(namefile, NAMESIZE, "%s/%s_corr_bolla_r.equal_mu.%.5f_P5A0.txt", argv[3], argv[4], mu);//49
         correlators.emplace_back(namefile);
         mysprintf(namefile, NAMESIZE, "%s/%s_corr_bolla_r.equal_mu.%.5f_P5P5.txt", argv[3], argv[4], mu);//50
@@ -935,7 +935,7 @@ int main(int argc, char** argv) {
 
 
     }
-    if (argc > 18 && strcmp(argv[4], "cB.72.96") != 0) {
+    if (argc > 18 && strcmp(argv[17], "three_corr") != 0 && strcmp(argv[4], "cB.72.96") != 0) {
         int Nconf_bolla = myconfs[42].iconfs.size();
         double**** data_no_bin = calloc_corr(Nconf_bolla, 4 + 3, file_head.l0);
         // error(Nconf_bolla!= myconfs[53].iconfs.size(),1,"main","conf of P5P5 correlated bolla are not the same of bolla");
@@ -1000,7 +1000,7 @@ int main(int argc, char** argv) {
     // var+13 c3 op
     // var+14 c3 eq
 
-    if (argc > 19 && strcmp(argv[19], "three_corr") == 0) {
+    if (strcmp(argv[argc - 1], "three_corr") == 0) {
         for (int q = 0; q < 1 + 2 + 3;q++) {
             int ir = 0;
             mysprintf(namefile, NAMESIZE, "%s/Vkvk_cont/%d_m%s/SAMER", argv[3], header.L, argv[11 + q]);
@@ -1329,14 +1329,14 @@ int main(int argc, char** argv) {
 
 
     int_scheme = integrate_reinman;
-    int isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? var + 3 : -1;
+    int isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 3 : -1;
     double* amu_sd = compute_amu_sd(conf_jack, 2, Njack, ZV, a, 5.0 / 9.0, int_scheme, outfile, "amu_{sd}(eq,l)", resampling, isub);
     write_jack(amu_sd, Njack, jack_file);
     check_correlatro_counter(25);
     printf("amu_sd(eq,l) = %g  %g\n", amu_sd[Njack - 1], error_jackboot(resampling, Njack, amu_sd));
     free(amu_sd);
 
-    isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? var + 4 : -1;
+    isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 4 : -1;
     amu_sd = compute_amu_sd(conf_jack, 5, Njack, ZA, a, 5.0 / 9.0, int_scheme, outfile, "amu_{sd}(op,l)", resampling, isub);
     write_jack(amu_sd, Njack, jack_file);
     check_correlatro_counter(26);
@@ -1345,14 +1345,14 @@ int main(int argc, char** argv) {
 
 
     int_scheme = integrate_simpson38;
-    isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? var + 3 : -1;
+    isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 3 : -1;
     amu_sd = compute_amu_sd(conf_jack, 2, Njack, ZV, a, 5.0 / 9.0, int_scheme, outfile, "amu_{sd,simpson38}(eq,l)", resampling, isub);
     write_jack(amu_sd, Njack, jack_file);
     check_correlatro_counter(27);
     printf("amu_sd_simpson38(eq,l) = %g  %g\n", amu_sd[Njack - 1], error_jackboot(resampling, Njack, amu_sd));
     free(amu_sd);
 
-    isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? var + 4 : -1;
+    isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 4 : -1;
     amu_sd = compute_amu_sd(conf_jack, 5, Njack, ZA, a, 5.0 / 9.0, int_scheme, outfile, "amu_{sd,simpson38}(op,l)", resampling, isub);
     write_jack(amu_sd, Njack, jack_file);
     check_correlatro_counter(28);
@@ -1364,7 +1364,7 @@ int main(int argc, char** argv) {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     constexpr double q2s = 1.0 / 9.0;
     int_scheme = integrate_reinman;
-    isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? var + 3 + 1 * 2 : -1;
+    isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 3 + 1 * 2 : -1;
     double* amu_sdeq_s = compute_amu_sd(conf_jack, 2 + 6, Njack, ZVs.P[0], a, q2s, int_scheme, outfile, "amu_{sd}(eq,s)", resampling, isub);
     write_jack(amu_sdeq_s, Njack, jack_file);
     check_correlatro_counter(29);
@@ -1372,7 +1372,7 @@ int main(int argc, char** argv) {
 
 
     int_scheme = integrate_reinman;
-    isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? var + 3 + 2 * 2 : -1;
+    isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 3 + 2 * 2 : -1;
     double* amu_sdeq_s1 = compute_amu_sd(conf_jack, 2 + 12, Njack, ZVs1.P[0], a, q2s, int_scheme, outfile, "amu_{sd}(eq,s1)", resampling, isub);
     write_jack(amu_sdeq_s1, Njack, jack_file);
     check_correlatro_counter(30);
@@ -1393,7 +1393,7 @@ int main(int argc, char** argv) {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
     int_scheme = integrate_reinman;
-    isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? var + 4 + 1 * 2 : -1;
+    isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 4 + 1 * 2 : -1;
     double* amu_sdop_s = compute_amu_sd(conf_jack, 5 + 6, Njack, ZAs.P[0], a, q2s, int_scheme, outfile, "amu_{sd}(op,s)", resampling, isub);
     write_jack(amu_sdop_s, Njack, jack_file);
     check_correlatro_counter(32);
@@ -1401,7 +1401,7 @@ int main(int argc, char** argv) {
 
 
     int_scheme = integrate_reinman;
-    isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? var + 4 + 2 * 2 : -1;
+    isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 4 + 2 * 2 : -1;
     double* amu_sdop_s1 = compute_amu_sd(conf_jack, 5 + 12, Njack, ZAs1.P[0], a, q2s, int_scheme, outfile, "amu_{sd}(op,s1)", resampling, isub);
     write_jack(amu_sdop_s1, Njack, jack_file);
     check_correlatro_counter(33);
@@ -1421,7 +1421,7 @@ int main(int argc, char** argv) {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
     int_scheme = integrate_simpson38;
-    isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? var + 3 + 1 * 2 : -1;
+    isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 3 + 1 * 2 : -1;
     double* amu_sdeq_simp_s = compute_amu_sd(conf_jack, 2 + 6, Njack, ZVs.P[0], a, q2s, int_scheme, outfile, "amu_{sd}_simpson38(eq,s)", resampling, isub);
     write_jack(amu_sdeq_simp_s, Njack, jack_file);
     check_correlatro_counter(35);
@@ -1429,7 +1429,7 @@ int main(int argc, char** argv) {
 
 
     int_scheme = integrate_simpson38;
-    isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? var + 3 + 2 * 2 : -1;
+    isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 3 + 2 * 2 : -1;
     double* amu_sdeq_simp_s1 = compute_amu_sd(conf_jack, 2 + 12, Njack, ZVs1.P[0], a, q2s, int_scheme, outfile, "amu_{sd}_simpson38(eq,s1)", resampling, isub);
     write_jack(amu_sdeq_simp_s1, Njack, jack_file);
     check_correlatro_counter(36);
@@ -1450,7 +1450,7 @@ int main(int argc, char** argv) {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
     int_scheme = integrate_simpson38;
-    isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? var + 4 + 1 * 2 : -1;
+    isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 4 + 1 * 2 : -1;
     double* amu_sdop_simp_s = compute_amu_sd(conf_jack, 5 + 6, Njack, ZAs.P[0], a, q2s, int_scheme, outfile, "amu_{sd}_simpson38(op,s)", resampling, isub);
     write_jack(amu_sdop_simp_s, Njack, jack_file);
     check_correlatro_counter(38);
@@ -1458,7 +1458,7 @@ int main(int argc, char** argv) {
 
 
     int_scheme = integrate_simpson38;
-    isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? var + 4 + 2 * 2 : -1;
+    isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 4 + 2 * 2 : -1;
     double* amu_sdop_simp_s1 = compute_amu_sd(conf_jack, 5 + 12, Njack, ZAs1.P[0], a, q2s, int_scheme, outfile, "amu_{sd}_simpson38(op,s1)", resampling, isub);
     write_jack(amu_sdop_simp_s1, Njack, jack_file);
     check_correlatro_counter(39);
@@ -1753,7 +1753,7 @@ int main(int argc, char** argv) {
                 double** asdc_vec = (double**)malloc(sizeof(double*) * Ncharm);
                 for (int ic = 0;ic < Ncharm;ic++) {
                     mysprintf(name_corr, NAMESIZE, "amu_{sd,%s}(%s,c%d)", name_intgr[intgr].c_str(), name_eqop[tm].c_str(), ic);
-                    isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? id_eqop[tm + ic * 2] : -1;
+                    isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? id_eqop[tm + ic * 2] : -1;
                     asdc_vec[ic] = compute_amu_sd(conf_jack, 2 + 6 * (3 + ic) + 3 * tm, Njack, Z, a, q2c, int_scheme, outfile, name_corr, resampling, isub);
                     write_jack(asdc_vec[ic], Njack, jack_file);
                     check_correlatro_counter(73 + ic + intgr * (Ncharm + name_M.size()) + tm * (Ncharm + name_M.size()) * name_intgr.size());
@@ -2227,13 +2227,13 @@ int main(int argc, char** argv) {
 
         // double* trash = plateau_correlator_function(option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack, namefile_plateaux, outfile, 5, "trash", identity, jack_file);
         // check_correlatro_counter(122);
-        isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? var + 3 : -1;
+        isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 3 : -1;
         double* amu_SD_eq_l1 = compute_amu_sd(conf_jack, id_VKVKeq_mudm, Njack, ZV, a, 5.0 / 9.0, int_scheme, outfile, "amu_{SD}(eq,l1)", resampling, isub);
         write_jack(amu_SD_eq_l1, Njack, jack_file);
         printf("amu_{SD}(eq,l1) = %g  %g\n", amu_SD_eq_l1[Njack - 1], myres->comp_error(amu_SD_eq_l1));
         check_correlatro_counter(134);
 
-        isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? var + 4 : -1;
+        isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 4 : -1;
         double* amu_SD_op_l1 = compute_amu_sd(conf_jack, id_VKVKop_mudm, Njack, ZA, a, 5.0 / 9.0, int_scheme, outfile, "amu_{SD}(op,l1)", resampling, isub);
         printf("amu_{SD}(op,l1) = %g  %g\n", amu_SD_op_l1[Njack - 1], myres->comp_error(amu_SD_op_l1));
         write_jack(amu_SD_op_l1, Njack, jack_file);
@@ -2251,7 +2251,7 @@ int main(int argc, char** argv) {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     double** afull_vec = (double**)malloc(sizeof(double*) * Nstrange);
     int_scheme = integrate_simpson38;
-    isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? var + 3 + 1 * 2 : -1;
+    isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 3 + 1 * 2 : -1;
     double* amu_fulleq_simp_s = compute_amu_full(conf_jack, 2 + 6, Njack, ZVs.P[0], a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,s)", resampling, isub);
     write_jack(amu_fulleq_simp_s, Njack, jack_file);
     check_correlatro_counter(136);
@@ -2259,7 +2259,7 @@ int main(int argc, char** argv) {
 
 
     int_scheme = integrate_simpson38;
-    isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? var + 3 + 2 * 2 : -1;
+    isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 3 + 2 * 2 : -1;
     double* amu_fulleq_simp_s1 = compute_amu_full(conf_jack, 2 + 12, Njack, ZVs1.P[0], a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,s1)", resampling, isub);
     write_jack(amu_fulleq_simp_s1, Njack, jack_file);
     check_correlatro_counter(137);
@@ -2283,7 +2283,7 @@ int main(int argc, char** argv) {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
     int_scheme = integrate_simpson38;
-    isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? var + 4 + 1 * 2 : -1;
+    isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 4 + 1 * 2 : -1;
     double* amu_fullop_simp_s = compute_amu_full(conf_jack, 5 + 6, Njack, ZAs.P[0], a, q2s, int_scheme, outfile, "amu_{full}_simpson38(op,s)", resampling, isub);
     write_jack(amu_fullop_simp_s, Njack, jack_file);
     check_correlatro_counter(140);
@@ -2291,7 +2291,7 @@ int main(int argc, char** argv) {
 
 
     int_scheme = integrate_simpson38;
-    isub = (argc > 19 && strcmp(argv[19], "three_corr") == 0) ? var + 4 + 2 * 2 : -1;
+    isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 4 + 2 * 2 : -1;
     double* amu_fullop_simp_s1 = compute_amu_full(conf_jack, 5 + 12, Njack, ZAs1.P[0], a, q2s, int_scheme, outfile, "amu_{full}_simpson38(op,s1)", resampling, isub);
     write_jack(amu_fullop_simp_s1, Njack, jack_file);
     check_correlatro_counter(141);
