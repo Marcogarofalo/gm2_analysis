@@ -1,4 +1,4 @@
-## $M_K$ {#M_K}
+## $M_K$ and $Z$ {#M_K}
 
 ```{r ,include=FALSE}
 library(Rose)
@@ -33,10 +33,11 @@ ens<-c(
        "cC.06.80_mu.0.000600",
        "cD.54.96_mu.0.000540"
        )
+source("/home/garofalo/programs/Rose/R/read_block.R")
 dir <-"/home/garofalo/analysis/g-2_new_stat/out/"
 df<-NULL
 for (e in ens){
-  mt<-Rose::read_df(paste0(dir,e,"_output"))
+  mt<-read_df(paste0(dir,e,"_output"))
   all_obs<-Rose::get_all_corr(mt)
   df<-add_corr_to_df("M_{K1}^{op}",all_obs ,mt,df, 
                      rename = paste0("MK1-",substr( e , start = 1 , stop = 8 )))
@@ -49,4 +50,102 @@ for (e in ens){
 }
 gg<-plot_df_corr_ggplot(df)
 fig<-myplotly(gg, to_print = TRUE)
+```
+
+
+
+
+```{r, results='asis',echo=FALSE}
+ens<-c(
+      # "cA.30.32_mu.0.003000",
+      #  "cA.40.24_mu.0.004000",
+      #  "cA.53.24_mu.0.005300",
+       "cB.72.64_mu.0.000720"
+       # "cB.72.96_mu.0.000720",
+       # "cC.06.80_mu.0.000600",
+       # "cD.54.96_mu.0.000540"
+       )
+dir <-"/home/garofalo/analysis/g-2_new_stat/out/"
+df<-NULL
+for (e in ens){
+  mt<-Rose::read_df(paste0(dir,e,"_output"))
+  all_obs<-Rose::get_all_corr(mt)
+  df<-add_corr_to_df("M_{eta1}^{op}",all_obs ,mt,df)
+  df<-add_corr_to_df("M_{eta1}^{eq}",all_obs ,mt,df)
+  df<-add_corr_to_df("G_{eta1}^{op}",all_obs ,mt,df)
+  df<-add_corr_to_df("G_{eta1}^{eq}",all_obs ,mt,df)
+  
+
+}
+gg<-plot_df_corr_ggplot(df)
+fig<-myplotly(gg, to_print = TRUE)
+```
+
+
+```{r, results='asis',echo=FALSE}
+ens<-c(
+      # "cA.30.32_mu.0.003000",
+      #  "cA.40.24_mu.0.004000",
+      #  "cA.53.24_mu.0.005300",
+        "cB.72.64_mu.0.000720",
+       "cB.72.96_mu.0.000720",
+       "cC.06.80_mu.0.000600",
+       "cC.06.112_mu.0.000600",
+       "cD.54.96_mu.0.000540",
+       "cE.44.112_mu.0.000440"
+       )
+dir <-"/home/garofalo/analysis/g-2_new_stat/out/"
+
+for (e in ens){
+  cat(e,"\n\n")
+  df<-NULL
+  mt<-Rose::read_df(paste0(dir,e,"_output"))
+  all_obs<-Rose::get_all_corr(mt)
+  df<-add_corr_to_df("Z_A(s)",all_obs ,mt,df,
+                     rename = paste0("ZA(s)-",substr( e , start = 1 , stop = 8 )))
+  df<-add_corr_to_df("Z_A(s1)",all_obs ,mt,df,
+                     rename = paste0("ZA(s1)-",substr( e , start = 1 , stop = 8 )))
+  
+  df<-add_corr_to_df("Z_V(s)",all_obs ,mt,df,
+                     rename = paste0("ZV(s)-",substr( e , start = 1 , stop = 8 )))
+  df<-add_corr_to_df("Z_V(s1)",all_obs ,mt,df,
+                     rename = paste0("ZV(s1)-",substr( e , start = 1 , stop = 8 )))
+  gg<-plot_df_corr_ggplot(df)
+  fig<-myplotly(gg,e, to_print = TRUE)
+
+}
+```
+
+
+```{r, results='asis',echo=FALSE}
+ens<-c(
+      # "cA.30.32_mu.0.003000",
+      #  "cA.40.24_mu.0.004000",
+      #  "cA.53.24_mu.0.005300",
+       "cB.72.64_mu.0.000720",
+       "cB.72.96_mu.0.000720",
+       "cC.06.80_mu.0.000600",
+       "cC.06.112_mu.0.000600",
+       "cD.54.96_mu.0.000540",
+       "cE.44.112_mu.0.000440"
+       )
+dir <-"/home/garofalo/analysis/g-2_new_stat/out/"
+df<-NULL
+for (e in ens){
+  mt<-Rose::read_df(paste0(dir,e,"_output"))
+  all_obs<-Rose::get_all_corr(mt)
+  # df<-add_corr_to_df("Z_A",all_obs ,mt,df, 
+  #                    rename = paste0("ZA-",substr( e , start = 1 , stop = 8 )))
+  # df<-add_corr_to_df("Z_V",all_obs ,mt,df,
+  #                    rename = paste0("ZV-",substr( e , start = 1 , stop = 8 )))
+  fit<-get_full_res("Z_A",all_obs,mt)
+  cat("Z_A (",e,")=",mean_print(fit[1,1],fit[1,2]),"\n\n")
+  fit<-get_full_res("Z_V",all_obs,mt)
+  cat("Z_V (",e,")=",mean_print(fit[1,1],fit[1,2]),"\n\n")
+  
+  # fit<-get_full_res("ms(MK)",all_obs ,mt)
+  # cat("$m_s($",substr( e , start = 1 , stop = 8 ),"$)$=", mean_print(fit[1,1],fit[1,2]), "\n\n")
+}
+# gg<-plot_df_corr_ggplot(df)
+# fig<-myplotly(gg, to_print = TRUE)
 ```
