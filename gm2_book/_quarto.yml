@@ -9,6 +9,10 @@ book:
     - index.qmd
     - MK.qmd
     - continuum_amu_s_full.qmd
+    - continuum_amu_s_W.qmd
+    - continuum_amu_s_sd.qmd
+    - continuum_amu_l_W.qmd
+    - continuum_amu_l_sd.qmd
     - references.qmd
 
 bibliography: references.bib

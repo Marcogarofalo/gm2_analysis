@@ -1,6 +1,6 @@
-# $a_{\mu}(s)$ {#amu_s_continuum}
+# $a_{\mu}^W(l)$ {#amu_l_continuum_W}
 
-no bounding has been applied
+we interpolate at $L_{ref}= 5.46$ fm
 
 ```{r ,include=FALSE}
 library(Rose)
@@ -26,36 +26,35 @@ myplotly(ggplot())
 
 
 
-
-
 ```{r, echo=FALSE, results='asis'}
 eq_op<-function(x){
   if(x==0) return("OS") # equal
   else return("TM") # opposite
 }
 
-file=sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_MK_cov_fit_data.txt")
-df<- read.table(file, header=FALSE, fill=TRUE)
-iy<-length(df[1,])-2
-dft<-df[,c(1,iy,iy+2)]
-names(dft)<-c("$a^2(\\text{fm})$","$a_{\\mu}(s)$","r" )
-dft[,2]<-mapply( mean_print, df[,iy], df[,iy+1])
-kable(dft)
+# file=sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_MK_cov_fit_data.txt")
+# df<- read.table(file, header=FALSE, fill=TRUE)
+# iy<-length(df[1,])-2
+# dft<-df[,c(1,iy,iy+2)]
+# names(dft)<-c("$a^2(\\text{fm})$","$a_{\\mu}(s)$","r" )
+# dft[,2]<-mapply( mean_print, df[,iy], df[,iy+1])
+# kable(dft)
 ```
+
 
 ### linear
 
 The continuum fit is done with the function
 $$
 \begin{cases}
-a_{\mu}^{SD}(eq,s)=P[0]+a^2P[1]\\
-a_{\mu}^{SD}(op,s)=P[0]+a^2P[2]
+a_{\mu}^{SD}(eq,s)=P[0]+a^2P[1]+a^4 P[3]\\
+a_{\mu}^{SD}(op,s)=P[0]+a^2P[2]+a^4 P[5]
 \end{cases}
 $$
 
 
 ```{r, echo=FALSE, results='asis',  warning=FALSE}
-df<-Rose::read_fit_P_file("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_MK_cov_fit_P.dat")
+df<-Rose::read_fit_P_file("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_W_lphys_Lref_poly__w1_a4OS_a4TM_cov_fit_P.dat")
 Rose::make_table_fit_result(df)
 # df1<-data.frame("P"=df$P[,1], "value"=mapply(mean_print, df$P[,2],df$P[,3] ) )
 # cat("$\\chi^2/dof=$ ",df$chi2,"\n\n")
@@ -64,7 +63,7 @@ Rose::make_table_fit_result(df)
 
 
 ```{r, echo=FALSE, results='asis', dev='tikz', warning=FALSE}
-file=sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_MK_cov_fit_data.txt")
+file=sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_W_lphys_Lref_poly__w1_a4OS_a4TM_cov_fit_data.txt")
 df<- read.table(file, header=FALSE, fill=TRUE)
 iy<-length(df[1,])-2
 
@@ -84,7 +83,7 @@ df[,iy+2]<-plyr::laply(df[,iy+2],eq_op)
 datalist = list()
 for (n in c(1:2)){
   
-file=sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_MK_cov_fit_out_n%d_afm.txt",n-1)
+file=sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_W_lphys_Lref_poly__w1_a4OS_a4TM_cov_fit_out_n%d_afm.txt",n-1)
 datalist[[n]]<- read.table(file, header=FALSE, fill=TRUE,   
                  col.names=c(paste0("x",n),paste0("fit",n),paste0("fiterr",n)))
 
@@ -101,4 +100,3 @@ fig<- myplotly(gg,"","$a^2(\\mbox{fm})$", "$a_{\\mu}^{SD}(s)$", to_print = TRUE)
 
 
 ```
-

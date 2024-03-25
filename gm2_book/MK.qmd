@@ -70,10 +70,16 @@ df<-NULL
 for (e in ens){
   mt<-Rose::read_df(paste0(dir,e,"_output"))
   all_obs<-Rose::get_all_corr(mt)
+  df<-add_corr_to_df("M_{K1}^{op}",all_obs ,mt,df)
+  df<-add_corr_to_df("M_{K2}^{op}",all_obs ,mt,df)
   df<-add_corr_to_df("M_{eta1}^{op}",all_obs ,mt,df)
-  df<-add_corr_to_df("M_{eta1}^{eq}",all_obs ,mt,df)
-  df<-add_corr_to_df("G_{eta1}^{op}",all_obs ,mt,df)
-  df<-add_corr_to_df("G_{eta1}^{eq}",all_obs ,mt,df)
+  df<-add_corr_to_df("M_{eta}^{op}",all_obs ,mt,df)
+  df<-add_corr_to_df("M_{eta1}^{op}",all_obs ,mt,df)
+  df<-add_corr_to_df("M_{phi}^{op}",all_obs ,mt,df)
+  df<-add_corr_to_df("M_{phi1}^{op}",all_obs ,mt,df)
+  
+  # df<-add_corr_to_df("G_{eta1}^{op}",all_obs ,mt,df)
+  # df<-add_corr_to_df("G_{eta1}^{eq}",all_obs ,mt,df)
   
 
 }
