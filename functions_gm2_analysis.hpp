@@ -47,7 +47,9 @@ enum enum_ensembles {
     D54,
     A53,
     A40,
-    A30
+    A30,
+    E112,
+    C112
 };
 
 double integrand_K(double x, void* params);

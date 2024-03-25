@@ -206,7 +206,7 @@ void   do_analysis(char** argv, std::vector<int> ids, std::vector<std::string> M
                             fit_info.N = 1;
                             fit_info.Nvar = 8;
                             fit_info.Njack = Njack;
-                            fit_info.myen = { B72_96, C06, D54 };
+                            fit_info.myen = { B72_96, C06, D54 ,E112 };
                             if (fit_info.Npar >= fit_info.myen.size() * fit_info.N) { continue; }
 
                             fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.myen.size() * fit_info.N, fit_info.Njack);
@@ -322,17 +322,17 @@ void   do_analysis(char** argv, std::vector<int> ids, std::vector<std::string> M
                             fit_info.Njack = Njack;
                             // fit_info.myen = { B72_64, C06, D54 };
                             if (icut == 0)
-                                fit_info.Nxen = { {B72_96, C06 ,D54},
-                                                   {B72_96, C06, D54} };
+                                fit_info.Nxen = { {B72_96, C06 ,D54, E112},
+                                                   {B72_96, C06, D54 ,E112} };
                             if (icut == 1)
-                                fit_info.Nxen = { { C06 ,D54},
-                                                   {B72_96, C06, D54} };
+                                fit_info.Nxen = { { C06 ,D54, E112},
+                                                   {B72_96, C06, D54 ,E112} };
                             if (icut == 2)
-                                fit_info.Nxen = { {B72_96, C06 ,D54},
-                                                   { C06, D54} };
+                                fit_info.Nxen = { {B72_96, C06 ,D54 ,E112},
+                                                   { C06, D54, E112} };
                             if (icut == 3)
-                                fit_info.Nxen = { { C06 ,D54},
-                                                   { C06, D54} };
+                                fit_info.Nxen = { { C06 ,D54, E112},
+                                                   { C06, D54, E112} };
 
 
                             fit_info.init_N_etot_form_Nxen();
@@ -559,7 +559,7 @@ void   do_analysis(char** argv, std::vector<int> ids, std::vector<std::string> M
                             fit_info.N = 2;
                             fit_info.Nvar = 8;
                             fit_info.Njack = Njack;
-                            fit_info.myen = { B72_96, C06, D54 };
+                            fit_info.myen = { B72_96, C06, D54 , E112 };
                             if (fit_info.Npar >= fit_info.myen.size() * fit_info.N) { fit_info.restore_default(); continue; }
 
                             fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.myen.size() * fit_info.N, fit_info.Njack);
@@ -685,12 +685,12 @@ void   do_analysis(char** argv, std::vector<int> ids, std::vector<std::string> M
             if (integration == "reinman") { id0 = ids[0 + iM * 2]; id1 = ids[1 + iM * 2]; }
 
 
-            for (int a : { 0, 1}) {
+            for (int a : { 0, 1, 2}) {
                 std::vector<int> vec;
                 for (int l : {0, 1, 2, 3, 4, 5, 8, 10, 12, 15}) {
                     if (a == 0) vec = std::vector<int>({ 0,  4, 8, 12 });
                     if (a == 1) vec = std::vector<int>({ 0,  1, 2, 3 });
-                    if (a == 2) vec = std::vector<int>({ 0,  5, 6, 7, 9, 10, 11,  13, 14, 15 });
+                    if (a == 2) vec = std::vector<int>({ 0 });//vec = std::vector<int>({ 0,  5, 6, 7, 9, 10, 11,  13, 14, 15 });
                     for (int al : vec) {
 
                         for (int w = 0;w < 2;w++) {
@@ -698,6 +698,7 @@ void   do_analysis(char** argv, std::vector<int> ids, std::vector<std::string> M
                             if (al > 0 && l > 0) { fit_info.restore_default(); continue; }
                             fit_info.restore_default();
                             fit_info.Npar = 4;
+                            if (a == 2)fit_info.Npar++;
                             if (integration == "reinman") { id0 = ids[0 + iM * 2]; id1 = ids[1 + iM * 2]; }
 
 
@@ -705,7 +706,7 @@ void   do_analysis(char** argv, std::vector<int> ids, std::vector<std::string> M
                             fit_info.N = 2;
                             fit_info.Nvar = 8;
                             fit_info.Njack = Njack;
-                            fit_info.myen = { B72_96, C06, D54 };
+                            fit_info.myen = { B72_96, C06, D54, E112 };
                             if (fit_info.Npar >= fit_info.myen.size() * fit_info.N) { fit_info.restore_default(); continue; }
 
                             fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.myen.size() * fit_info.N, fit_info.Njack);
@@ -770,6 +771,8 @@ void   do_analysis(char** argv, std::vector<int> ids, std::vector<std::string> M
                             if (a == 0 && al > 0) { aname = "+" + logPname + "OS"; }
                             if (a == 1 && al == 0) { aname = "a4TM"; }
                             if (a == 1 && al > 0) { aname = "+" + logPname + "TM"; }
+                            if (a == 2) { aname = "a4OS_a4TM"; }
+
 
 
 
@@ -840,6 +843,13 @@ int main(int argc, char** argv) {
     files.emplace_back(namefile);
     mysprintf(namefile, NAMESIZE, "%s/%s_cA.30.32_mu.0.003000", argv[2], argv[1]);
     files.emplace_back(namefile);
+
+    mysprintf(namefile, NAMESIZE, "%s/%s_cE.44.112_mu.0.000440", argv[2], argv[1]);
+    files.emplace_back(namefile);
+
+    mysprintf(namefile, NAMESIZE, "%s/%s_cC.06.112_mu.0.000600", argv[2], argv[1]);
+    files.emplace_back(namefile);
+
 
     data_all jackall = read_all_the_files(files, argv[1]);
     jackall.create_generalised_resampling();
@@ -5705,7 +5715,7 @@ int main(int argc, char** argv) {
     fit_info.N = 2;
     fit_info.Nvar = 8;
     fit_info.Njack = Njack;
-    fit_info.myen = { B72_64, C06, D54 };
+    fit_info.myen = { B72_64, C06, D54 , E112 };
 
     fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.myen.size() * fit_info.N, fit_info.Njack);
     count = 0;
@@ -5754,10 +5764,20 @@ int main(int argc, char** argv) {
     std::vector<double> xcont = { 0, 0 /*Delta*/, 0, 0,/*l, a,m*/ fit_info.x[4][0][Njack - 1],
          fit_info.x[5][0][Njack - 1] , fit_info.x[6][0][Njack - 1], fit_info.x[7][0][Njack - 1] };
 
-   
+
     //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
     print_fit_band(argv, jackall, fit_info, fit_info, namefit, "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0005, xcont);
 
     free_fit_result(fit_info, amu_SD_l_common_a4);
     fit_info.restore_default();
+
+
+    /////////////////////////
+    do_analysis(argv, { 149, 150 }, { "MK" }, "SD_sphys", jackall);
+
+
+    do_analysis(argv, { 151, 152 }, { "MK" }, "W_sphys", jackall);
+
+    do_analysis(argv, { Nobs - 2, Nobs - 1 }, { "lphys" }, "W", jackall);
+
 }

@@ -1603,6 +1603,9 @@ double rhs_amu_cut(int n, int Nvar, double* x, int Npar, double* P) {
             break;
         }
     }
+    else if (ia2 == 2) {
+        r += a2 * P[1 + n]+ a2*a2;
+    }
 
 
 
