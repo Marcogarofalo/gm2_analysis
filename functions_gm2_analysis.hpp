@@ -134,6 +134,7 @@ double rhs_amu_diff_RF(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_amu_diff(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_amu_ratio(int n, int Nvar, double* x, int Npar, double* P) ;
 double rhs_amu_common(int n, int Nvar, double* x, int Npar, double* P);
+double rhs_amu_a4_common(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_amu_common_a2_FVE(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_amu_common_a2_FVE_log_eq(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_amu_common_a2_FVE_log_op(int n, int Nvar, double* x, int Npar, double* P);

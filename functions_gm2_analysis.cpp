@@ -1829,6 +1829,13 @@ double rhs_amu_common(int n, int Nvar, double* x, int Npar, double* P) {
     else if (n == 1) r = P[0] + a * P[2];
     return r;
 }
+double rhs_amu_a4_common(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    if (n == 0)      r = P[0] + a * P[1]+ a * a * P[3];
+    else if (n == 1) r = P[0] + a * P[2]+ a * a * P[4];
+    return r;
+}
 
 
 

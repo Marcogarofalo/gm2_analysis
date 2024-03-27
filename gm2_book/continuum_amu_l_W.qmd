@@ -94,7 +94,7 @@ gg<-gg + geom_line(data=datalist[[n]], mapping=aes_string(x=datalist[[n]][,1] , 
 
 }
 
-fig<- myplotly(gg,"","$a^2(\\mbox{fm})$", "$a_{\\mu}^{SD}(s)$", to_print = TRUE)
+fig<- myplotly(gg,"","$a^2(\\mbox{fm})$", "$a_{\\mu}^{W}(s)$", to_print = TRUE)
 # fig<- myplotly(gg,"","$L$", "$E_2- E_{free}^{lat}+E_{free}^{cont}/m$", output = "HTML" ,to_print = FALSE)
 # htmlwidgets::saveWidget(fig, "two_energy_fit.html", selfcontained = T)
 
