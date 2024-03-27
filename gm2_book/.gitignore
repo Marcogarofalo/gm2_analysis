@@ -5,3 +5,4 @@
 *.map
 *.woff
 *.dcf
+/nice_plots
