@@ -1,0 +1,113 @@
+# B64
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+# library(hadron)
+#library(kableExtra) # breaks latex
+#library(tidyverse)
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x,y)) + geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir=parent.frame())
+  #ggp
+  df    # NOT returning a plot
+}
+res1 <- f1(df)
+ggp   # Let knit handle the plot
+myplotly(ggplot())
+#widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
+```
+
+
+
+```{r, results='asis',echo=FALSE}
+e<-"B64"
+dir <-"/home/garofalo/analysis/blinded_gm2/data/out/"
+df<-NULL
+mt<-read_df(paste0(dir,e,"_output"))
+all_obs<-Rose::get_all_corr(mt)
+df<-add_corr_to_df("amu_{bound}_(TM)_above",all_obs ,mt,df, 
+                   reshape = FALSE
+                   )
+df<-add_corr_to_df("amu_{bound}_(TM)_below",all_obs ,mt,df,
+                   reshape = FALSE, nudge = 0.1
+                   )
+df<-add_corr_to_df("amu_{bound_meff_t}_(TM)_below",all_obs ,mt,df,
+                   reshape = FALSE, nudge = 0.1
+                   )
+# df<-add_corr_to_df("amu_{bound_meff}_(TM)_below",all_obs ,mt,df,
+#                    reshape = FALSE, nudge = 0.1
+#                    )
+
+df1<- get_block("amu_{full}_(TM)",all_obs ,mt,NULL ,log=FALSE,number=NULL,
+                     nudge=0.0, print_res=FALSE , rename="integrand", 
+                     logx=0, ix=1, iy=7, ierr=8, ifit=5, ierrfit=6, iplateau=1)
+
+gg<-plot_df_corr_ggplot(df)
+gg<-plot_df_corr_ggplot(df1,gg=gg,noribbon = TRUE)
+
+fig<-myplotly(gg, to_print = TRUE)
+```
+
+
+
+
+```{r, results='asis',echo=FALSE}
+e<-"B64"
+dir <-"/home/garofalo/analysis/blinded_gm2/data/out/"
+df<-NULL
+mt<-read_df(paste0(dir,e,"_output"))
+all_obs<-Rose::get_all_corr(mt)
+df<-add_corr_to_df("amu_{bound}_(OS)_above",all_obs ,mt,df, 
+                   reshape = FALSE
+                   )
+df<-add_corr_to_df("amu_{bound}_(OS)_below",all_obs ,mt,df,
+                   reshape = FALSE, nudge = 0.3
+                   )
+#   
+df<-add_corr_to_df("amu_{bound_meff_t}_(OS)_below",all_obs ,mt,df,
+                   reshape = FALSE, nudge = 0.2
+                   )
+df1<- get_block("amu_{full}_(OS)",all_obs ,mt,NULL ,log=FALSE,number=NULL,
+                     nudge=0.0, print_res=FALSE , rename="integrand", 
+                     logx=0, ix=1, iy=7, ierr=8, ifit=5, ierrfit=6, iplateau=1)
+# df<-add_corr_to_df("amu_{bound_meff_tmin}_(OS)_below",all_obs ,mt,df,
+#                    reshape = FALSE, nudge = 0.2
+#                    )
+
+# df<-add_corr_to_df("amu_{bound_meff}_(OS)_below",all_obs ,mt,df,
+#                    reshape = FALSE, nudge = 0.1
+#                    )
+
+gg<-plot_df_corr_ggplot(df)
+gg<-plot_df_corr_ggplot(df1,gg=gg,noribbon = TRUE)
+
+fig<-myplotly(gg, to_print = TRUE)
+```
+
+## effective mass VKVK
+
+
+
+```{r, results='asis',echo=FALSE}
+e<-"B64"
+dir <-"/home/garofalo/analysis/blinded_gm2/data/out/"
+df<-NULL
+mt<-read_df(paste0(dir,e,"_output"))
+all_obs<-Rose::get_all_corr(mt)
+df<-add_corr_to_df("M_VKVK_TM",all_obs ,mt,df, 
+                   reshape = TRUE
+                   )
+df<-add_corr_to_df("M_VKVK_OS",all_obs ,mt,df,
+                   reshape = TRUE, nudge = 0.1
+                   )
+
+gg<-plot_df_corr_ggplot(df)
+
+
+fig<-myplotly(gg, to_print = TRUE)
+```
