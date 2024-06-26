@@ -1,4 +1,4 @@
-# C80
+# blinded C80
 
 ```{r ,include=FALSE}
 library(Rose)
@@ -24,6 +24,7 @@ myplotly(ggplot())
 
 
 
+
 ```{r, results='asis',echo=FALSE}
 e<-"C80"
 dir <-"/home/garofalo/analysis/blinded_gm2/data/out/"
@@ -31,17 +32,17 @@ df<-NULL
 mt<-read_df(paste0(dir,e,"_output"))
 all_obs<-Rose::get_all_corr(mt)
 df<-add_corr_to_df("amu_{bound}_(TM)_above",all_obs ,mt,df, 
-                   reshape = FALSE
+                   reshape = FALSE, print_res = FALSE
                    )
 df<-add_corr_to_df("amu_{bound}_(TM)_below",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.1
+                   reshape = FALSE, nudge = 0.2
                    )
 df<-add_corr_to_df("amu_{bound_meff_t}_(TM)_below",all_obs ,mt,df,
                    reshape = FALSE, nudge = 0.1
                    )
-# df<-add_corr_to_df("amu_{bound_meff}_(TM)_below",all_obs ,mt,df,
-#                    reshape = FALSE, nudge = 0.1
-#                    )
+df<-add_corr_to_df("amu_{bound_meff}_(TM)_above",all_obs ,mt,df,
+                   reshape = FALSE, nudge = 0.3
+                   )
 
 df1<- get_block("amu_{full}_(TM)",all_obs ,mt,NULL ,log=FALSE,number=NULL,
                      nudge=0.0, print_res=FALSE , rename="integrand", 
@@ -63,21 +64,21 @@ df<-NULL
 mt<-read_df(paste0(dir,e,"_output"))
 all_obs<-Rose::get_all_corr(mt)
 df<-add_corr_to_df("amu_{bound}_(OS)_above",all_obs ,mt,df, 
-                   reshape = FALSE
+                   reshape = FALSE, print_res = FALSE
                    )
 df<-add_corr_to_df("amu_{bound}_(OS)_below",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.3
+                   reshape = FALSE, nudge = 0.2
                    )
 #   
 df<-add_corr_to_df("amu_{bound_meff_t}_(OS)_below",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.2
+                   reshape = FALSE, nudge = 0.1
                    )
 df1<- get_block("amu_{full}_(OS)",all_obs ,mt,NULL ,log=FALSE,number=NULL,
                      nudge=0.0, print_res=FALSE , rename="integrand", 
                      logx=0, ix=1, iy=7, ierr=8, ifit=5, ierrfit=6, iplateau=1)
-# df<-add_corr_to_df("amu_{bound_meff_tmin}_(OS)_below",all_obs ,mt,df,
-#                    reshape = FALSE, nudge = 0.2
-#                    )
+df<-add_corr_to_df("amu_{bound_meff}_(OS)_above",all_obs ,mt,df,
+                  reshape = FALSE, nudge = 0.3
+                  )
 
 # df<-add_corr_to_df("amu_{bound_meff}_(OS)_below",all_obs ,mt,df,
 #                    reshape = FALSE, nudge = 0.1
@@ -91,6 +92,8 @@ fig<-myplotly(gg, to_print = TRUE)
 
 ### effective mass VKVK
 
+vertical line at $t_e$ which correspond to the last mass used in the bounding of 
+$a_\mu$, i.e. for $t_{cut}> t_e$ we use $m_{eff}(t_{e})$
 
 
 ```{r, results='asis',echo=FALSE}
@@ -116,32 +119,31 @@ fig<-myplotly(gg, to_print = TRUE)
 
 
 
-
 ```{r, results='asis',echo=FALSE}
 e<-"C80"
 dir <-"/home/garofalo/analysis/blinded_gm2/data/out/"
 df<-NULL
 mt<-read_df(paste0(dir,e,"_output"))
 all_obs<-Rose::get_all_corr(mt)
-df<-add_corr_to_df("amu_{bound}_(TM)_above",all_obs ,mt,df, 
-                   reshape = FALSE
+df<-add_corr_to_df("amu_{bound}_(TM)_1_above",all_obs ,mt,df, 
+                   reshape = FALSE, print_res = FALSE
                    )
-df<-add_corr_to_df("amu_{bound}_(TM)_below",all_obs ,mt,df,
+df<-add_corr_to_df("amu_{bound}_(TM)_1_below",all_obs ,mt,df,
+                   reshape = FALSE, nudge = 0.2
+                   )
+df<-add_corr_to_df("amu_{bound_meff_t}_(TM)_1_below",all_obs ,mt,df,
                    reshape = FALSE, nudge = 0.1
                    )
-df<-add_corr_to_df("amu_{bound_meff_t}_(TM)_below",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.1
+df<-add_corr_to_df("amu_{bound_meff}_(TM)_1_above",all_obs ,mt,df,
+                   reshape = FALSE, nudge = 0.3
                    )
-# df<-add_corr_to_df("amu_{bound_meff}_(TM)_below",all_obs ,mt,df,
-#                    reshape = FALSE, nudge = 0.1
-#                    )
 
-df1<- get_block("amu_{full}_(TM)",all_obs ,mt,NULL ,log=FALSE,number=NULL,
-                     nudge=0.0, print_res=FALSE , rename="integrand", 
-                     logx=0, ix=1, iy=7, ierr=8, ifit=5, ierrfit=6, iplateau=1)
+# df1<- get_block("amu_{full}_(TM)_1",all_obs ,mt,NULL ,log=FALSE,number=NULL,
+#                      nudge=0.0, print_res=FALSE , rename="integrand", 
+#                      logx=0, ix=1, iy=7, ierr=8, ifit=5, ierrfit=6, iplateau=1)
 
 gg<-plot_df_corr_ggplot(df)
-gg<-plot_df_corr_ggplot(df1,gg=gg,noribbon = TRUE)
+# gg<-plot_df_corr_ggplot(df1,gg=gg,noribbon = TRUE)
 
 fig<-myplotly(gg, to_print = TRUE)
 ```
@@ -155,35 +157,37 @@ dir <-"/home/garofalo/analysis/blinded_gm2/data/out/"
 df<-NULL
 mt<-read_df(paste0(dir,e,"_output"))
 all_obs<-Rose::get_all_corr(mt)
-df<-add_corr_to_df("amu_{bound}_(OS)_above",all_obs ,mt,df, 
-                   reshape = FALSE
+df<-add_corr_to_df("amu_{bound}_(OS)_1_above",all_obs ,mt,df, 
+                   reshape = FALSE, print_res = FALSE
                    )
-df<-add_corr_to_df("amu_{bound}_(OS)_below",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.3
-                   )
-#   
-df<-add_corr_to_df("amu_{bound_meff_t}_(OS)_below",all_obs ,mt,df,
+df<-add_corr_to_df("amu_{bound}_(OS)_1_below",all_obs ,mt,df,
                    reshape = FALSE, nudge = 0.2
                    )
-df1<- get_block("amu_{full}_(OS)",all_obs ,mt,NULL ,log=FALSE,number=NULL,
-                     nudge=0.0, print_res=FALSE , rename="integrand", 
-                     logx=0, ix=1, iy=7, ierr=8, ifit=5, ierrfit=6, iplateau=1)
-# df<-add_corr_to_df("amu_{bound_meff_tmin}_(OS)_below",all_obs ,mt,df,
-#                    reshape = FALSE, nudge = 0.2
-#                    )
+#   
+df<-add_corr_to_df("amu_{bound_meff_t}_(OS)_1_below",all_obs ,mt,df,
+                   reshape = FALSE, nudge = 0.1
+                   )
+# df1<- get_block("amu_{full}_(OS)",all_obs ,mt,NULL ,log=FALSE,number=NULL,
+#                      nudge=0.0, print_res=FALSE , rename="integrand", 
+#                      logx=0, ix=1, iy=7, ierr=8, ifit=5, ierrfit=6, iplateau=1)
+df<-add_corr_to_df("amu_{bound_meff}_(OS)_1_above",all_obs ,mt,df,
+                  reshape = FALSE, nudge = 0.3
+                  )
 
 # df<-add_corr_to_df("amu_{bound_meff}_(OS)_below",all_obs ,mt,df,
 #                    reshape = FALSE, nudge = 0.1
 #                    )
 
 gg<-plot_df_corr_ggplot(df)
-gg<-plot_df_corr_ggplot(df1,gg=gg,noribbon = TRUE)
+#gg<-plot_df_corr_ggplot(df1,gg=gg,noribbon = TRUE)
 
 fig<-myplotly(gg, to_print = TRUE)
 ```
 
 ### effective mass VKVK
 
+vertical line at $t_e$ which correspond to the last mass used in the bounding of 
+$a_\mu$, i.e. for $t_{cut}> t_e$ we use $m_{eff}(t_{e})$
 
 
 ```{r, results='asis',echo=FALSE}
@@ -192,10 +196,10 @@ dir <-"/home/garofalo/analysis/blinded_gm2/data/out/"
 df<-NULL
 mt<-read_df(paste0(dir,e,"_output"))
 all_obs<-Rose::get_all_corr(mt)
-df<-add_corr_to_df("M_VKVK_TM",all_obs ,mt,df, 
+df<-add_corr_to_df("M_VKVK_TM_1",all_obs ,mt,df, 
                    reshape = TRUE
                    )
-df<-add_corr_to_df("M_VKVK_OS",all_obs ,mt,df,
+df<-add_corr_to_df("M_VKVK_OS_1",all_obs ,mt,df,
                    reshape = TRUE, nudge = 0.1
                    )
 
@@ -204,6 +208,7 @@ gg<-plot_df_corr_ggplot(df)
 
 fig<-myplotly(gg, to_print = TRUE)
 ```
+
 
 ## Summing the results eigenvector
 
@@ -219,29 +224,44 @@ cat("###\n\n")
 fit1<-get_full_res("amu_{bound}_(TM)_ave",all_obs ,mt,df )
 fit2<-get_full_res("amu_{bound}_(TM)_1_ave",all_obs ,mt,df )
 fit3<-get_full_res("amu_{bound}_(TM)_ave_eigen",all_obs ,mt,df )
-cat("amu_{bound}_(TM)430 =",mean_print(fit1[1,1],fit1[1,2]),"\n\n")
-cat("amu_{bound}_(TM)520 =",mean_print(fit2[1,1],fit2[1,2]),"\n\n")
+cat("amu_{bound}_(TM)520 =",mean_print(fit1[1,1],fit1[1,2]),"\n\n")
+cat("amu_{bound}_(TM)430 =",mean_print(fit2[1,1],fit2[1,2]),"\n\n")
 cat("amu_{bound}_(TM)sum =",mean_print(fit3[1,1],fit3[1,2]),"\n\n")
 cat("###\n\n")
 fit1<-get_full_res("amu_{bound}_(OS)_ave",all_obs ,mt,df )
 fit2<-get_full_res("amu_{bound}_(OS)_1_ave",all_obs ,mt,df )
 fit3<-get_full_res("amu_{bound}_(OS)_ave_eigen",all_obs ,mt,df )
-cat("amu_{bound}_(OS)430 =",mean_print(fit1[1,1],fit1[1,2]),"\n\n")
-cat("amu_{bound}_(OS)520 =",mean_print(fit2[1,1],fit2[1,2]),"\n\n")
+cat("amu_{bound}_(OS)520 =",mean_print(fit1[1,1],fit1[1,2]),"\n\n")
+cat("amu_{bound}_(OS)430 =",mean_print(fit2[1,1],fit2[1,2]),"\n\n")
 cat("amu_{bound}_(OS)sum =",mean_print(fit3[1,1],fit3[1,2]),"\n\n")
 cat("###\n\n")
+##########################################
 fit1<-get_full_res("amu_{bound_meff_t}_(TM)_ave",all_obs ,mt,df )
 fit2<-get_full_res("amu_{bound_meff_t}_(TM)_1_ave",all_obs ,mt,df )
 fit3<-get_full_res("amu_{bound_meff_t}_(TM)_ave_eigen",all_obs ,mt,df )
-cat("amu_{bound_meff_t}_(TM)430 =",mean_print(fit1[1,1],fit1[1,2]),"\n\n")
-cat("amu_{bound_meff_t}_(TM)520 =",mean_print(fit2[1,1],fit2[1,2]),"\n\n")
+cat("amu_{bound_meff_t}_(TM)520 =",mean_print(fit1[1,1],fit1[1,2]),"\n\n")
+cat("amu_{bound_meff_t}_(TM)430 =",mean_print(fit2[1,1],fit2[1,2]),"\n\n")
 cat("amu_{bound_meff_t}_(TM)sum =",mean_print(fit3[1,1],fit3[1,2]),"\n\n")
 cat("###\n\n")
 fit1<-get_full_res("amu_{bound_meff_t}_(OS)_ave",all_obs ,mt,df )
 fit2<-get_full_res("amu_{bound_meff_t}_(OS)_1_ave",all_obs ,mt,df )
 fit3<-get_full_res("amu_{bound_meff_t}_(OS)_ave_eigen",all_obs ,mt,df )
-cat("amu_{bound_meff_t}_(OS)430 =",mean_print(fit1[1,1],fit1[1,2]),"\n\n")
-cat("amu_{bound_meff_t}_(OS)520 =",mean_print(fit2[1,1],fit2[1,2]),"\n\n")
+cat("amu_{bound_meff_t}_(OS)520 =",mean_print(fit1[1,1],fit1[1,2]),"\n\n")
+cat("amu_{bound_meff_t}_(OS)430 =",mean_print(fit2[1,1],fit2[1,2]),"\n\n")
 cat("amu_{bound_meff_t}_(OS)sum =",mean_print(fit3[1,1],fit3[1,2]),"\n\n")
-
+##########################################
+cat("###\n\n")
+fit1<-get_full_res("amu_{bound_meff}_(TM)_ave",all_obs ,mt,df )
+fit2<-get_full_res("amu_{bound_meff}_(TM)_1_ave",all_obs ,mt,df )
+fit3<-get_full_res("amu_{bound_meff}_(TM)_ave_eigen",all_obs ,mt,df )
+cat("amu_{bound_meff}_(TM)520 =",mean_print(fit1[1,1],fit1[1,2]),"\n\n")
+cat("amu_{bound_meff}_(TM)430 =",mean_print(fit2[1,1],fit2[1,2]),"\n\n")
+cat("amu_{bound_meff}_(TM)sum =",mean_print(fit3[1,1],fit3[1,2]),"\n\n")
+cat("###\n\n")
+fit1<-get_full_res("amu_{bound_meff}_(OS)_ave",all_obs ,mt,df )
+fit2<-get_full_res("amu_{bound_meff}_(OS)_1_ave",all_obs ,mt,df )
+fit3<-get_full_res("amu_{bound_meff}_(OS)_ave_eigen",all_obs ,mt,df )
+cat("amu_{bound_meff}_(OS)520 =",mean_print(fit1[1,1],fit1[1,2]),"\n\n")
+cat("amu_{bound_meff}_(OS)430 =",mean_print(fit2[1,1],fit2[1,2]),"\n\n")
+cat("amu_{bound_meff}_(OS)sum =",mean_print(fit3[1,1],fit3[1,2]),"\n\n")
 ```

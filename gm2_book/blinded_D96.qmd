@@ -1,4 +1,4 @@
-# blinded B64
+# blinded D96
 
 ```{r ,include=FALSE}
 library(Rose)
@@ -48,7 +48,7 @@ The different labels refer to:
 
 
 ```{r, results='asis',echo=FALSE}
-e<-"B64"
+e<-"D96"
 dir <-"/home/garofalo/analysis/blinded_gm2/data/out/"
 df<-NULL
 mt<-read_df(paste0(dir,e,"_output"))
@@ -80,7 +80,7 @@ fig<-myplotly(gg, to_print = TRUE)
 
 
 ```{r, results='asis',echo=FALSE}
-e<-"B64"
+e<-"D96"
 dir <-"/home/garofalo/analysis/blinded_gm2/data/out/"
 df<-NULL
 mt<-read_df(paste0(dir,e,"_output"))
@@ -118,7 +118,7 @@ vertical line at $t_e$ which correspond to the last mass used in the bounding of
 $a_\mu$, i.e. for $t_{cut}> t_e$ we use $m_{eff}(t_{e})$
 
 ```{r, results='asis',echo=FALSE}
-e<-"B64"
+e<-"D96"
 dir <-"/home/garofalo/analysis/blinded_gm2/data/out/"
 df<-NULL
 mt<-read_df(paste0(dir,e,"_output"))

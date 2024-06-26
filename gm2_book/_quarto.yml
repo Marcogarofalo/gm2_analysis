@@ -16,6 +16,8 @@ book:
     - continuum_amu_l_sd.qmd
     - blinded_B64.qmd
     - blinded_C80.qmd
+    - blinded_D96.qmd
+    - blinded_continuum.qmd
     - references.qmd
 
 bibliography: references.bib

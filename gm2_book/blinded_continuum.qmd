@@ -1,0 +1,44 @@
+# blinded continuum
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+# library(hadron)
+#library(kableExtra) # breaks latex
+#library(tidyverse)
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x,y)) + geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir=parent.frame())
+  #ggp
+  df    # NOT returning a plot
+}
+res1 <- f1(df)
+ggp   # Let knit handle the plot
+myplotly(ggplot())
+#widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
+```
+
+
+```{r, results='asis', echo=FALSE, warning=FALSE}
+source("/home/garofalo/programs/Rose/R/plot_routines.R")
+dir<-"/home/garofalo/analysis/blinded_gm2/data/fit_all/"
+namefit<-paste0(dir,"amu_bound_a2_GS_L_Mpi")
+file<-paste0(namefit,"_fit_P.dat")
+fit<- read_fit_P_file(file)
+cat("\n\n")
+dt<-make_table_fit_result(fit)
+print(dt)
+gg<-myggplot()
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM","OS"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit"
+             #, nolabel_for_fit = TRUE
+               )
+fig<-myplotly(gg, "","$a^2[fm]$",
+            paste0("$a_\\mu$"), to_print = TRUE)
+```
