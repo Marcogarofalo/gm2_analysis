@@ -118,6 +118,8 @@ vertical line at $t_e$ which correspond to the last mass used in the bounding of
 $a_\mu$, i.e. for $t_{cut}> t_e$ we use $m_{eff}(t_{e})$
 
 ```{r, results='asis',echo=FALSE}
+source("/home/garofalo/programs/Rose/R/plot_routines.R")
+
 e<-"B64"
 dir <-"/home/garofalo/analysis/blinded_gm2/data/out/"
 df<-NULL
@@ -129,12 +131,13 @@ df<-add_corr_to_df("M_VKVK_TM",all_obs ,mt,df,
 df<-add_corr_to_df("M_VKVK_OS",all_obs ,mt,df,
                    reshape = TRUE, nudge = 0.1
                    )
-gg<-plot_df_corr_ggplot(df) 
+
+gg<-plot_df_corr_ggplot(df, extra_length_plateau = 0.4) 
 fit<-get_full_res("amu_{bound_meff_t}_(TM)_below",all_obs ,mt )
 gg<- gg + geom_vline(xintercept = fit[1,3], color="black")
 
 fit<-get_full_res("amu_{bound_meff_t}_(OS)_below",all_obs ,mt )
-gg<- gg + geom_vline(xintercept = fit[1,3], color="blue")
+gg<- gg + geom_vline(xintercept = fit[1,3]+0.3, color="blue")
 # gg<- gg+ geom_abline(intercept = 37, slope = -5, color="M_VKVK_OS", 
 #                  linetype="dashed", size=1.5)
 

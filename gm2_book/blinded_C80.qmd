@@ -108,7 +108,11 @@ df<-add_corr_to_df("M_VKVK_TM",all_obs ,mt,df,
 df<-add_corr_to_df("M_VKVK_OS",all_obs ,mt,df,
                    reshape = TRUE, nudge = 0.1
                    )
+fit<-get_full_res("amu_{bound_meff_t}_(TM)_below",all_obs ,mt )
+gg<- gg + geom_vline(xintercept = fit[1,3], color="black")
 
+fit<-get_full_res("amu_{bound_meff_t}_(OS)_below",all_obs ,mt )
+gg<- gg + geom_vline(xintercept = fit[1,3], color="blue")
 gg<-plot_df_corr_ggplot(df)
 
 
@@ -202,7 +206,11 @@ df<-add_corr_to_df("M_VKVK_TM_1",all_obs ,mt,df,
 df<-add_corr_to_df("M_VKVK_OS_1",all_obs ,mt,df,
                    reshape = TRUE, nudge = 0.1
                    )
+fit<-get_full_res("amu_{bound_meff_t}_(TM)_below",all_obs ,mt )
+gg<- gg + geom_vline(xintercept = fit[1,3], color="black")
 
+fit<-get_full_res("amu_{bound_meff_t}_(OS)_below",all_obs ,mt )
+gg<- gg + geom_vline(xintercept = fit[1,3], color="blue")
 gg<-plot_df_corr_ggplot(df)
 
 
