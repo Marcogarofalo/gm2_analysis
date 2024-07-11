@@ -29,6 +29,10 @@ dir<-"/home/garofalo/analysis/blinded_gm2/data/fit_all/"
 gg<-myggplot()
 namefit<-paste0(dir,"amu_diff_bound_a2")
 file<-paste0(namefit,"_fit_P.dat")
+df<-read.table(paste0(namefit,"_fit_data.txt"))
+dft<-df[,c(1,3)]
+dft[,2]<-mapply(mean_print, df[,3],df[,4])
+kable(dft, col.names = c("$a^2$","TM-OS-BMW"))
 gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM-OS"), width=1e-4, gg=gg
                  ,               id_color = 5, id_shape = 5,
              # , labelfit = "zap"
@@ -38,6 +42,10 @@ gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM-OS"), width=1e-4, g
                )
 namefit<-paste0(dir,"amu_diff_bound_meff_t_a2")
 file<-paste0(namefit,"_fit_P.dat")
+df<-read.table(paste0(namefit,"_fit_data.txt"))
+dft<-df[,c(1,3)]
+dft[,2]<-mapply(mean_print, df[,3],df[,4])
+kable(dft, col.names = c("$a^2$","TM-OS-BMW"))
 gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM-OS-meff_t"), width=1e-4, gg=gg
                  ,               id_color = 5, id_shape = 5,
              # , labelfit = "zap"
@@ -47,6 +55,10 @@ gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM-OS-meff_t"), width=
                )
 namefit<-paste0(dir,"amu_diff_bound_meff_a2")
 file<-paste0(namefit,"_fit_P.dat")
+df<-read.table(paste0(namefit,"_fit_data.txt"))
+dft<-df[,c(1,3)]
+dft[,2]<-mapply(mean_print, df[,3],df[,4])
+kable(dft, col.names = c("$a^2$","TM-OS-BMW"))
 gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM-OS-Meff"), width=1e-4, gg=gg
                  ,               id_color = 5, id_shape = 5,
              # , labelfit = "zap"

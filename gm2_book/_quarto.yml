@@ -18,6 +18,7 @@ book:
     - blinded_C80.qmd
     - blinded_D96.qmd
     - blinded_continuum.qmd
+    - difference_continuum.qmd
     - references.qmd
 
 bibliography: references.bib
