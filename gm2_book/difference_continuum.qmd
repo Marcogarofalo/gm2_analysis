@@ -1,0 +1,104 @@
+# difference and ration
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+# library(hadron)
+#library(kableExtra) # breaks latex
+#library(tidyverse)
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x,y)) + geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir=parent.frame())
+  #ggp
+  df    # NOT returning a plot
+}
+res1 <- f1(df)
+ggp   # Let knit handle the plot
+myplotly(ggplot())
+#widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
+```
+
+
+
+```{r, results='asis', echo=FALSE, warning=FALSE}
+dir<-"/home/garofalo/analysis/blinded_gm2/data/fit_all/"
+gg<-myggplot()
+namefit<-paste0(dir,"amu_diff_bound_a2")
+file<-paste0(namefit,"_fit_P.dat")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM-OS"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit"
+             #, nolabel_for_fit = TRUE
+             ,noribbon = TRUE
+               )
+namefit<-paste0(dir,"amu_diff_bound_meff_t_a2")
+file<-paste0(namefit,"_fit_P.dat")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM-OS-meff_t"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-meff_t"
+             #, nolabel_for_fit = TRUE
+             ,nudge = 0.00004,noribbon = TRUE
+               )
+namefit<-paste0(dir,"amu_diff_bound_meff_a2")
+file<-paste0(namefit,"_fit_P.dat")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM-OS-Meff"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-meff"
+             #, nolabel_for_fit = TRUE
+             ,nudge = 0.00008,
+             noribbon = FALSE
+               )
+
+
+fig<-myplotly(gg, "","$a^2[fm]$",
+            paste0("$a_\\mu$"), to_print = TRUE, xrange=c(0,0.0065))
+```
+
+
+## Ratio
+
+ratio extrapolated with GS to the volume of C80 and physical point
+
+```{r, results='asis', echo=FALSE, warning=FALSE}
+dir<-"/home/garofalo/analysis/blinded_gm2/data/fit_all/"
+gg<-myggplot()
+namefit<-paste0(dir,"amu_ratio_bound_a2")
+file<-paste0(namefit,"_fit_P.dat")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM/OS"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit"
+             #, nolabel_for_fit = TRUE
+             ,noribbon = TRUE
+               )
+namefit<-paste0(dir,"amu_ratio_bound_meff_t_a2")
+file<-paste0(namefit,"_fit_P.dat")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM/OS-meff_t"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-meff_t"
+             #, nolabel_for_fit = TRUE
+             ,nudge = 0.00004,noribbon = TRUE
+               )
+namefit<-paste0(dir,"amu_ratio_bound_meff_a2")
+file<-paste0(namefit,"_fit_P.dat")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM/OS-Meff"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-meff"
+             #, nolabel_for_fit = TRUE
+             ,nudge = 0.00008,
+             noribbon = FALSE
+               )
+
+
+fig<-myplotly(gg, "","$a^2[fm]$",
+            paste0("$a_\\mu$"), to_print = TRUE, xrange=c(0,0.0065))
+```
