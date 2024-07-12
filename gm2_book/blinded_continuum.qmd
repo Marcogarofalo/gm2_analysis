@@ -146,6 +146,8 @@ fig<-myplotly(gg, "","$a^2[fm]$",
 
 ## fitting (OS+TM)/2
 
+P[0] is the value of the continuum limit, 
+fit function: $P[0]+P[1]a^2$
 
 ```{r, results='asis', echo=FALSE, warning=FALSE}
 source("/home/garofalo/programs/Rose/R/plot_routines.R")

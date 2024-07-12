@@ -140,3 +140,17 @@ gg<- gg + geom_vline(xintercept = fit[1,3], color="blue")
 
 fig<-myplotly(gg, to_print = TRUE)
 ```
+
+## FVE
+
+```{r, results='asis',echo=FALSE}
+source("/home/garofalo/programs/Rose/R/read_block.R")
+e<-"D96"
+dir <-"/home/garofalo/analysis/blinded_gm2/data/out/"
+mt<-read_df(paste0(dir,e,"_output"))
+all_obs<-Rose::get_all_corr(mt)
+fit<-get_full_res("DV_DM",all_obs ,mt)
+cat("DV_DM = ",fit[1,1]," +- ", fit[1,2],"\n\n")
+fit<-get_full_res("DV_to_C80",all_obs ,mt)
+cat("DV_to_C80 = ",fit[1,1]," +- ", fit[1,2],"\n\n")
+```

@@ -277,3 +277,17 @@ cat("amu_{bound_meff}_(OS)520 =",mean_print(fit1[1,1],fit1[1,2]),"\n\n")
 cat("amu_{bound_meff}_(OS)430 =",mean_print(fit2[1,1],fit2[1,2]),"\n\n")
 cat("amu_{bound_meff}_(OS)sum =",mean_print(fit3[1,1],fit3[1,2]),"\n\n")
 ```
+
+## FVE
+
+```{r, results='asis',echo=FALSE}
+source("/home/garofalo/programs/Rose/R/read_block.R")
+e<-"C80"
+dir <-"/home/garofalo/analysis/blinded_gm2/data/out/"
+mt<-read_df(paste0(dir,e,"_output"))
+all_obs<-Rose::get_all_corr(mt)
+fit<-get_full_res("DV_DM",all_obs ,mt)
+cat("DV_DM = ",fit[1,1]," +- ", fit[1,2],"\n\n")
+fit<-get_full_res("DV_to_C80",all_obs ,mt)
+cat("DV_to_C80 = ",fit[1,1]," +- ", fit[1,2],"\n\n")
+```
