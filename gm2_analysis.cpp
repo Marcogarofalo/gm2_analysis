@@ -862,12 +862,12 @@ int main(int argc, char** argv) {
     int count = 0;
     for (auto name : correlators) {
         printf("reading  confs from file: %s\n", name.c_str());
-        if (argc <= 17 || strcmp(argv[17], "three_corr") == 0){
-            if (count >=36 ){
+        if (argc <= 17 || strcmp(argv[17], "three_corr") == 0) {
+            if (count >= 36) {
                 configuration_class tmp;
                 myconfs.emplace_back(tmp);
             }
-            else 
+            else
                 myconfs.emplace_back(name.c_str());
         }
         else if (count == 42) {
@@ -1869,7 +1869,7 @@ int main(int argc, char** argv) {
     free(ms_etas);
 
     double* ms_phi = interpol_Z(Nstrange, Njack, Mphi, ms, jack_aMphi_MeV_exp, outfile, "ms(phi)", resampling);
-    free(ms_phi);
+    // free(ms_phi);
 
 
 
@@ -1883,7 +1883,7 @@ int main(int argc, char** argv) {
     free(mc_etac);
 
     double* mc_JPsi = interpol_Z(Ncharm_inter, Njack, Jpsi_vec, mc, jack_aJpsi_MeV_exp, outfile, "mc(Jpsi)", resampling);
-    free(mc_JPsi);
+    // free(mc_JPsi);
     free_2(3, mc);
 
     ///////////////////////////////////// correlator
@@ -2395,6 +2395,27 @@ int main(int argc, char** argv) {
     write_jack(amu_W_MK, Njack, jack_file);
     printf("amu_W(op,MK) = %g  %g\n", amu_W_MK[Njack - 1], error_jackboot(resampling, Njack, amu_W_MK));
     check_correlatro_counter(152);
+    ////
+    double** v_m = (double**)malloc(sizeof(double) * 2);
+    v_m[0] = ms_phi;
+    v_m[1] = mc_JPsi;
+    double** cov_msc = myres->comp_cov(2, v_m);
+    printf("m_s(phi) = %g  +- %g\n", ms_phi[Njack - 1], myres->comp_error(ms_phi));
+    printf("m_c(JPsi)= %g  +- %g\n", mc_JPsi[Njack - 1], myres->comp_error(mc_JPsi));
+    printf("covariance\n");
+    for (int i = 0;i < 2;i++) {
+        for (int j = 0;j < 2;j++) {
+            printf("%g ", cov_msc[i][j]);
+        }
+        printf("\n");
+    }
+    printf("correlation\n");
+    for (int i = 0;i < 2;i++) {
+        for (int j = 0;j < 2;j++) {
+            printf("%g ", cov_msc[i][j] / sqrt(cov_msc[i][i] * cov_msc[j][j]));
+        }
+        printf("\n");
+    }
 
     //////////////////////
     free_2(2, ms);

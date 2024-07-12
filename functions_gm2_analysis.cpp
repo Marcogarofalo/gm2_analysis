@@ -1,6 +1,6 @@
 #define functions_gm2_analysis_C
 #include "functions_gm2_analysis.hpp"
-
+#include "correlators_analysis.hpp"
 
 double integrand_K(double x, void* params) {
     double z = *(double*)params;
@@ -188,7 +188,6 @@ double* compute_amu_full(double**** in, int id, int Njack, double* Z, double* a,
     free_2(T / 2, corr_sub);
     return amu;
 }
-
 
 
 double* compute_amu_sd(double**** in, int id, int Njack, double* Z, double* a, double q2, double (*int_scheme)(int, int, double*), FILE* outfile, const char* description, const char* resampling, int isub) {
@@ -1604,7 +1603,7 @@ double rhs_amu_cut(int n, int Nvar, double* x, int Npar, double* P) {
         }
     }
     else if (ia2 == 2) {
-        r += a2 * P[1 + n]+ a2*a2;
+        r += a2 * P[1 + n] + a2 * a2;
     }
 
 
@@ -1832,8 +1831,8 @@ double rhs_amu_common(int n, int Nvar, double* x, int Npar, double* P) {
 double rhs_amu_a4_common(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
     double a = x[0];
-    if (n == 0)      r = P[0] + a * P[1]+ a * a * P[3];
-    else if (n == 1) r = P[0] + a * P[2]+ a * a * P[4];
+    if (n == 0)      r = P[0] + a * P[1] + a * a * P[3];
+    else if (n == 1) r = P[0] + a * P[2] + a * a * P[4];
     return r;
 }
 
