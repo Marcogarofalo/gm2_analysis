@@ -22,6 +22,7 @@
 #include "non_linear_fit.hpp"
 #include "tower.hpp"
 #include "fit_all.hpp"
+#include "functions_amu.hpp"
 // #include "lhs_functions.hpp"
 
 #include <string>
@@ -657,7 +658,7 @@ int main(int argc, char** argv) {
     double muc1 = atof(argv[14]);
     double muc2 = atof(argv[15]);
     double muc3 = atof(argv[16]);
-    double mul1;
+    double mul1 = mu;
     if (argc > 17 && strcmp(argv[17], "three_corr") != 0) { mul1 = atof(argv[17]); }
 
     generic_header header;
@@ -1827,6 +1828,11 @@ int main(int argc, char** argv) {
                     write_jack(asdc_vec[ic], Njack, jack_file);
                     check_correlatro_counter(93 + ic + intgr * (Ncharm + name_M.size()) + tm * (Ncharm + name_M.size()) * name_intgr.size());
                     printf("%s = %g  %g\n", name_corr, asdc_vec[ic][Njack - 1], error_jackboot(resampling, Njack, asdc_vec[ic]));
+                    printf("------------------------------------------------------------------------------------------------------------------------");
+                    int_scheme = integrate_simpson38;
+                     double* amu_fulleq_simp_c0 = compute_amu_full(conf_jack, 2 + 6 * (3 + 0) + 3 * 0, Njack, ZV, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,c0)", resampling, isub);
+    printf("amu_fulleq_simp_c0 = %g  %g\n", amu_fulleq_simp_c0[Njack - 1], error_jackboot(resampling, Njack, amu_fulleq_simp_c0));
+//exit(1);
                 }
                 for (int im = 0; im < name_M.size(); im++) {// etac JPsi
                     mysprintf(name_corr, NAMESIZE, "amu_W_%s(%s,%s)", name_intgr[intgr].c_str(), name_eqop[tm].c_str(), name_M[im].c_str());
@@ -2054,8 +2060,12 @@ int main(int argc, char** argv) {
     int  id_VKVKop_SD_mudm;
     int  id_sea_VKVKeq;
     int  id_sea_VKVKop;
-
-    // if (argc >= 19) 
+ printf("------------------------------------------------------------------------------------------------------------------------");
+ int_scheme = integrate_simpson38;
+ {double* amu_fulleq_simp_c0 = compute_amu_full(conf_jack, 2 + 6 * (3 + 0) + 3 * 0, Njack, ZV, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,c0)", resampling, isub);
+    printf("amu_fulleq_simp_c0 = %g  %g\n", amu_fulleq_simp_c0[Njack - 1], error_jackboot(resampling, Njack, amu_fulleq_simp_c0));
+ }
+    if (argc >= 19) 
     {
         fit_type fit_info;
         fit_info.N = 1;
@@ -2194,7 +2204,12 @@ int main(int argc, char** argv) {
 
         free_2(2, amu_W_eq_mu);
 
-
+printf("------------------------------------------------------------------------------------------------------------------------");
+    int_scheme = integrate_simpson38;
+ {double* amu_fulleq_simp_c0 = compute_amu_full(conf_jack, 2 + 6 * (3 + 0) + 3 * 0, Njack, ZV, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,c0)", resampling, isub);
+    printf("amu_fulleq_simp_c0 = %g  %g\n", amu_fulleq_simp_c0[Njack - 1], error_jackboot(resampling, Njack, amu_fulleq_simp_c0));
+  
+ }
         /// total op
         double** amu_W_op_mu = (double**)malloc(sizeof(double*) * 2);
         amu_W_op_mu[0] = (double*)malloc(sizeof(double) * Njack);
@@ -2208,7 +2223,12 @@ int main(int argc, char** argv) {
         double* amu_W_op_phys = interpol_Z(Nmu, Njack, Masses_pions, amu_W_op_mu, jack_Mpia_exp, outfile, "amu_{W}(op,phys)", resampling);
         write_jack(amu_W_op_phys, Njack, jack_file);
         check_correlatro_counter(133);
-
+printf("------------------------------------------------------------------------------------------------------------------------");
+    int_scheme = integrate_simpson38;
+ {double* amu_fulleq_simp_c0 = compute_amu_full(conf_jack, 2 + 6 * (3 + 0) + 3 * 0, Njack, ZV, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,c0)", resampling, isub);
+    printf("amu_fulleq_simp_c0 = %g  %g\n", amu_fulleq_simp_c0[Njack - 1], error_jackboot(resampling, Njack, amu_fulleq_simp_c0));
+    // exit(1);
+ }
         free_2(2, amu_W_op_mu);
 
         double* tmp_b = (double*)malloc(sizeof(double) * Njack);
@@ -2258,8 +2278,13 @@ int main(int argc, char** argv) {
         check_correlatro_counter(135);
 
     }
-    // else { for (int i = 122; i <= 135;i++)  zero_corr(zeros, Njack, jack_file); }
-
+    else { for (int i = 122; i <= 135;i++)  zero_corr(zeros, Njack, jack_file); }
+    printf("------------------------------------------------------------------------------------------------------------------------");
+    int_scheme = integrate_simpson38;
+ {double* amu_fulleq_simp_c0 = compute_amu_full(conf_jack, 2 + 6 * (3 + 0) + 3 * 0, Njack, ZV, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,c0)", resampling, isub);
+    printf("amu_fulleq_simp_c0 = %g  %g\n", amu_fulleq_simp_c0[Njack - 1], error_jackboot(resampling, Njack, amu_fulleq_simp_c0));
+    // exit(1);
+ }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // amu_full s
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2416,6 +2441,91 @@ int main(int argc, char** argv) {
         }
         printf("\n");
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // a_full_c_eq simpson38
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    double** afull_c_vec = (double**)malloc(sizeof(double*) * Ncharm_inter);
+    int_scheme = integrate_simpson38;
+    isub = -2;//(strcmp(argv[argc - 1], "three_corr") == 0) ? var + 3 + 1 * 2 : -1;
+    double* amu_fulleq_simp_c0 = compute_amu_full(conf_jack, 2 + 6 * (3 + 0) + 3 * 0, Njack, ZV, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,c0)", resampling, isub);
+    write_jack(amu_fulleq_simp_c0, Njack, jack_file);
+    check_correlatro_counter(153);
+    printf("amu_fulleq_simp_c0 = %g  %g\n", amu_fulleq_simp_c0[Njack - 1], error_jackboot(resampling, Njack, amu_fulleq_simp_c0));
+
+
+    int_scheme = integrate_simpson38;
+    isub = -2;//(strcmp(argv[argc - 1], "three_corr") == 0) ? var + 3 + 2 * 2 : -1;
+    double* amu_fulleq_simp_c1 = compute_amu_full(conf_jack, 2 + 6 * (3 + 1) + 3 * 0, Njack, ZV, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,c1)", resampling, isub);
+    write_jack(amu_fulleq_simp_s1, Njack, jack_file);
+    check_correlatro_counter(154);
+    printf("amu_fulleq_simp_c1 = %g  %g\n", amu_fulleq_simp_c1[Njack - 1], error_jackboot(resampling, Njack, amu_fulleq_simp_c1));
+
+    int_scheme = integrate_simpson38;
+    isub = -2;//(strcmp(argv[argc - 1], "three_corr") == 0) ? var + 3 + 2 * 2 : -1;
+    double* amu_fulleq_simp_c2 = compute_amu_full(conf_jack, 2 + 6 * (3 + 2) + 3 * 0, Njack, ZV, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,c2)", resampling, isub);
+    write_jack(amu_fulleq_simp_c2, Njack, jack_file);
+    check_correlatro_counter(155);
+    printf("amu_fulleq_simp_c2 = %g  %g\n", amu_fulleq_simp_c2[Njack - 1], error_jackboot(resampling, Njack, amu_fulleq_simp_c2));
+    
+    afull_c_vec[0] = amu_fulleq_simp_c0;
+    afull_c_vec[1] = amu_fulleq_simp_c1;
+    afull_c_vec[2] = amu_fulleq_simp_c2;
+
+    double* amu_full_cphys = interpol_Z(Ncharm_inter, Njack, Jpsi_vec, afull_c_vec, jack_aJpsi_MeV_exp, outfile, "amu_{full}_simpson38(eq,JPsi)", resampling);
+    write_jack(amu_full_cphys, Njack, jack_file);
+    free(amu_full_cphys);
+    check_correlatro_counter(156);
+
+    tmp = interpol_Z(Ncharm_inter, Njack, Metac_vec, afull_c_vec, jack_aMetac_MeV_exp, outfile, "amu_{full,simp}(eq,etac)", resampling);
+    write_jack(tmp, Njack, jack_file);
+    check_correlatro_counter(157); free(tmp);
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // a_full_c_op simpson38
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    int_scheme = integrate_simpson38;
+    isub = -2;//(strcmp(argv[argc - 1], "three_corr") == 0) ? var + 4 + 1 * 2 : -1;
+    double* amu_fullop_simp_c0 = compute_amu_full(conf_jack, 2 + 6 * (3 + 0) + 3 * 1, Njack, ZA, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(op,c0)", resampling, isub);
+    write_jack(amu_fullop_simp_c0, Njack, jack_file);
+    check_correlatro_counter(158);
+    printf("amu_fullop_simp_c0 = %g  %g\n", amu_fullop_simp_c0[Njack - 1], error_jackboot(resampling, Njack, amu_fullop_simp_c0));
+
+
+    int_scheme = integrate_simpson38;
+    isub = -2;//(strcmp(argv[argc - 1], "three_corr") == 0) ? var + 4 + 2 * 2 : -1;
+    double* amu_fullop_simp_c1 = compute_amu_full(conf_jack, 2 + 6 * (3 + 1) + 3 * 1, Njack, ZA, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(op,c1)", resampling, isub);
+    write_jack(amu_fullop_simp_c1, Njack, jack_file);
+    check_correlatro_counter(159);
+    printf("amu_fullop_simp_c1 = %g  %g\n", amu_fullop_simp_c1[Njack - 1], error_jackboot(resampling, Njack, amu_fullop_simp_c1));
+
+    int_scheme = integrate_simpson38;
+    isub = -2;//(strcmp(argv[argc - 1], "three_corr") == 0) ? var + 4 + 2 * 2 : -1;
+    double* amu_fullop_simp_c2 = compute_amu_full(conf_jack, 2 + 6 * (3 + 2) + 3 * 1, Njack, ZA, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(op,c2)", resampling, isub);
+    write_jack(amu_fullop_simp_c2, Njack, jack_file);
+    check_correlatro_counter(160);
+    printf("amu_fullop_simp_c2 = %g  %g\n", amu_fullop_simp_c2[Njack - 1], error_jackboot(resampling, Njack, amu_fullop_simp_c2));
+
+
+
+    afull_c_vec[0] = amu_fullop_simp_c0;
+    afull_c_vec[1] = amu_fullop_simp_c1;
+    afull_c_vec[2] = amu_fullop_simp_c2;
+
+    amu_full_cphys = interpol_Z(Ncharm_inter, Njack, Jpsi_vec, afull_c_vec, jack_aJpsi_MeV_exp, outfile, "amu_{full}_simpson38(op,JPsi)", resampling);
+    write_jack(amu_full_cphys, Njack, jack_file);
+    check_correlatro_counter(161);
+    free(amu_full_cphys);
+
+
+    tmp = interpol_Z(Ncharm_inter, Njack, Metac_vec, afull_c_vec, jack_aMetac_MeV_exp, outfile, "amu_{full,simp}(op,etac)", resampling);
+    write_jack(tmp, Njack, jack_file);
+    check_correlatro_counter(162); free(tmp);
+
+
 
     //////////////////////
     free_2(2, ms);

@@ -952,13 +952,13 @@ int main(int argc, char** argv) {
     free_fit_result(fit_info, amu_SD_l_common_a4);
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     fit_info.restore_default();
     fit_info.Npar = 3;
     fit_info.N = 2;
     fit_info.Nvar = 8;
     fit_info.Njack = Njack;
-    fit_info.myen = { B72_64, C06, D54  };
+    fit_info.myen = { B72_64, C06, D54 };
 
     fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.myen.size() * fit_info.N, fit_info.Njack);
     count = 0;
@@ -1010,10 +1010,10 @@ int main(int argc, char** argv) {
     //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
     print_fit_band(argv, jackall, fit_info, fit_info, namefit, "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0005, xcont);
     free_fit_result(fit_info, amu_SD_l_common_a4);
-    
+
     ////////////////////////////////     a4  ///////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     fit_info.restore_default();
     fit_info.Npar = 5;
     fit_info.N = 2;
@@ -1071,17 +1071,17 @@ int main(int argc, char** argv) {
     //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
     print_fit_band(argv, jackall, fit_info, fit_info, namefit, "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0005, xcont);
     free_fit_result(fit_info, amu_SD_l_common_a4);
-    
+
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     fit_info.restore_default();
     fit_info.Npar = 5;
     fit_info.N = 2;
     fit_info.Nvar = 8;
     fit_info.Njack = Njack;
-    fit_info.myen = { B72_64, C06, D54  };
+    fit_info.myen = { B72_64, C06, D54 };
 
     fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.myen.size() * fit_info.N, fit_info.Njack);
     count = 0;
@@ -1136,9 +1136,9 @@ int main(int argc, char** argv) {
 
 
 
-     ////////////////////////////////    s W  ///////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    
+    ////////////////////////////////    s W  ///////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////////////////////////////////
+
     fit_info.restore_default();
     fit_info.Npar = 3;
     fit_info.N = 2;
@@ -1196,17 +1196,17 @@ int main(int argc, char** argv) {
     //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
     print_fit_band(argv, jackall, fit_info, fit_info, namefit, "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0005, xcont);
     free_fit_result(fit_info, amu_SD_l_common_a4);
-    
+
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     fit_info.restore_default();
     fit_info.Npar = 3;
     fit_info.N = 2;
     fit_info.Nvar = 8;
     fit_info.Njack = Njack;
-    fit_info.myen = { B72_64, C06, D54  };
+    fit_info.myen = { B72_64, C06, D54 };
 
     fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.myen.size() * fit_info.N, fit_info.Njack);
     count = 0;
@@ -1259,9 +1259,9 @@ int main(int argc, char** argv) {
     print_fit_band(argv, jackall, fit_info, fit_info, namefit, "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0005, xcont);
     free_fit_result(fit_info, amu_SD_l_common_a4);
 
-     ////////////////////////////////    s W  ///////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    
+    ////////////////////////////////    s W  ///////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////////////////////////////////
+
     fit_info.restore_default();
     fit_info.Npar = 5;
     fit_info.N = 2;
@@ -1319,17 +1319,17 @@ int main(int argc, char** argv) {
     //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
     print_fit_band(argv, jackall, fit_info, fit_info, namefit, "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0005, xcont);
     free_fit_result(fit_info, amu_SD_l_common_a4);
-    
+
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     fit_info.restore_default();
     fit_info.Npar = 5;
     fit_info.N = 2;
     fit_info.Nvar = 8;
     fit_info.Njack = Njack;
-    fit_info.myen = { B72_96, C06, D54  };
+    fit_info.myen = { B72_96, C06, D54 };
 
     fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.myen.size() * fit_info.N, fit_info.Njack);
     count = 0;
@@ -1381,5 +1381,174 @@ int main(int argc, char** argv) {
     //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
     print_fit_band(argv, jackall, fit_info, fit_info, namefit, "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0005, xcont);
     free_fit_result(fit_info, amu_SD_l_common_a4);
+
+
+    //////////////////////////////////////////////////////////////
+    // charm
+    //////////////////////////////////////////////////////////////
+
+    ////////////////////////// fit the charm A to a constant
+
+    fit_info.restore_default();
+    fit_info.corr_id = { 156, 157, 161, 162 };
+    fit_info.N = fit_info.corr_id.size();
+    fit_info.Nvar = 1;
+    fit_info.Npar = fit_info.corr_id.size();
+    fit_info.Njack = Njack;
+    fit_info.myen = { A30, A40, A53 };
+    fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.myen.size() * fit_info.N, fit_info.Njack);
+    count = 0;
+    for (int n = 0;n < fit_info.N;n++) {
+        for (int e : fit_info.myen) {
+            for (int j = 0;j < Njack;j++) {
+                fit_info.x[0][count][j] = jackall.en[e].header.L * jackall.en[e].jack[1][j];// ;//jackall.en[e].jack[41][j] * jack_Mpi_MeV_exp[j] / hbarc;//* jackall.en[e].jack[1][j] 
+            }
+            count++;
+        }
+    }
+    fit_info.function = const_A;
+    fit_info.linear_fit = true;
+
+    mysprintf(namefit, NAMESIZE, "interpolate_A_charm");
+    fit_result Acharm = fit_all_data(argv, jackall, lhs_Acharm, fit_info, namefit);
+    fit_info.band_range = { 0, 8 };
+    print_fit_band(argv, jackall, fit_info, fit_info, namefit, "Acharm", Acharm, Acharm, 0, fit_info.myen.size() - 1, 0.1);
+    for (int j = 0; j < Njack;j++) {
+        double a = jackall.en[B72_64].jack[41][j];
+        double Mpi_MeV = jack_Mpi_MeV_exp[j];
+        double L = jackall.en[B72_64].header.L;
+        for (int i = 0; i < fit_info.N; i++)
+            jackall.en[A30].jack[fit_info.corr_id[i]][j] = Acharm.P[i][j];
+
+    }
+    free_fit_result(fit_info, Acharm);
+    fit_info.restore_default();
+
+
+    ///////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////     a4  ///////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    {
+        fit_info.restore_default();
+        fit_info.Npar = 5;
+        fit_info.N = 2;
+        fit_info.Nvar = 8;
+        fit_info.Njack = Njack;
+        fit_info.myen = { A30,  B72_64, C06, D54 , E112 };
+
+        fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.myen.size() * fit_info.N, fit_info.Njack);
+        count = 0;
+        for (int n = 0;n < fit_info.N;n++) {
+            for (int e : fit_info.myen) {
+                for (int j = 0;j < Njack;j++) {
+                    fit_info.x[0][count][j] = pow(jackall.en[e].jack[41][j], 2); // a^2
+                    fit_info.x[1][count][j] = jackall.en[e].jack[58][j];  // Delta_FV_GS
+                    fit_info.x[2][count][j] = jackall.en[e].jack[1][j];  //Mpi
+                    fit_info.x[3][count][j] = jack_Mpi_MeV_exp[j];
+                    fit_info.x[4][count][j] = 0/* l */ + 1e-6;
+                    fit_info.x[5][count][j] = 0/* a */ + 1e-6;
+                    fit_info.x[6][count][j] = 0 + 1e-6;
+                    fit_info.x[7][count][j] = 0/* w */ + 1e-6;
+                }
+                count++;
+            }
+        }
+        fit_info.corr_id = { 156, 161 };
+        fit_info.function = rhs_amu_a4_common;
+        fit_info.linear_fit = false;
+        fit_info.covariancey = true;
+        // fit_info.acc= 1e-6;
+        // fit_info.chi2_gap_jackboot=0.1;
+        // fit_info.guess_per_jack=5;
+        // fit_info.repeat_start=5;
+        fit_info.verbosity = 0;
+        fit_info.compute_cov_fit(argv, jackall, lhs_amu);
+        ie = 0; ie1 = 0;
+        for (int n = 0;n < fit_info.N;n++) {
+            for (int e = 0;e < fit_info.myen.size();e++) {
+                ie1 = 0;
+                for (int n1 = 0;n1 < fit_info.N;n1++) {
+                    for (int e1 = 0;e1 < fit_info.myen.size();e1++) {
+                        if (e != e1)   fit_info.cov[ie][ie1] = 0;
+                        ie1++;
+                    }
+                }
+                ie++;
+            }
+        }
+        fit_info.compute_cov1_fit();
+        mysprintf(namefit, NAMESIZE, "amu_full_a2_a4_MJPsi_cov");
+        amu_SD_l_common_a4 = fit_all_data(argv, jackall, lhs_amu, fit_info, namefit);
+        fit_info.band_range = { 0,0.0085 };
+        xcont = { 0, 0 /*Delta*/, 0, 0,/*l, a,m*/ fit_info.x[4][0][Njack - 1],
+             fit_info.x[5][0][Njack - 1] , fit_info.x[6][0][Njack - 1], fit_info.x[7][0][Njack - 1] };
+
+        //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
+        print_fit_band(argv, jackall, fit_info, fit_info, namefit, "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0005, xcont);
+        free_fit_result(fit_info, amu_SD_l_common_a4);
+
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+
+        fit_info.restore_default();
+        fit_info.Npar = 5;
+        fit_info.N = 2;
+        fit_info.Nvar = 8;
+        fit_info.Njack = Njack;
+        fit_info.myen = {  A30, B72_64, C06, D54 };
+
+        fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.myen.size() * fit_info.N, fit_info.Njack);
+        count = 0;
+        for (int n = 0;n < fit_info.N;n++) {
+            for (int e : fit_info.myen) {
+                for (int j = 0;j < Njack;j++) {
+                    fit_info.x[0][count][j] = pow(jackall.en[e].jack[41][j], 2); // a^2
+                    fit_info.x[1][count][j] = jackall.en[e].jack[58][j];  // Delta_FV_GS
+                    fit_info.x[2][count][j] = jackall.en[e].jack[1][j];  //Mpi
+                    fit_info.x[3][count][j] = jack_Mpi_MeV_exp[j];
+                    fit_info.x[4][count][j] = 0/* l */ + 1e-6;
+                    fit_info.x[5][count][j] = 0/* a */ + 1e-6;
+                    fit_info.x[6][count][j] = 0 + 1e-6;
+                    fit_info.x[7][count][j] = 0/* w */ + 1e-6;
+                }
+                count++;
+            }
+        }
+        fit_info.corr_id = { 156, 161 };
+        fit_info.function = rhs_amu_a4_common;
+        fit_info.linear_fit = false;
+        fit_info.covariancey = true;
+        // fit_info.acc= 1e-6;
+        // fit_info.chi2_gap_jackboot=0.1;
+        // fit_info.guess_per_jack=5;
+        // fit_info.repeat_start=5;
+        fit_info.verbosity = 0;
+        fit_info.compute_cov_fit(argv, jackall, lhs_amu);
+        ie = 0; ie1 = 0;
+        for (int n = 0;n < fit_info.N;n++) {
+            for (int e = 0;e < fit_info.myen.size();e++) {
+                ie1 = 0;
+                for (int n1 = 0;n1 < fit_info.N;n1++) {
+                    for (int e1 = 0;e1 < fit_info.myen.size();e1++) {
+                        if (e != e1)   fit_info.cov[ie][ie1] = 0;
+                        ie1++;
+                    }
+                }
+                ie++;
+            }
+        }
+        fit_info.compute_cov1_fit();
+        mysprintf(namefit, NAMESIZE, "amu_full_a2_a4_MJPsi_4beta_cov");
+        amu_SD_l_common_a4 = fit_all_data(argv, jackall, lhs_amu, fit_info, namefit);
+        fit_info.band_range = { 0,0.0085 };
+        xcont = { 0, 0 /*Delta*/, 0, 0,/*l, a,m*/ fit_info.x[4][0][Njack - 1],
+             fit_info.x[5][0][Njack - 1] , fit_info.x[6][0][Njack - 1], fit_info.x[7][0][Njack - 1] };
+
+        //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
+        print_fit_band(argv, jackall, fit_info, fit_info, namefit, "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0005, xcont);
+        free_fit_result(fit_info, amu_SD_l_common_a4);
+    }
 
 }
