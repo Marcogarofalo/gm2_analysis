@@ -80,3 +80,4 @@ gm2_book/cover.png
 *.fls
 *.aux
 *.fdb_latexmk
+*.gz
