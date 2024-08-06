@@ -23,6 +23,7 @@
 #include "tower.hpp"
 #include "fit_all.hpp"
 #include "functions_amu.hpp"
+#include "gamma_analysis.hpp"
 // #include "lhs_functions.hpp"
 
 #include <string>
@@ -700,6 +701,11 @@ int main(int argc, char** argv) {
     printf("writing output in :\n %s \n", namefile);
     FILE* outfile = open_file(namefile, "w+");
 
+    mysprintf(namefile, NAMESIZE, "%s/out/%s_gamma", argv[3], option[6]);
+    printf("writing output in :\n %s \n", namefile);
+    FILE* out_gamma = open_file(namefile, "w+");
+
+
     mysprintf(namefile, NAMESIZE, "%s/jackknife/%s_%s", argv[3], option[4], option[6]);
     FILE* jack_file = open_file(namefile, "w+");
     write_header_g2(jack_file, header);
@@ -1057,7 +1063,7 @@ int main(int argc, char** argv) {
         error(var + 15 != correlators.size(), 1, "main", "wrong counting");
     }
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///// adding D meson here
+    ///// adding K meson here
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // declare
     int idD = correlators.size();
@@ -1081,20 +1087,38 @@ int main(int argc, char** argv) {
             read_twopt(correlators[i].c_str(), myconfs[i], T, data, i, bin);
             fclose(tmp);
         }
+        else {
+            printf("files %s do not exist !!!!!\n",correlators[i].c_str());
+        }
 
     }
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // D meson reading end
+    // K meson reading end
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     // data_bin = binning(confs, var, file_head.l0, data, bin);
     // data_bin = binning_toNb(confs, var, file_head.l0, data, bin);
     // //if you want to do the gamma analysis you need to do before freeing the raw data
-    // // effective_mass_phi4_gamma(option, kinematic_2pt, (char*)"P5P5", data_bin, Neff, namefile_plateaux, out_gamma, 0, "M_{PS}^{ll}");
-    // // effective_mass_phi4_gamma(option, kinematic_2pt, (char*)"P5P5", data_bin, Neff, namefile_plateaux, out_gamma, 1, "M_{PS1}^{ll}");
+
+    gamma_correlator_func(option, kinematic_2pt, (char*)"P5P5", data, Neff, namefile_plateaux, out_gamma, 5, "VK_{pi}^{TM}", identity_func_gamma);
+    gamma_correlator_func(option, kinematic_2pt, (char*)"P5P5", data, Neff, namefile_plateaux, out_gamma, 2, "VK_{pi}^{OS}", identity_func_gamma);
+
+    gamma_correlator_func(option, kinematic_2pt, (char*)"P5P5", data, Neff, namefile_plateaux, out_gamma, 11, "VK_s1^{TM}", identity_func_gamma);
+    gamma_correlator_func(option, kinematic_2pt, (char*)"P5P5", data, Neff, namefile_plateaux, out_gamma, 8, "VK_s1^{OS}", identity_func_gamma);
+
+
+    gamma_correlator_func(option, kinematic_2pt, (char*)"P5P5", data, Neff, namefile_plateaux, out_gamma, 4, "P5P5_{pi}^{TM}", identity_func_gamma);
+    gamma_correlator_func(option, kinematic_2pt, (char*)"P5P5", data, Neff, namefile_plateaux, out_gamma, 1, "P5P5_{pi}^{OS}", identity_func_gamma);
+
+    gamma_correlator_func(option, kinematic_2pt, (char*)"P5P5", data, Neff, namefile_plateaux, out_gamma, 4, "M_{pi}^{TM}", mass_gamma);
+    gamma_correlator_func(option, kinematic_2pt, (char*)"P5P5", data, Neff, namefile_plateaux, out_gamma, 1, "M_{pi}^{OS}", mass_gamma);
+
+    gamma_correlator_func(option, kinematic_2pt, (char*)"P5P5", data, Neff, namefile_plateaux, out_gamma, idD, "P5P5_{K1}^{TM}", identity_func_gamma);
+    gamma_correlator_func(option, kinematic_2pt, (char*)"P5P5", data, Neff, namefile_plateaux, out_gamma, idD, "M_{K1}^{TM}", mass_gamma);
+
     // //effective_mass_phi4_gamma(  option, kinematic_2pt,   (char*) "P5P5", data,  confs ,namefile_plateaux,out_gamma,3,"M_{PS}^{ll}");
     // free_corr(bin, var, file_head.l0, data);
     ncorr_new = correlators.size();
@@ -1828,11 +1852,7 @@ int main(int argc, char** argv) {
                     write_jack(asdc_vec[ic], Njack, jack_file);
                     check_correlatro_counter(93 + ic + intgr * (Ncharm + name_M.size()) + tm * (Ncharm + name_M.size()) * name_intgr.size());
                     printf("%s = %g  %g\n", name_corr, asdc_vec[ic][Njack - 1], error_jackboot(resampling, Njack, asdc_vec[ic]));
-                    printf("------------------------------------------------------------------------------------------------------------------------");
-                    int_scheme = integrate_simpson38;
-                     double* amu_fulleq_simp_c0 = compute_amu_full(conf_jack, 2 + 6 * (3 + 0) + 3 * 0, Njack, ZV, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,c0)", resampling, isub);
-    printf("amu_fulleq_simp_c0 = %g  %g\n", amu_fulleq_simp_c0[Njack - 1], error_jackboot(resampling, Njack, amu_fulleq_simp_c0));
-//exit(1);
+                    
                 }
                 for (int im = 0; im < name_M.size(); im++) {// etac JPsi
                     mysprintf(name_corr, NAMESIZE, "amu_W_%s(%s,%s)", name_intgr[intgr].c_str(), name_eqop[tm].c_str(), name_M[im].c_str());
@@ -2060,13 +2080,9 @@ int main(int argc, char** argv) {
     int  id_VKVKop_SD_mudm;
     int  id_sea_VKVKeq;
     int  id_sea_VKVKop;
- printf("------------------------------------------------------------------------------------------------------------------------");
- int_scheme = integrate_simpson38;
- {double* amu_fulleq_simp_c0 = compute_amu_full(conf_jack, 2 + 6 * (3 + 0) + 3 * 0, Njack, ZV, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,c0)", resampling, isub);
-    printf("amu_fulleq_simp_c0 = %g  %g\n", amu_fulleq_simp_c0[Njack - 1], error_jackboot(resampling, Njack, amu_fulleq_simp_c0));
- }
-    if (argc >= 19) 
-    {
+    
+    double* M_PS1;
+    if (argc >= 19) {
         fit_type fit_info;
         fit_info.N = 1;
         fit_info.Njack = Njack;
@@ -2113,7 +2129,7 @@ int main(int argc, char** argv) {
         printf("Ncorrelator=%d\n", ncorr_new);
 
         ///////////////////////////////////
-        double* M_PS1 = plateau_correlator_function(option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack, namefile_plateaux, outfile, id_P5P5_mudmu, "M_{PS1}^{op}", M_eff_T, jack_file);
+        M_PS1 = plateau_correlator_function(option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack, namefile_plateaux, outfile, id_P5P5_mudmu, "M_{PS1}^{op}", M_eff_T, jack_file);
         check_correlatro_counter(122);
         free(M_PS1);
 
@@ -2204,12 +2220,6 @@ int main(int argc, char** argv) {
 
         free_2(2, amu_W_eq_mu);
 
-printf("------------------------------------------------------------------------------------------------------------------------");
-    int_scheme = integrate_simpson38;
- {double* amu_fulleq_simp_c0 = compute_amu_full(conf_jack, 2 + 6 * (3 + 0) + 3 * 0, Njack, ZV, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,c0)", resampling, isub);
-    printf("amu_fulleq_simp_c0 = %g  %g\n", amu_fulleq_simp_c0[Njack - 1], error_jackboot(resampling, Njack, amu_fulleq_simp_c0));
-  
- }
         /// total op
         double** amu_W_op_mu = (double**)malloc(sizeof(double*) * 2);
         amu_W_op_mu[0] = (double*)malloc(sizeof(double) * Njack);
@@ -2223,12 +2233,7 @@ printf("------------------------------------------------------------------------
         double* amu_W_op_phys = interpol_Z(Nmu, Njack, Masses_pions, amu_W_op_mu, jack_Mpia_exp, outfile, "amu_{W}(op,phys)", resampling);
         write_jack(amu_W_op_phys, Njack, jack_file);
         check_correlatro_counter(133);
-printf("------------------------------------------------------------------------------------------------------------------------");
-    int_scheme = integrate_simpson38;
- {double* amu_fulleq_simp_c0 = compute_amu_full(conf_jack, 2 + 6 * (3 + 0) + 3 * 0, Njack, ZV, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,c0)", resampling, isub);
-    printf("amu_fulleq_simp_c0 = %g  %g\n", amu_fulleq_simp_c0[Njack - 1], error_jackboot(resampling, Njack, amu_fulleq_simp_c0));
-    // exit(1);
- }
+
         free_2(2, amu_W_op_mu);
 
         double* tmp_b = (double*)malloc(sizeof(double) * Njack);
@@ -2279,12 +2284,7 @@ printf("------------------------------------------------------------------------
 
     }
     else { for (int i = 122; i <= 135;i++)  zero_corr(zeros, Njack, jack_file); }
-    printf("------------------------------------------------------------------------------------------------------------------------");
-    int_scheme = integrate_simpson38;
- {double* amu_fulleq_simp_c0 = compute_amu_full(conf_jack, 2 + 6 * (3 + 0) + 3 * 0, Njack, ZV, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,c0)", resampling, isub);
-    printf("amu_fulleq_simp_c0 = %g  %g\n", amu_fulleq_simp_c0[Njack - 1], error_jackboot(resampling, Njack, amu_fulleq_simp_c0));
-    // exit(1);
- }
+    
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // amu_full s
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2447,9 +2447,10 @@ printf("------------------------------------------------------------------------
     // a_full_c_eq simpson38
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     double** afull_c_vec = (double**)malloc(sizeof(double*) * Ncharm_inter);
+
     int_scheme = integrate_simpson38;
     isub = -2;//(strcmp(argv[argc - 1], "three_corr") == 0) ? var + 3 + 1 * 2 : -1;
-    double* amu_fulleq_simp_c0 = compute_amu_full(conf_jack, 2 + 6 * (3 + 0) + 3 * 0, Njack, ZV, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,c0)", resampling, isub);
+    double* amu_fulleq_simp_c0 = compute_amu_full(conf_jack, 2 + 6 * (3 + 0) + 3 * 0, Njack, ZV, a, q2c, int_scheme, outfile, "amu_{full}_simpson38(eq,c0)", resampling, isub);
     write_jack(amu_fulleq_simp_c0, Njack, jack_file);
     check_correlatro_counter(153);
     printf("amu_fulleq_simp_c0 = %g  %g\n", amu_fulleq_simp_c0[Njack - 1], error_jackboot(resampling, Njack, amu_fulleq_simp_c0));
@@ -2457,18 +2458,18 @@ printf("------------------------------------------------------------------------
 
     int_scheme = integrate_simpson38;
     isub = -2;//(strcmp(argv[argc - 1], "three_corr") == 0) ? var + 3 + 2 * 2 : -1;
-    double* amu_fulleq_simp_c1 = compute_amu_full(conf_jack, 2 + 6 * (3 + 1) + 3 * 0, Njack, ZV, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,c1)", resampling, isub);
+    double* amu_fulleq_simp_c1 = compute_amu_full(conf_jack, 2 + 6 * (3 + 1) + 3 * 0, Njack, ZV, a, q2c, int_scheme, outfile, "amu_{full}_simpson38(eq,c1)", resampling, isub);
     write_jack(amu_fulleq_simp_s1, Njack, jack_file);
     check_correlatro_counter(154);
     printf("amu_fulleq_simp_c1 = %g  %g\n", amu_fulleq_simp_c1[Njack - 1], error_jackboot(resampling, Njack, amu_fulleq_simp_c1));
 
     int_scheme = integrate_simpson38;
     isub = -2;//(strcmp(argv[argc - 1], "three_corr") == 0) ? var + 3 + 2 * 2 : -1;
-    double* amu_fulleq_simp_c2 = compute_amu_full(conf_jack, 2 + 6 * (3 + 2) + 3 * 0, Njack, ZV, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(eq,c2)", resampling, isub);
+    double* amu_fulleq_simp_c2 = compute_amu_full(conf_jack, 2 + 6 * (3 + 2) + 3 * 0, Njack, ZV, a, q2c, int_scheme, outfile, "amu_{full}_simpson38(eq,c2)", resampling, isub);
     write_jack(amu_fulleq_simp_c2, Njack, jack_file);
     check_correlatro_counter(155);
     printf("amu_fulleq_simp_c2 = %g  %g\n", amu_fulleq_simp_c2[Njack - 1], error_jackboot(resampling, Njack, amu_fulleq_simp_c2));
-    
+
     afull_c_vec[0] = amu_fulleq_simp_c0;
     afull_c_vec[1] = amu_fulleq_simp_c1;
     afull_c_vec[2] = amu_fulleq_simp_c2;
@@ -2489,7 +2490,7 @@ printf("------------------------------------------------------------------------
 
     int_scheme = integrate_simpson38;
     isub = -2;//(strcmp(argv[argc - 1], "three_corr") == 0) ? var + 4 + 1 * 2 : -1;
-    double* amu_fullop_simp_c0 = compute_amu_full(conf_jack, 2 + 6 * (3 + 0) + 3 * 1, Njack, ZA, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(op,c0)", resampling, isub);
+    double* amu_fullop_simp_c0 = compute_amu_full(conf_jack, 2 + 6 * (3 + 0) + 3 * 1, Njack, ZA, a, q2c, int_scheme, outfile, "amu_{full}_simpson38(op,c0)", resampling, isub);
     write_jack(amu_fullop_simp_c0, Njack, jack_file);
     check_correlatro_counter(158);
     printf("amu_fullop_simp_c0 = %g  %g\n", amu_fullop_simp_c0[Njack - 1], error_jackboot(resampling, Njack, amu_fullop_simp_c0));
@@ -2497,14 +2498,14 @@ printf("------------------------------------------------------------------------
 
     int_scheme = integrate_simpson38;
     isub = -2;//(strcmp(argv[argc - 1], "three_corr") == 0) ? var + 4 + 2 * 2 : -1;
-    double* amu_fullop_simp_c1 = compute_amu_full(conf_jack, 2 + 6 * (3 + 1) + 3 * 1, Njack, ZA, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(op,c1)", resampling, isub);
+    double* amu_fullop_simp_c1 = compute_amu_full(conf_jack, 2 + 6 * (3 + 1) + 3 * 1, Njack, ZA, a, q2c, int_scheme, outfile, "amu_{full}_simpson38(op,c1)", resampling, isub);
     write_jack(amu_fullop_simp_c1, Njack, jack_file);
     check_correlatro_counter(159);
     printf("amu_fullop_simp_c1 = %g  %g\n", amu_fullop_simp_c1[Njack - 1], error_jackboot(resampling, Njack, amu_fullop_simp_c1));
 
     int_scheme = integrate_simpson38;
     isub = -2;//(strcmp(argv[argc - 1], "three_corr") == 0) ? var + 4 + 2 * 2 : -1;
-    double* amu_fullop_simp_c2 = compute_amu_full(conf_jack, 2 + 6 * (3 + 2) + 3 * 1, Njack, ZA, a, q2s, int_scheme, outfile, "amu_{full}_simpson38(op,c2)", resampling, isub);
+    double* amu_fullop_simp_c2 = compute_amu_full(conf_jack, 2 + 6 * (3 + 2) + 3 * 1, Njack, ZA, a, q2c, int_scheme, outfile, "amu_{full}_simpson38(op,c2)", resampling, isub);
     write_jack(amu_fullop_simp_c2, Njack, jack_file);
     check_correlatro_counter(160);
     printf("amu_fullop_simp_c2 = %g  %g\n", amu_fullop_simp_c2[Njack - 1], error_jackboot(resampling, Njack, amu_fullop_simp_c2));
@@ -2524,6 +2525,54 @@ printf("------------------------------------------------------------------------
     tmp = interpol_Z(Ncharm_inter, Njack, Metac_vec, afull_c_vec, jack_aMetac_MeV_exp, outfile, "amu_{full,simp}(op,etac)", resampling);
     write_jack(tmp, Njack, jack_file);
     check_correlatro_counter(162); free(tmp);
+
+
+    //////////////////////////////////////////////////////////////
+    // f_pi 
+    //////////////////////////////////////////////////////////////
+    fit_info.restore_default();
+    fit_info.Nvar = 1;
+    fit_info.Npar = 1;
+    fit_info.N = 1;
+    fit_info.Njack = Njack;
+    fit_info.n_ext_P = 3;
+    fit_info.malloc_ext_P();
+    for (int j = 0; j < fit_info.Njack; j++) {
+        fit_info.ext_P[0][j] = M_PS_op[j];
+        fit_info.ext_P[1][j] = header.mus[0];
+        fit_info.ext_P[2][j] = header.mus[0];
+    }
+    fit_info.function = constant_fit;
+    fit_info.linear_fit = true;
+    fit_info.T = header.T;
+
+    fit_info.corr_id = { 4 };
+
+    struct fit_result f_PS = fit_fun_to_fun_of_corr(
+        option, kinematic_2pt, (char*)"P5P5", conf_jack, namefile_plateaux,
+        outfile, lhs_function_f_PS, "f_{pi}", fit_info, jack_file);
+    free_fit_result(fit_info, f_PS);
+    check_correlatro_counter(163);
+    if (argc >= 19) {
+        for (int j = 0; j < fit_info.Njack; j++) {
+            fit_info.ext_P[0][j] = M_PS1[j];
+            fit_info.ext_P[1][j] = mul1;
+            fit_info.ext_P[2][j] = mul1;
+        }
+        fit_info.corr_id = { id_P5P5_cor_mudmu };
+
+        struct fit_result f_PS1 = fit_fun_to_fun_of_corr(
+            option, kinematic_2pt, (char*)"P5P5", conf_jack, namefile_plateaux,
+            outfile, lhs_function_f_PS, "f_{pi}_l1", fit_info, jack_file);
+        free_fit_result(fit_info, f_PS1);
+        check_correlatro_counter(164);
+    }else {
+        zero_corr(zeros, Njack, jack_file);       check_correlatro_counter(164);    
+    }
+    double* mu_jack = myres->create_fake(mu, mu / 1e+6, 1);
+    double* mu1_jack = myres->create_fake(mul1, mul1 / 1e+6, 1);
+    write_jack(mu_jack, Njack, jack_file);        check_correlatro_counter(165);
+    write_jack(mu1_jack, Njack, jack_file);        check_correlatro_counter(166);
 
 
 
