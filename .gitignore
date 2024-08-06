@@ -79,4 +79,4 @@ gm2_book/cover.png
 *.pdf
 *.fls
 *.aux
-*.fbd_latexmk
+*.fdb_latexmk
