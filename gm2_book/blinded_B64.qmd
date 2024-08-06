@@ -48,6 +48,7 @@ The different labels refer to:
 
 
 ```{r, results='asis',echo=FALSE}
+source("/home/garofalo/programs/Rose/R/plot_routines.R")
 e<-"B64"
 dir <-"/home/garofalo/analysis/blinded_gm2/data/out/"
 df<-NULL
@@ -70,8 +71,14 @@ df1<- get_block("amu_{full}_(TM)",all_obs ,mt,NULL ,log=FALSE,number=NULL,
                      nudge=0.0, print_res=FALSE , rename="integrand", 
                      logx=0, ix=1, iy=7, ierr=8, ifit=5, ierrfit=6, iplateau=1)
 
+# df2<- get_block("amu_{full}_(TM)",all_obs ,mt,NULL ,log=FALSE,number=NULL,
+#                      nudge=0.0, print_res=FALSE , rename="corr", 
+#                      logx=0, ix=1, iy=9, ierr=10, ifit=5, ierrfit=6, iplateau=1)
+# # df2$y<-df1$y/df2$y  ## to get the kernel K
+
 gg<-plot_df_corr_ggplot(df)
 gg<-plot_df_corr_ggplot(df1,gg=gg,noribbon = TRUE)
+# gg<-plot_df_corr_ggplot(df2,gg=gg,noribbon = TRUE)
 
 fig<-myplotly(gg, to_print = TRUE)
 ```

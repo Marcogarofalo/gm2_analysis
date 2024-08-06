@@ -46,7 +46,7 @@ dir<-"/home/garofalo/analysis/blinded_gm2/data/fit_all/"
 namefit<-paste0(dir,"amu_bound_a2_GS_L_Mpi")
 file<-paste0(namefit,"_fit_P.dat")
 fit<- read_fit_P_file(file)
-cat("\n\n")
+cat("3 params fit\n\n")
 dt<-make_table_fit_result(fit)
 print(dt)
 gg<-myggplot()
@@ -55,7 +55,40 @@ gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM","OS"), width=1e-4,
              # , labelfit = "zap"
                 ,single_name_for_fit ="fit"
              #, nolabel_for_fit = TRUE
+             ,noline=TRUE
                )
+namefit<-paste0(dir,"amu_bound_a2_a4TM_GS_L_Mpi")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM","OS"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-a4TM"
+             #, nolabel_for_fit = TRUE
+             ,noline=TRUE
+               )
+namefit<-paste0(dir,"amu_bound_a2_a4OS_GS_L_Mpi")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM","OS"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-a4OS"
+             #, nolabel_for_fit = TRUE
+             ,noline=TRUE
+               )
+namefit<-paste0(dir,"amu_bound_a2_a4_GS_L_Mpi")
+file<-paste0(namefit,"_fit_P.dat")
+fit<- read_fit_P_file(file)
+cat("5 params fit\n\n")
+dt<-make_table_fit_result(fit)
+print(dt)
+
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM","OS"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-a4"
+             #, nolabel_for_fit = TRUE
+             ,noline=TRUE
+               )
+
+
 fig<-myplotly(gg, "","$a^2[fm]$",
             paste0("$a_\\mu$"), to_print = TRUE)
 ```
@@ -76,6 +109,31 @@ gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM","OS"), width=1e-4,
              # , labelfit = "zap"
                 ,single_name_for_fit ="fit"
              #, nolabel_for_fit = TRUE
+             ,noline=TRUE
+               )
+namefit<-paste0(dir,"amu_bound_meff_t_a2_a4TM_GS_L_Mpi")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM","OS"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-a4TM"
+             #, nolabel_for_fit = TRUE
+             ,noline=TRUE
+               )
+namefit<-paste0(dir,"amu_bound_meff_t_a2_a4OS_GS_L_Mpi")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM","OS"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-a4OS"
+             #, nolabel_for_fit = TRUE
+             ,noline=TRUE
+               )
+namefit<-paste0(dir,"amu_bound_meff_t_a2_a4_GS_L_Mpi")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM","OS"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-a4"
+             #, nolabel_for_fit = TRUE
+             ,noline=TRUE
                )
 fig<-myplotly(gg, "","$a^2[fm]$",
             paste0("$a_\\mu$"), to_print = TRUE)
@@ -97,6 +155,31 @@ gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM","OS"), width=1e-4,
              # , labelfit = "zap"
                 ,single_name_for_fit ="fit"
              #, nolabel_for_fit = TRUE
+             ,noline=TRUE
+               )
+namefit<-paste0(dir,"amu_bound_meff_a2_a4TM_GS_L_Mpi")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM","OS"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-a4TM"
+             #, nolabel_for_fit = TRUE
+             ,noline=TRUE
+               )
+namefit<-paste0(dir,"amu_bound_meff_a2_a4OS_GS_L_Mpi")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM","OS"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-a4OS"
+             #, nolabel_for_fit = TRUE
+             ,noline=TRUE
+               )
+namefit<-paste0(dir,"amu_bound_meff_a2_a4_GS_L_Mpi")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM","OS"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-a4"
+             #, nolabel_for_fit = TRUE
+             ,noline=TRUE
                )
 fig<-myplotly(gg, "","$a^2[fm]$",
             paste0("$a_\\mu$"), to_print = TRUE)
@@ -116,6 +199,7 @@ gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM","OS"), width=1e-4,
                 ,single_name_for_fit ="fit"
              #, nolabel_for_fit = TRUE
              ,noribbon = TRUE
+             ,noline =TRUE
                )
 namefit<-paste0(dir,"amu_bound_meff_t_a2_GS_L_Mpi")
 file<-paste0(namefit,"_fit_P.dat")
@@ -124,7 +208,7 @@ gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM-meff_t","OS-meff_t"
              # , labelfit = "zap"
                 ,single_name_for_fit ="fit-meff_t"
              #, nolabel_for_fit = TRUE
-             ,nudge = 0.00004,noribbon = TRUE
+             ,nudge = 0.00004,noribbon = TRUE,noline =TRUE
                )
 namefit<-paste0(dir,"amu_bound_meff_a2_GS_L_Mpi")
 file<-paste0(namefit,"_fit_P.dat")
@@ -134,7 +218,38 @@ gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM-meff","OS-meff"), w
                 ,single_name_for_fit ="fit-meff"
              #, nolabel_for_fit = TRUE
              ,nudge = 0.00008,
-             noribbon = TRUE
+             noribbon = TRUE,noline =TRUE
+               )
+
+###########################################################
+namefit<-paste0(dir,"amu_treesub_bound_a2_GS_L_Mpi")
+file<-paste0(namefit,"_fit_P.dat")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM-treesub","OS-treesub"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit"
+             #, nolabel_for_fit = TRUE
+             ,nudge = 0.00012,noribbon = TRUE
+             ,noline =TRUE
+               )
+namefit<-paste0(dir,"amu_treesub_bound_meff_t_a2_GS_L_Mpi")
+file<-paste0(namefit,"_fit_P.dat")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM-meff_t-treesub","OS-meff_t-treesub"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-meff_t"
+             #, nolabel_for_fit = TRUE
+             ,nudge = 0.00016,noribbon = TRUE,noline =TRUE
+               )
+namefit<-paste0(dir,"amu_treesub_bound_meff_a2_GS_L_Mpi")
+file<-paste0(namefit,"_fit_P.dat")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM-meff-treesub","OS-meff-treesub"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-meff"
+             #, nolabel_for_fit = TRUE
+             ,nudge = 0.00020,
+             noribbon = TRUE,noline =TRUE
                )
 
 
@@ -166,7 +281,7 @@ gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM+OS/2"), width=1e-4,
              # , labelfit = "zap"
                 ,single_name_for_fit ="fit"
              #, nolabel_for_fit = TRUE
-             ,noribbon = FALSE
+             ,noribbon = FALSE,noline =TRUE
                )
 namefit<-paste0(dir,"amu_ave_bound_meff_t_a2")
 file<-paste0(namefit,"_fit_P.dat")
@@ -180,7 +295,7 @@ gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM+OS/2 meff_t"), widt
              # , labelfit = "zap"
                 ,single_name_for_fit ="fit-meff_t"
              #, nolabel_for_fit = TRUE
-             ,nudge = 0.00004,noribbon = FALSE
+             ,nudge = 0.00004,noribbon = FALSE,noline =TRUE
                )
 namefit<-paste0(dir,"amu_ave_bound_meff_a2")
 file<-paste0(namefit,"_fit_P.dat")
@@ -195,10 +310,60 @@ gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM+OS/2 Meff"), width=
                 ,single_name_for_fit ="fit-meff"
              #, nolabel_for_fit = TRUE
              ,nudge = 0.00008,
-             noribbon = FALSE
+             noribbon = FALSE,,noline =TRUE
                )
 
 cat("click on the legend to remove a data set\n\n")
 fig<-myplotly(gg, "","$a^2[fm]$",
             paste0("$a_\\mu$"), to_print = TRUE, xrange=c(0,0.0065))
+```
+
+## tree level lattice artefact subtraction
+
+
+```{r, results='asis', echo=FALSE, warning=FALSE}
+source("/home/garofalo/programs/Rose/R/plot_routines.R")
+dir<-"/home/garofalo/analysis/blinded_gm2/data/fit_all/"
+namefit<-paste0(dir,"amu_treesub_bound_a2_GS_L_Mpi")
+file<-paste0(namefit,"_fit_P.dat")
+fit<- read_fit_P_file(file)
+cat("3 params fit\n\n")
+dt<-make_table_fit_result(fit)
+print(dt)
+gg<-myggplot()
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM","OS"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit"
+             #, nolabel_for_fit = TRUE
+             ,noline=TRUE
+               )
+namefit<-paste0(dir,"amu_treesub_bound_a2_a4TM_GS_L_Mpi")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM","OS"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-a4TM"
+             #, nolabel_for_fit = TRUE
+             ,noline=TRUE
+               )
+namefit<-paste0(dir,"amu_treesub_bound_a2_a4OS_GS_L_Mpi")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM","OS"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-a4OS"
+             #, nolabel_for_fit = TRUE
+             ,noline=TRUE
+               )
+namefit<-paste0(dir,"amu_treesub_bound_a2_a4_GS_L_Mpi")
+gg<-plot_fit(basename = namefit, var="afm",data_type = c("TM","OS"), width=1e-4, gg=gg
+                 ,               id_color = 5, id_shape = 5,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-a4"
+             #, nolabel_for_fit = TRUE
+             ,noline=TRUE
+               )
+
+
+fig<-myplotly(gg, "","$a^2[fm]$",
+            paste0("$a_\\mu$"), to_print = TRUE)
 ```

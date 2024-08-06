@@ -6,20 +6,21 @@ library(ggplot2)
 library(plotly)
 library(knitr)
 # library(hadron)
-#library(kableExtra) # breaks latex
-#library(tidyverse)
+# library(kableExtra) # breaks latex
+# library(tidyverse)
 
 df <- data.frame(x = 1:5, y = 1:5)
 f1 <- function(df) {
-  gg <- ggplot(df, aes(x,y)) + geom_point()
-  assign("ggp", plotly::ggplotly(gg), envir=parent.frame())
-  #ggp
-  df    # NOT returning a plot
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
 }
 res1 <- f1(df)
-ggp   # Let knit handle the plot
+ggp # Let knit handle the plot
 myplotly(ggplot())
-#widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
+# widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
 ```
 the different bounding are:
 
@@ -48,68 +49,72 @@ The different labels refer to:
 
 
 ```{r, results='asis',echo=FALSE}
-e<-"D96"
-dir <-"/home/garofalo/analysis/blinded_gm2/data/out/"
-df<-NULL
-mt<-read_df(paste0(dir,e,"_output"))
-all_obs<-Rose::get_all_corr(mt)
-df<-add_corr_to_df("amu_{bound}_(TM)_above",all_obs ,mt,df, 
-                   reshape = FALSE, print_res = FALSE
-                   )
-df<-add_corr_to_df("amu_{bound}_(TM)_below",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.2
-                   )
-df<-add_corr_to_df("amu_{bound_meff_t}_(TM)_below",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.1
-                   )
-df<-add_corr_to_df("amu_{bound_meff}_(TM)_above",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.3
-                   )
+e <- "D96"
+dir <- "/home/garofalo/analysis/blinded_gm2/data/out/"
+df <- NULL
+mt <- read_df(paste0(dir, e, "_output"))
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("amu_{bound}_(TM)_above", all_obs, mt, df,
+  reshape = FALSE, print_res = FALSE
+)
+df <- add_corr_to_df("amu_{bound}_(TM)_below", all_obs, mt, df,
+  reshape = FALSE, nudge = 0.2
+)
+df <- add_corr_to_df("amu_{bound_meff_t}_(TM)_below", all_obs, mt, df,
+  reshape = FALSE, nudge = 0.1
+)
+df <- add_corr_to_df("amu_{bound_meff}_(TM)_above", all_obs, mt, df,
+  reshape = FALSE, nudge = 0.3
+)
 
-df1<- get_block("amu_{full}_(TM)",all_obs ,mt,NULL ,log=FALSE,number=NULL,
-                     nudge=0.0, print_res=FALSE , rename="integrand", 
-                     logx=0, ix=1, iy=7, ierr=8, ifit=5, ierrfit=6, iplateau=1)
+df1 <- get_block("amu_{full}_(TM)", all_obs, mt, NULL,
+  log = FALSE, number = NULL,
+  nudge = 0.0, print_res = FALSE, rename = "integrand",
+  logx = 0, ix = 1, iy = 7, ierr = 8, ifit = 5, ierrfit = 6, iplateau = 1
+)
 
-gg<-plot_df_corr_ggplot(df)
-gg<-plot_df_corr_ggplot(df1,gg=gg,noribbon = TRUE)
+gg <- plot_df_corr_ggplot(df)
+gg <- plot_df_corr_ggplot(df1, gg = gg, noribbon = TRUE)
 
-fig<-myplotly(gg, to_print = TRUE)
+fig <- myplotly(gg, to_print = TRUE)
 ```
 
 
 
 
 ```{r, results='asis',echo=FALSE}
-e<-"D96"
-dir <-"/home/garofalo/analysis/blinded_gm2/data/out/"
-df<-NULL
-mt<-read_df(paste0(dir,e,"_output"))
-all_obs<-Rose::get_all_corr(mt)
-df<-add_corr_to_df("amu_{bound}_(OS)_above",all_obs ,mt,df, 
-                   reshape = FALSE, print_res = FALSE
-                   )
-df<-add_corr_to_df("amu_{bound}_(OS)_below",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.2
-                   )
-#   
-df<-add_corr_to_df("amu_{bound_meff_t}_(OS)_below",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.1
-                   )
-df1<- get_block("amu_{full}_(OS)",all_obs ,mt,NULL ,log=FALSE,number=NULL,
-                     nudge=0.0, print_res=FALSE , rename="integrand", 
-                     logx=0, ix=1, iy=7, ierr=8, ifit=5, ierrfit=6, iplateau=1)
-df<-add_corr_to_df("amu_{bound_meff}_(OS)_above",all_obs ,mt,df,
-                  reshape = FALSE, nudge = 0.3
-                  )
+e <- "D96"
+dir <- "/home/garofalo/analysis/blinded_gm2/data/out/"
+df <- NULL
+mt <- read_df(paste0(dir, e, "_output"))
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("amu_{bound}_(OS)_above", all_obs, mt, df,
+  reshape = FALSE, print_res = FALSE
+)
+df <- add_corr_to_df("amu_{bound}_(OS)_below", all_obs, mt, df,
+  reshape = FALSE, nudge = 0.2
+)
+#
+df <- add_corr_to_df("amu_{bound_meff_t}_(OS)_below", all_obs, mt, df,
+  reshape = FALSE, nudge = 0.1
+)
+df1 <- get_block("amu_{full}_(OS)", all_obs, mt, NULL,
+  log = FALSE, number = NULL,
+  nudge = 0.0, print_res = FALSE, rename = "integrand",
+  logx = 0, ix = 1, iy = 7, ierr = 8, ifit = 5, ierrfit = 6, iplateau = 1
+)
+df <- add_corr_to_df("amu_{bound_meff}_(OS)_above", all_obs, mt, df,
+  reshape = FALSE, nudge = 0.3
+)
 
 # df<-add_corr_to_df("amu_{bound_meff}_(OS)_below",all_obs ,mt,df,
 #                    reshape = FALSE, nudge = 0.1
 #                    )
 
-gg<-plot_df_corr_ggplot(df)
-gg<-plot_df_corr_ggplot(df1,gg=gg,noribbon = TRUE)
+gg <- plot_df_corr_ggplot(df)
+gg <- plot_df_corr_ggplot(df1, gg = gg, noribbon = TRUE)
 
-fig<-myplotly(gg, to_print = TRUE)
+fig <- myplotly(gg, to_print = TRUE)
 ```
 
 ## effective mass VKVK
@@ -118,39 +123,173 @@ vertical line at $t_e$ which correspond to the last mass used in the bounding of
 $a_\mu$, i.e. for $t_{cut}> t_e$ we use $m_{eff}(t_{e})$
 
 ```{r, results='asis',echo=FALSE}
-e<-"D96"
-dir <-"/home/garofalo/analysis/blinded_gm2/data/out/"
-df<-NULL
-mt<-read_df(paste0(dir,e,"_output"))
-all_obs<-Rose::get_all_corr(mt)
-df<-add_corr_to_df("M_VKVK_TM",all_obs ,mt,df, 
-                   reshape = TRUE
-                   )
-df<-add_corr_to_df("M_VKVK_OS",all_obs ,mt,df,
-                   reshape = TRUE, nudge = 0.1
-                   )
-gg<-plot_df_corr_ggplot(df) 
-fit<-get_full_res("amu_{bound_meff_t}_(TM)_below",all_obs ,mt )
-gg<- gg + geom_vline(xintercept = fit[1,3], color="black")
+e <- "D96"
+dir <- "/home/garofalo/analysis/blinded_gm2/data/out/"
+df <- NULL
+mt <- read_df(paste0(dir, e, "_output"))
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("M_VKVK_TM", all_obs, mt, df,
+  reshape = TRUE
+)
+df <- add_corr_to_df("M_VKVK_OS", all_obs, mt, df,
+  reshape = TRUE, nudge = 0.1
+)
+gg <- plot_df_corr_ggplot(df)
+fit <- get_full_res("amu_{bound_meff_t}_(TM)_below", all_obs, mt)
+gg <- gg + geom_vline(xintercept = fit[1, 3], color = "black")
 
-fit<-get_full_res("amu_{bound_meff_t}_(OS)_below",all_obs ,mt )
-gg<- gg + geom_vline(xintercept = fit[1,3], color="blue")
-# gg<- gg+ geom_abline(intercept = 37, slope = -5, color="M_VKVK_OS", 
+fit <- get_full_res("amu_{bound_meff_t}_(OS)_below", all_obs, mt)
+gg <- gg + geom_vline(xintercept = fit[1, 3], color = "blue")
+# gg<- gg+ geom_abline(intercept = 37, slope = -5, color="M_VKVK_OS",
 #                  linetype="dashed", size=1.5)
 
-fig<-myplotly(gg, to_print = TRUE)
+fig <- myplotly(gg, to_print = TRUE)
 ```
 
 ## FVE
 
 ```{r, results='asis',echo=FALSE}
 source("/home/garofalo/programs/Rose/R/read_block.R")
-e<-"D96"
-dir <-"/home/garofalo/analysis/blinded_gm2/data/out/"
-mt<-read_df(paste0(dir,e,"_output"))
-all_obs<-Rose::get_all_corr(mt)
-fit<-get_full_res("DV_DM",all_obs ,mt)
-cat("DV_DM = ",fit[1,1]," +- ", fit[1,2],"\n\n")
-fit<-get_full_res("DV_to_C80",all_obs ,mt)
-cat("DV_to_C80 = ",fit[1,1]," +- ", fit[1,2],"\n\n")
+e <- "D96"
+dir <- "/home/garofalo/analysis/blinded_gm2/data/out/"
+mt <- read_df(paste0(dir, e, "_output"))
+all_obs <- Rose::get_all_corr(mt)
+fit <- get_full_res("DV_DM", all_obs, mt)
+cat("DV_DM = ", fit[1, 1], " +- ", fit[1, 2], "\n\n")
+fit <- get_full_res("DV_to_C80", all_obs, mt)
+cat("DV_to_C80 = ", fit[1, 1], " +- ", fit[1, 2], "\n\n")
+```
+
+## Statistic
+
+
+```{r, results='asis',echo=FALSE}
+
+e <- c("D96", "D96_184confs", "D96_122confs")
+confs <- c(256, 184, 122)
+
+dir <- "/home/garofalo/analysis/blinded_gm2/data/out/"
+df <- NULL
+for (i in seq_along(e)) {
+
+mt <- read_df(paste0(dir, e[i], "_output"))
+all_obs <- Rose::get_all_corr(mt)
+name<-"amu_{bound}_(TM)_above"
+df <- add_corr_to_df(string =name, all_obs, mt, df,
+  reshape = FALSE, nudge = 0.0+(i-1)*0.2,print_res = FALSE, rename = paste0(name,confs[i])
+)
+name<-"amu_{bound}_(TM)_below"
+df <- add_corr_to_df(name, all_obs, mt, df,
+  reshape = FALSE, nudge = 0.1+(i-1)*0.2, rename = paste0(name,confs[i])
+)
+name<-"amu_{bound_meff_t}_(TM)_below"
+df <- add_corr_to_df(name, all_obs, mt, df,
+  reshape = FALSE, nudge = 0.05+(i-1)*0.2, rename = paste0(name,confs[i])
+)
+name<-"amu_{bound_meff}_(TM)_above"
+df <- add_corr_to_df(name, all_obs, mt, df,
+  reshape = FALSE, nudge = 0.15+(i-1)*0.2, rename = paste0(name,confs[i])
+)
+}
+###############################################################################
+
+
+gg <- plot_df_corr_ggplot(df)
+
+
+fig <- myplotly(gg, to_print = TRUE)
+```
+
+
+```{r}
+e <- c("D96", "D96_184confs", "D96_122confs")
+confs <- c(256, 184, 122)
+df <- NULL
+dir <- "/home/garofalo/analysis/blinded_gm2/data/out/"
+
+for (i in seq_along(e)) {
+  mt <- read_df(paste0(dir, e[i], "_output"))
+  all_obs <- Rose::get_all_corr(mt)
+
+  fit <- get_full_res("amu_{bound}_(TM)_ave", all_obs, mt)
+  fit_meff_t <- get_full_res("amu_{bound_meff_t}_(TM)_ave", all_obs, mt)
+  fit_meff <- get_full_res("amu_{bound_meff}_(TM)_ave", all_obs, mt)
+  fit_OS <- get_full_res("amu_{bound}_(OS)_ave", all_obs, mt)
+  fit_OS_meff_t <- get_full_res("amu_{bound_meff_t}_(OS)_ave", all_obs, mt)
+  fit_OS_meff <- get_full_res("amu_{bound_meff}_(OS)_ave", all_obs, mt)
+
+  dft <- data.frame(
+    "Nconf" = confs[i],
+    "amu_{bound}_(TM)" = fit[1, 1],
+    "damu_{bound}_(TM)" = fit[1, 2],
+    "amu_{bound_meff_t}_(TM)" = fit_meff_t[1, 1],
+    "damu_{bound_meff_t}_(TM)" = fit_meff_t[1, 2],
+    "amu_{bound_meff}_(TM)" = fit_meff[1, 1],
+    "damu_{bound_meff}_(TM)" = fit_meff[1, 2],
+    "amu_{bound}_(OS)" = fit_OS[1, 1],
+    "damu_{bound}_(OS)" = fit_OS[1, 2],
+    "amu_{bound_meff_t}_(OS)" = fit_OS_meff_t[1, 1],
+    "damu_{bound_meff_t}_(OS)" = fit_OS_meff_t[1, 2],
+    "amu_{bound_meff}_(OS)" = fit_OS_meff[1, 1],
+    "damu_{bound_meff}_(OS)" = fit_OS_meff[1, 2]
+  )
+  df <- rbind(df, dft)
+}
+gg <- myggplot()
+
+############################################################################
+lab<-"damu_{bound_meff_t}_(TM)"
+gg <- gg + geom_point(aes(
+  x = 1 / sqrt(df$Nconf),
+  y = df$damu_.bound_meff_t._.TM.,
+  color = !!lab
+))
+
+df$x <- 1 / sqrt(df$Nconf)
+lm_fit <- lm(damu_.bound_meff_t._.TM. ~ 0 + x, data = df)
+tmp<-data.frame(x=c(df$x,0))
+predicted_df <- data.frame(mpg_pred = predict(lm_fit, tmp), x = tmp$x)
+gg <- gg + geom_line(aes(x = tmp$x, y = !!predicted_df$mpg_pred,color = !!lab))
+#########################################################################
+lab<-"damu_{bound_meff_t}_(OS)"
+gg <- gg + geom_point(aes(
+  x = 1 / sqrt(df$Nconf),
+  y = df$damu_.bound_meff_t._.OS.,
+  color = !!lab
+))
+
+tmp<-data.frame(x=c(df$x,0))
+lm_fit <- lm(damu_.bound_meff_t._.OS. ~ 0 + x, data = df)
+predicted_df <- data.frame(mpg_pred = predict(lm_fit, tmp), x = tmp$x)
+gg <- gg + geom_line(aes(x = tmp$x, y = !!predicted_df$mpg_pred, color = !!lab))
+#######################################################à
+lab<-"amu_{bound_meff}_(TM)"
+gg <- gg + geom_point(aes(
+  x = 1 / sqrt(df$Nconf),
+  y = df$damu_.bound_meff._.TM.,
+  color = !!lab
+))
+
+df$x <- 1 / sqrt(df$Nconf)
+lm_fit <- lm(damu_.bound_meff._.TM. ~ 0 + x, data = df)
+tmp<-data.frame(x=c(df$x,0))
+predicted_df <- data.frame(mpg_pred = predict(lm_fit, tmp), x = tmp$x)
+gg <- gg + geom_line(aes(x = tmp$x, y = !!predicted_df$mpg_pred,color = !!lab))
+#########################################################################
+lab<-"amu_{bound_meff}_(OS)"
+gg <- gg + geom_point(aes(
+  x = 1 / sqrt(df$Nconf),
+  y = df$damu_.bound_meff._.OS.,
+  color = !!lab
+))
+
+tmp<-data.frame(x=c(df$x,0))
+lm_fit <- lm(damu_.bound_meff._.OS. ~ 0 + x, data = df)
+predicted_df <- data.frame(mpg_pred = predict(lm_fit, tmp), x = tmp$x)
+gg <- gg + geom_line(aes(x = tmp$x, y = !!predicted_df$mpg_pred, color = !!lab))
+
+
+
+#
+fig <- myplotly(gg, "", "$1/\\sqrt{N}$", to_print = TRUE, xrange=c(0,0.093), yrange=c(0,1.05e-9))
 ```

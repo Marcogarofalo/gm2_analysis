@@ -155,3 +155,31 @@ for (e in ens){
 # gg<-plot_df_corr_ggplot(df)
 # fig<-myplotly(gg, to_print = TRUE)
 ```
+
+
+```{r, results='asis',echo=FALSE}
+ens<-c(
+      # "cA.30.32_mu.0.003000",
+      #  "cA.40.24_mu.0.004000",
+      #  "cA.53.24_mu.0.005300",
+       # "cB.72.64_mu.0.000720"
+       # "cB.72.96_mu.0.000720",
+       # "cC.06.80_mu.0.000600",
+       "cE.44.112_mu.0.000440"
+       )
+dir <-"/home/garofalo/analysis/g-2_new_stat/out/"
+df<-NULL
+for (e in ens){
+  mt<-Rose::read_df(paste0(dir,e,"_output"))
+  all_obs<-Rose::get_all_corr(mt)
+  df<-add_corr_to_df("M_{JPsi}^{op}(c0)",all_obs ,mt,df)
+  df<-add_corr_to_df("M_{JPsi}^{op}(c1)",all_obs ,mt,df)
+  df<-add_corr_to_df("M_{JPsi}^{op}(c2)",all_obs ,mt,df)
+  # df<-add_corr_to_df("G_{eta1}^{op}",all_obs ,mt,df)
+  # df<-add_corr_to_df("G_{eta1}^{eq}",all_obs ,mt,df)
+  
+
+}
+gg<-plot_df_corr_ggplot(df)
+fig<-myplotly(gg, to_print = TRUE)
+```
