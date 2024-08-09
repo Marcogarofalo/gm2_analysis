@@ -22,7 +22,7 @@
 #include "fit_all.hpp"
 #include "resampling_new.hpp"
 #include "global.hpp"
-#include "do_analysis_charm.hpp"
+// #include "do_analysis_charm.hpp"
 
 #include <string>
 #include <cstring> 
@@ -31,6 +31,28 @@
 #include <memory>
 #include <vector>
 #include <map>
+
+
+enum enum_ensembles {
+    B72_64,
+    B72_96,
+    C06,
+    D54,
+    A53,
+    A40,
+    A30,
+    E112,
+    C112,
+    B14_64,
+    B25_48,
+};
+
+
+constexpr double fpi_MeV = 130.5;
+constexpr double fpi_MeV_err = 0.04;
+
+// constexpr double Mpi_MeV = 135;
+// constexpr double Mpi_MeV_err = 0.2;
 
 generic_header read_header(FILE* stream) {
     generic_header header;
@@ -850,6 +872,12 @@ int main(int argc, char** argv) {
     mysprintf(namefile, NAMESIZE, "%s/%s_cC.06.112_mu.0.000600", argv[2], argv[1]);
     files.emplace_back(namefile);
 
+    mysprintf(namefile, NAMESIZE, "%s/%s_cB.14.64_mu.0.001400", argv[2], argv[1]);
+    files.emplace_back(namefile);
+
+    mysprintf(namefile, NAMESIZE, "%s/%s_cB.25.48_mu.0.002500", argv[2], argv[1]);
+    files.emplace_back(namefile);
+
 
     data_all jackall = read_all_the_files(files, argv[1]);
     jackall.create_generalised_resampling();
@@ -889,14 +917,19 @@ int main(int argc, char** argv) {
     sum_amu_W.resampling = argv[1];
 
     int count = 0;
+    double* jack_fpi_phys_MeV = myres->create_fake(fpi_MeV, fpi_MeV_err, 1);
+    double* jack_Mpi_phys_MeV = myres->create_fake(Mpi_MeV, Mpi_MeV_err, 1);
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
     fit_info.restore_default();
-    fit_info.N = 2;
+    fit_info.N = 8;
     fit_info.Nvar = 8;
+    fit_info.Npar = 7;
     fit_info.Njack = Njack;
-    fit_info.Nxen = { {A53, A40, A30, B72_64, B72_96, C06, C112, D54, E112},
-                                                {B72_64, B72_96, C06, D54} };
+    fit_info.Nxen = { {A53, A40, A30}, {B25_48, B14_64, B72_64, B72_96},
+                        {C06, C112}, {D54},
+                        {E112},  {B72_64},
+                        {C06}, {D54} };
     fit_info.init_N_etot_form_Nxen();
 
     fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
@@ -904,19 +937,33 @@ int main(int argc, char** argv) {
     for (int n = 0;n < fit_info.Nxen.size();n++) {
         for (int e : fit_info.Nxen[n]) {
             for (int j = 0;j < Njack;j++) {
-                double my_mu, my_M;
-                if (n == 0) {
+                double my_mu, my_M, my_fpi;
+                if (n < 5) {
                     my_mu = jackall.en[e].jack[165][j];
                     my_M = jackall.en[e].jack[1][j];
+                    my_fpi = jackall.en[e].jack[163][j];
                 }
-                else if (n == 1) {
+                else if (n >= 5) {
                     my_mu = jackall.en[e].jack[166][j];
                     my_M = jackall.en[e].jack[123][j];
+                    my_fpi = jackall.en[e].jack[164][j];
                 }
 
-                fit_info.x[0][count][j] = my_mu; // a^2
-                fit_info.x[1][count][j] = my_M;  // Delta_FV_GS
-                // fit_info.x[2][count][j] = jackall.en[e].jack[1][j];  //Mpi
+                fit_info.x[0][count][j] = my_mu; // 
+                fit_info.x[1][count][j] = my_M;  // 
+                fit_info.x[2][count][j] = my_fpi;  //
+                fit_info.x[3][count][j] = jackall.en[e].header.L;
+
+                fit_info.x[4][count][j] = my_M / (4 * M_PI * my_fpi);
+                fit_info.x[4][count][j] *= fit_info.x[4][count][j];
+
+                fit_info.x[5][count][j] = jack_Mpi_phys_MeV[j] / hbarc;
+                fit_info.x[6][count][j] = jack_fpi_phys_MeV[j] / hbarc;
+
+
+                fit_info.x[7][count][j] = jack_Mpi_phys_MeV[j] / (4 * M_PI * jack_fpi_phys_MeV[j]);
+                fit_info.x[7][count][j] *= fit_info.x[7][count][j];
+
                 // fit_info.x[3][count][j] = jack_Mpi_MeV_exp[j];
                 // fit_info.x[4][count][j] = l + 1e-6;
                 // fit_info.x[5][count][j] = a + 1e-6;
@@ -927,43 +974,59 @@ int main(int argc, char** argv) {
         }
     }
 
-    fit_info.corr_id = { 146, 147 };
-    fit_info.function = rhs_amu_common;
+    // fit_info.corr_id = { 1, 123, 163, 164 }; // Mpi(mu1), Mpi(mu2), fpi(mu1), fpi(mu2)
+    fit_info.corr_id = { 163, 163, 163, 163, 163, 164, 164, 164 }; //  fpi(mu1), fpi(mu2)
+    fit_info.function = rhs_afpi;
     fit_info.linear_fit = false;
-    fit_info.covariancey = true;
+    fit_info.covariancey = false;
     // fit_info.acc= 1e-6;
     // fit_info.chi2_gap_jackboot=0.1;
     // fit_info.guess_per_jack=5;
     // fit_info.repeat_start=5;
-    fit_info.verbosity = 0;
-    fit_info.compute_cov_fit(argv, jackall, lhs_amu);
-    int ie = 0, ie1 = 0;
-    for (int n = 0;n < fit_info.N;n++) {
-        for (int e = 0;e < fit_info.myen.size();e++) {
-            ie1 = 0;
-            for (int n1 = 0;n1 < fit_info.N;n1++) {
-                for (int e1 = 0;e1 < fit_info.myen.size();e1++) {
-                    if (e != e1)   fit_info.cov[ie][ie1] = 0;
-                    ie1++;
-                }
-            }
-            ie++;
-        }
-    }
-    fit_info.compute_cov1_fit();
-    mysprintf(namefit, NAMESIZE, "amu_full_a2_MK_cov");
-    fit_result amu_SD_l_common_a4 = fit_all_data(argv, jackall, lhs_amu, fit_info, namefit);
-    fit_info.band_range = { 0,0.0081 };
-    std::vector<double> xcont = { 0, 0 /*Delta*/, 0, 0,/*l, a,m*/ fit_info.x[4][0][Njack - 1],
-         fit_info.x[5][0][Njack - 1] , fit_info.x[6][0][Njack - 1], fit_info.x[7][0][Njack - 1] };
+    // fit_info.verbosity = 0;
+    // fit_info.compute_cov_fit(argv, jackall, lhs_afpi);
+    // int ie = 0, ie1 = 0;
+    // for (int n = 0;n < fit_info.N;n++) {
+    //     for (int e = 0;e < fit_info.myen.size();e++) {
+    //         ie1 = 0;
+    //         for (int n1 = 0;n1 < fit_info.N;n1++) {
+    //             for (int e1 = 0;e1 < fit_info.myen.size();e1++) {
+    //                 if (e != e1)   fit_info.cov[ie][ie1] = 0;
+    //                 ie1++;
+    //             }
+    //         }
+    //         ie++;
+    //     }
+    // }
+    // fit_info.compute_cov1_fit();
+    fit_info.guess = { 0.0908026, 0.07951 , 0.06816, 0.05688, 0.04891 ,1 ,1 };
+    mysprintf(namefit, NAMESIZE, "afpi_cov");
+    fit_result fit_afpi = fit_all_data(argv, jackall, lhs_afpi, fit_info, namefit);
+    fit_info.band_range = { 0.005,0.035 };
+    // std::vector<double> xcont = { 0, 0 /*Delta*/, 0, 0,/*l, a,m*/ fit_info.x[4][0][Njack - 1],
+    //      fit_info.x[5][0][Njack - 1] , fit_info.x[6][0][Njack - 1], fit_info.x[7][0][Njack - 1] };
 
 
     //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
-    print_fit_band(argv, jackall, fit_info, fit_info, namefit, "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0005, xcont);
+    std::vector<double> xcont = {};
+    print_fit_band(argv, jackall, fit_info, fit_info, namefit, "xi", fit_afpi, fit_afpi, 4, 0, 0.0005, xcont);
 
-    free_fit_result(fit_info, amu_SD_l_common_a4);
+    fit_afpi.clear();
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
+    fit_info.Npar = 8;
+    fit_info.function = rhs_afpi_FVEres;
 
+    fit_info.guess = { 0.0908026, 0.07951 , 0.06816, 0.05688, 0.04891 ,1 ,1 };
+    mysprintf(namefit, NAMESIZE, "afpi_resFVE_cov");
+    fit_afpi = fit_all_data(argv, jackall, lhs_afpi, fit_info, namefit);
+    fit_info.band_range = { 0.005,0.035 };
+    print_fit_band(argv, jackall, fit_info, fit_info, namefit, "xi", fit_afpi, fit_afpi, 4, 0, 0.0005, xcont);
 
+    mysprintf(namefit, NAMESIZE, "afpi_resFVE_corr_cov");
+    fit_info.function = rhs_afpi;
+    print_data_fit_corrected(argv, jackall, lhs_afpi_remove_FVE, fit_info, namefit, fit_afpi);
+    print_fit_band(argv, jackall, fit_info, fit_info, namefit, "xi", fit_afpi, fit_afpi, 4, 0, 0.0005, xcont);
+
+    fit_afpi.clear();
 }
