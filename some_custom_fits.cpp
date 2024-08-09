@@ -22,7 +22,6 @@
 #include "fit_all.hpp"
 #include "resampling_new.hpp"
 #include "global.hpp"
-#include "do_analysis_charm.hpp"
 
 #include <string>
 #include <cstring> 
@@ -31,6 +30,20 @@
 #include <memory>
 #include <vector>
 #include <map>
+
+
+enum enum_ensembles {
+    B72_64,
+    B72_96,
+    C06,
+    D54,
+    A53,
+    A40,
+    A30,
+    E112,
+    C112
+};
+
 
 generic_header read_header(FILE* stream) {
     generic_header header;

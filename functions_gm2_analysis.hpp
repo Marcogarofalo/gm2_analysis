@@ -35,17 +35,6 @@ extern "C" {
 
 using namespace std::complex_literals;
 
-enum enum_ensembles {
-    B72_64,
-    B72_96,
-    C06,
-    D54,
-    A53,
-    A40,
-    A30,
-    E112,
-    C112
-};
 
 // double integrand_K(double x, void* params);
 // double kernel_K(double z, double epsrel = 1e-7);
@@ -204,4 +193,9 @@ double rhs_amu_a4_common(int n, int Nvar, double* x, int Npar, double* P);
 
 // void compute_syst_eq28(data_all in, const char* outpath, const char* filename) ;
 
+
+double lhs_afpi(int n, int e, int j, data_all gjack, struct fit_type fit_info);
+double lhs_afpi_remove_FVE(int n, int e, int j, data_all gjack, struct fit_type fit_info, struct fit_result fit_out);
+double rhs_afpi(int n, int Nvar, double* x, int Npar, double* P);
+double rhs_afpi_FVEres(int n, int Nvar, double* x, int Npar, double* P);
 #endif

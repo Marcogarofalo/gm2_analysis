@@ -22,7 +22,8 @@
 #include "fit_all.hpp"
 #include "resampling_new.hpp"
 #include "global.hpp"
-#include "do_analysis_charm.hpp"
+
+
 
 #include <string>
 #include <cstring> 
@@ -31,6 +32,19 @@
 #include <memory>
 #include <vector>
 #include <map>
+
+enum enum_ensembles {
+    B72_64,
+    B72_96,
+    C06,
+    D54,
+    A53,
+    A40,
+    A30,
+    E112,
+    C112
+};
+// #include "do_analysis_charm.hpp"
 
 generic_header read_header(FILE* stream) {
     generic_header header;
@@ -5703,8 +5717,8 @@ int main(int argc, char** argv) {
     free_fit_result(fit_info, Acharm);
     fit_info.restore_default();
 
-    do_analysis_charm(argv, { 96,106, 97, 107 }, { "Meta", "MJpsi" }, "W_cphys", jackall);
-    do_analysis_charm(argv, { 76,86, 77, 87 }, { "Meta", "MJpsi" }, "SD_cphys", jackall);
+    // do_analysis_charm(argv, { 96,106, 97, 107 }, { "Meta", "MJpsi" }, "W_cphys", jackall);
+    // do_analysis_charm(argv, { 76,86, 77, 87 }, { "Meta", "MJpsi" }, "SD_cphys", jackall);
 
     ////////////////////////////////////////////////////////////////////////////////////
     /// analysis amu_s_full

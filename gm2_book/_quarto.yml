@@ -9,6 +9,7 @@ book:
     - index.qmd
     - Mpi.qmd
     - MK.qmd
+    - scale_setting.qmd
     - continuum_amu_s_full.qmd
     - continuum_amu_s_W.qmd
     - continuum_amu_s_sd.qmd

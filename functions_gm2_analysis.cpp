@@ -1,6 +1,7 @@
 #define functions_gm2_analysis_C
 #include "functions_gm2_analysis.hpp"
 #include "correlators_analysis.hpp"
+#include "fve.hpp"
 
 // double integrand_K(double x, void* params) {
 //     double z = *(double*)params;
@@ -2401,3 +2402,117 @@ double rhs_amu_a4_common(int n, int Nvar, double* x, int Npar, double* P) {
 //     printf("mean(eq28)= %g  %g \n", ave, err);
 //     fclose(f);
 // }
+
+
+double lhs_Mpi_fpi(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
+    double r;
+    r = gjack.en[e].jack[fit_info.corr_id[n]][j];
+    int count = 0;
+    for (int in = 0;in < n;in++)
+        for (int ie = 0;ie < e;ie++)
+            count++;
+    double mu = fit_info.x[0][count][j];
+    double Mpi = fit_info.x[1][count][j];
+    double fpi = fit_info.x[2][count][j];
+    double L = fit_info.x[3][count][j];
+    double xi = Mpi / (4 * M_PI * fpi);
+    xi = xi * xi;
+    double delta_FVE = FVE_GL_Mpi(L / Mpi, xi, fpi);
+    if (n < 2) { // Mpi
+        r /= (1 - 0.25 * delta_FVE);
+        r *= r; // Mpi^2
+    }
+    else if (n >= 2) { // fpi
+        r /= (1 + delta_FVE);
+    }
+
+    return r;
+}
+
+double lhs_afpi(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
+    double r;
+    r = gjack.en[e].jack[fit_info.corr_id[n]][j];
+    int count = 0;
+    for (int in = 0;in < n;in++)
+        for (int ie : fit_info.Nxen[in])
+            count++;
+
+    double mu = fit_info.x[0][count][j];
+    double Mpi = fit_info.x[1][count][j];
+    double fpi = fit_info.x[2][count][j];
+    double L = fit_info.x[3][count][j];
+    double xi = fit_info.x[4][count][j];
+    double delta_FVE = FVE_GL_Mpi(L / Mpi, xi, fpi);
+    r /= (1 + delta_FVE);
+
+    return r;
+}
+
+double lhs_afpi_remove_FVE(int n, int e, int j, data_all gjack, struct fit_type fit_info, struct fit_result fit_out) {
+    double r;
+    r = gjack.en[e].jack[fit_info.corr_id[n]][j];
+    int count = 0;
+    for (int in = 0;in < n;in++)
+        for (int ie : fit_info.Nxen[in])
+            count++;
+
+    double mu = fit_info.x[0][count][j];
+    double Mpi = fit_info.x[1][count][j];
+    double fpi = fit_info.x[2][count][j];
+    double L = fit_info.x[3][count][j];
+    double xi = fit_info.x[4][count][j];
+    double delta_FVE = FVE_GL_Mpi(L / Mpi, xi, fpi);
+    xi *= (1 + delta_FVE)*(1 + delta_FVE)/(1 - 0.25 * delta_FVE) * (1 - 0.25 * delta_FVE);
+    r /= (1 + delta_FVE);
+    r /=1+fit_out.P[7][j]*xi*exp(-Mpi*L)/pow(Mpi*L, 3.0/2.0);
+    return r;
+}
+
+double rhs_afpi(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a;
+    if (n < 5) {
+        a = P[(n)]; // A,B,C,D,E
+    }
+    else {
+        a = P[(n) % 5 + 1];// B,C,D
+    }
+    double aMpi = x[1];
+    double afpi = x[2];
+    double xi = x[4];
+    double L = x[3];
+    double delta_FVE = FVE_GL_Mpi(L / aMpi, xi, afpi);
+    xi *= (1 + delta_FVE)*(1 + delta_FVE)/(1 - 0.25 * delta_FVE) * (1 - 0.25 * delta_FVE);
+    double Mpi_phys_fm = x[5];
+    double fpi_phys_fm = x[6];
+    double xi_phys = x[7];
+    // r = a * P[6] * (1-2*xi*log(xi)+2*P[7]*xi+aMpi*aMpi*(P[8]+P[9]*xi)); 
+    r = a * fpi_phys_fm * (1 - 2 * xi * log(xi / xi_phys) - (P[5] + P[6] * a * fpi_phys_fm * a * fpi_phys_fm) * (xi - xi_phys));
+    return r;
+
+}
+
+double rhs_afpi_FVEres(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a;
+    if (n < 5) {
+        a = P[(n)]; // A,B,C,D,E
+    }
+    else {
+        a = P[(n) % 5 + 1];// B,C,D
+    }
+    double aMpi = x[1];
+    double afpi = x[2];
+    double xi = x[4];
+    double L = x[3];
+    double delta_FVE = FVE_GL_Mpi(L / aMpi, xi, afpi);
+    xi *= (1 + delta_FVE)*(1 + delta_FVE)/(1 - 0.25 * delta_FVE) * (1 - 0.25 * delta_FVE);
+    double Mpi_phys_fm = x[5];
+    double fpi_phys_fm = x[6];
+    double xi_phys = x[7];
+    // r = a * P[6] * (1-2*xi*log(xi)+2*P[7]*xi+aMpi*aMpi*(P[8]+P[9]*xi)); 
+    r = a * fpi_phys_fm * (1 - 2 * xi * log(xi / xi_phys) - (P[5] + P[6] * a * fpi_phys_fm * a * fpi_phys_fm) * (xi - xi_phys));
+    r *= 1+P[7]*xi*exp(-aMpi*L)/pow(aMpi*L, 3.0/2.0);
+    return r;
+
+}
