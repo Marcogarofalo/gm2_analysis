@@ -32,9 +32,9 @@ $$
   \widetilde{g}_1(\lambda) \simeq 4 \sqrt{\frac{\pi}{2}} \sum_{n=1}^\infty \frac{m(n)}{(\sqrt{n} \lambda)^{3/2}} e^{- \sqrt{n} \lambda} \\
    \xi_\pi \equiv \frac{M_\pi^2}{(4 \pi f_\pi)^2}
 $$
-with $m(n)$ the multiplicities of a three-dimensional vector $\vec{n}$ having integer norm $n$ (i.e.~$m(n) = \{6, 12, 8, 6, ...\}$).
+with $m(n)$ the multiplicities of a three-dimensional vector $\vec{n}$ having integer norm $n$ (i.e.~$m(n) = \{6, 12, 8, 6, ...\}$) and $\lambda=M_\pi L$.
 To obtain the above formula we expand $K_1$, the Bessel function of the second kind, by its asymptotic expansion.\
-Different choices of the expansion variable are possible: one can replace $f_\pi$ with the LO LEC $f$ and/or replace $M_\pi^2$ with $2 B m_\ell$ (and correspondingly $M_\pi L$ with $\sqrt{2 B m_\ell} L$ in the arguments of the functions $\widetilde{g}_1$ and $ \widetilde{g}_2$). 
+Different choices of the expansion variable are possible: one can replace $f_\pi$ with the LO LEC $f$ and/or replace $M_\pi^2$ with $2 B m_\ell$ (and correspondingly $M_\pi L$ with $\sqrt{2 B m_\ell} L$ in the arguments of the functions $\widetilde{g}_1$ and $\widetilde{g}_2$). 
 At NLO (i.e., for the GL formula) the above changes are equivalent, since any difference represents a NNLO effect.
 
 $$
@@ -256,7 +256,7 @@ $$
 ```{r, echo=FALSE, results='asis', dev='tikz', warning=FALSE}
 
 dir <- "/home/garofalo/analysis/g-2_new_stat/fit_all/"
-namefit <- paste0(dir, "afpi_resFVE_cov")
+namefit <- paste0(dir, "afpi_resFVE_corr_cov")
 file <- paste0(namefit, "_fit_P.dat")
 fit <- read_fit_P_file(file)
 cat("\n\n")
@@ -275,6 +275,20 @@ gg <- plot_fit(
   # , nolabel_for_fit = TRUE
   , noline = TRUE
 )
+
+# namefit <- paste0(dir, "afpi_resFVE_cov")
+# gg <- plot_fit(
+#   basename = namefit,
+#   var = "xi",
+#   id_x = 5,
+#   data_type = c("A_L", "B_L", "C_L", "D_L", "E_L", "B_L", "C_L", "D_L"),
+#   width = 1e-4,
+#   gg = gg, ,
+#   labelfit = "",
+#   # , single_name_for_fit = "fit"
+#   # , nolabel_for_fit = TRUE
+#   , noline = TRUE,noribbon = TRUE
+# )
 gg <- gg + geom_vline(xintercept = 0.00678723)
 fig <- myplotly(gg, "", "$\\xi$", "$af_\\pi$", to_print = TRUE)
 ```

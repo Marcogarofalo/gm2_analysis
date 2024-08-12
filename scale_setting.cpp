@@ -22,6 +22,7 @@
 #include "fit_all.hpp"
 #include "resampling_new.hpp"
 #include "global.hpp"
+#include "fve.hpp"
 // #include "do_analysis_charm.hpp"
 
 #include <string>
@@ -954,8 +955,11 @@ int main(int argc, char** argv) {
                 fit_info.x[2][count][j] = my_fpi;  //
                 fit_info.x[3][count][j] = jackall.en[e].header.L;
 
-                fit_info.x[4][count][j] = my_M / (4 * M_PI * my_fpi);
-                fit_info.x[4][count][j] *= fit_info.x[4][count][j];
+                double xi = my_M / (4 * M_PI * my_fpi);
+                xi *= xi;
+                double delta_FVE = FVE_GL_Mpi(jackall.en[e].header.L, xi, my_fpi);
+                xi *= (1 + delta_FVE) * (1 + delta_FVE) / (1 - 0.25 * delta_FVE) * (1 - 0.25 * delta_FVE);
+                fit_info.x[4][count][j] = xi;
 
                 fit_info.x[5][count][j] = jack_Mpi_phys_MeV[j] / hbarc;
                 fit_info.x[6][count][j] = jack_fpi_phys_MeV[j] / hbarc;
