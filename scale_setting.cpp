@@ -46,6 +46,7 @@ enum enum_ensembles {
     C112,
     B14_64,
     B25_48,
+    C20
 };
 
 
@@ -879,6 +880,8 @@ int main(int argc, char** argv) {
     mysprintf(namefile, NAMESIZE, "%s/%s_cB.25.48_mu.0.002500", argv[2], argv[1]);
     files.emplace_back(namefile);
 
+    mysprintf(namefile, NAMESIZE, "%s/%s_cC.20.48_mu.0.002000", argv[2], argv[1]);
+    files.emplace_back(namefile);
 
     data_all jackall = read_all_the_files(files, argv[1]);
     jackall.create_generalised_resampling();
@@ -928,7 +931,7 @@ int main(int argc, char** argv) {
     fit_info.Npar = 7;
     fit_info.Njack = Njack;
     fit_info.Nxen = { {A53, A40, A30}, {B25_48, B14_64, B72_64, B72_96},
-                        {C06, C112}, {D54},
+                        {C20, C06, C112}, {D54},
                         {E112},  {B72_64},
                         {C06}, {D54} };
     fit_info.init_N_etot_form_Nxen();
