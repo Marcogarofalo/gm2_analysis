@@ -1,0 +1,95 @@
+# VKVK corr  {#VKVK}
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+# library(hadron)
+# library(kableExtra) # breaks latex
+# library(tidyverse)
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+# widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
+```
+
+
+
+
+```{r, results='asis',echo=FALSE}
+
+source("/home/garofalo/programs/Rose/R/read_block.R")
+file <- "/home/garofalo/analysis/gm2_analysis/data_VKVK/out/VKVK_B64.dat_output"
+df <- NULL
+mt <- read_df(file)
+all_obs <- Rose::get_all_corr(mt)
+######
+#####
+
+df <- add_corr_to_df("meff_VKVK_ll_TM", all_obs, mt, df)
+df <- add_corr_to_df("meff_VKVK_ss_TM", all_obs, mt, df)
+df <- add_corr_to_df("meff_GEVP_VKVK_TM_l0", all_obs, mt, df)
+df <- add_corr_to_df("meff_GEVP_VKVK_TM_l1", all_obs, mt, df)
+
+aMpi <- get_full_res("M_{pi}", all_obs, mt)
+a_fm <- 0.079388
+hbc<- 197.326963
+L_a <- 64
+################################
+
+gg <- plot_df_corr_ggplot(df)
+################
+E2<- 2*sqrt( aMpi[1,1]^2 + (2*pi/L_a)^2 )
+gg<- gg+ geom_line(aes(x=c(1:L_a), y=rep(E2,L_a), color="$\\pi\\pi$"  )  )
+##################
+Erho<- 700*a_fm/hbc
+gg<- gg+ geom_line(aes(x=c(1:L_a), y=rep(Erho,L_a), color="700Mev"  )  )
+##################à
+fig <- myplotly(gg, to_print = TRUE)
+```
+
+
+
+
+```{r, results='asis',echo=FALSE}
+
+source("/home/garofalo/programs/Rose/R/read_block.R")
+file <- "/home/garofalo/analysis/gm2_analysis/data_VKVK/out/VKVK_B64.dat_output"
+df <- NULL
+mt <- read_df(file)
+all_obs <- Rose::get_all_corr(mt)
+######
+#####
+
+df <- add_corr_to_df("meff_VKVK_ll_OS", all_obs, mt, df)
+df <- add_corr_to_df("meff_VKVK_ss_OS", all_obs, mt, df)
+df <- add_corr_to_df("meff_GEVP_VKVK_OS_l0", all_obs, mt, df)
+df <- add_corr_to_df("meff_GEVP_VKVK_OS_l1", all_obs, mt, df)
+
+aMpi <- get_full_res("M_{pi}", all_obs, mt)
+a_fm <- 0.079388
+hbc<- 197.326963
+L_a <- 64
+################################
+
+gg <- plot_df_corr_ggplot(df)
+################
+E2<- 2*sqrt( aMpi[1,1]^2 + (2*pi/L_a)^2 )
+gg<- gg+ geom_line(aes(x=c(1:L_a), y=rep(E2,L_a), color="$\\pi\\pi$"  )  )
+##################
+Erho<- 700*a_fm/hbc
+gg<- gg+ geom_line(aes(x=c(1:L_a), y=rep(Erho,L_a), color="700Mev"  )  )
+##################à
+fig <- myplotly(gg, to_print = TRUE)
+```
+

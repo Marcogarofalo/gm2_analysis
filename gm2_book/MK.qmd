@@ -29,9 +29,11 @@ ens<-c(
       #  "cA.40.24_mu.0.004000",
       #  "cA.53.24_mu.0.005300",
        "cB.72.64_mu.0.000720",
-       # "cB.72.96_mu.0.000720",
+       "cB.72.96_mu.0.000720",
        "cC.06.80_mu.0.000600",
-       "cD.54.96_mu.0.000540"
+       "cC.06.112_mu.0.000600",
+       "cD.54.96_mu.0.000540",
+       "cE.44.112_mu.0.000440"
        )
 source("/home/garofalo/programs/Rose/R/read_block.R")
 dir <-"/home/garofalo/analysis/g-2_new_stat/out/"
@@ -46,7 +48,7 @@ for (e in ens){
   
   
   fit<-get_full_res("ms(MK)",all_obs ,mt)
-  cat("$m_s($",substr( e , start = 1 , stop = 8 ),"$)$=", mean_print(fit[1,1],fit[1,2]), "\n\n")
+  cat("$m_s($",gsub("\\_mu.*","",e),"$)$=", mean_print(fit[1,1],fit[1,2]), "\n\n")
 }
 gg<-plot_df_corr_ggplot(df)
 fig<-myplotly(gg, to_print = TRUE)

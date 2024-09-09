@@ -10,7 +10,9 @@ book:
     - Mpi.qmd
     - MK.qmd
     - pi0.qmd
+    - VKVK.qmd
     - scale_setting.qmd
+    - scratch.qmd
     - continuum_amu_s_full.qmd
     - continuum_amu_s_W.qmd
     - continuum_amu_s_sd.qmd

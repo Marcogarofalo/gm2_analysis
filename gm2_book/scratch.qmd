@@ -1,0 +1,68 @@
+# scratch
+
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+# library(hadron)
+# library(kableExtra) # breaks latex
+# library(tidyverse)
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+# widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
+```
+
+
+
+```{r, results='asis',echo=FALSE}
+source("/home/garofalo/programs/Rose/R/plot_routines.R")
+e <- "cB.72.64_mu.0.000720_output"
+dir <- "/home/garofalo/analysis/g-2_new_stat/out/"
+df <- NULL
+mt <- read_df(paste0(dir, e))
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("amu_{full}_simpson38(eq,s)", all_obs, mt, df,
+  reshape = FALSE, print_res = FALSE,
+  rename = "amu_s_OS"
+)
+
+df <- add_corr_to_df("amu_{full}_simpson38(eq,s1)", all_obs, mt, df,
+  reshape = FALSE, print_res = FALSE,
+  rename = "amu_s1_OS"
+)
+
+df <- add_corr_to_df("amu_{full}_simpson38(op,s)", all_obs, mt, df,
+  reshape = FALSE, print_res = FALSE,
+  rename = "amu_s_TM"
+)
+
+df <- add_corr_to_df("amu_{full}_simpson38(op,s1)", all_obs, mt, df,
+  reshape = FALSE, print_res = FALSE,
+  rename = "amu_s1_TM"
+)
+fit <- get_full_res("ms(MK)", all_obs, mt)
+cat("$m_s=$", mean_print(fit[1, 1], fit[1, 2]), "\n\n")
+
+OS_inter <- get_full_res("amu_{full,simp}(eq,MK)", all_obs, mt)
+cat("$a_{\\mu}(s_{phys},OS)=$", mean_print(OS_inter[1, 1], OS_inter[1, 2]), "\n\n")
+
+TM_inter <- get_full_res("amu_{full,simp}(op,MK)", all_obs, mt)
+cat("$a_{\\mu}(s_{phys},TM)=$", mean_print(TM_inter[1, 1], TM_inter[1, 2]), "\n\n")
+
+gg <- plot_df_corr_ggplot(df)
+# gg<-plot_df_corr_ggplot(df2,gg=gg,noribbon = TRUE)
+
+fig <- myplotly(gg, to_print = TRUE)
+```

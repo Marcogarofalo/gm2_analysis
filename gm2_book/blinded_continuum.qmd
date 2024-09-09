@@ -93,7 +93,7 @@ fig<-myplotly(gg, "","$a^2[fm]$",
             paste0("$a_\\mu$"), to_print = TRUE)
 ```
 
-# $m_eff(t)$ bound: above 1) and below 2) (Tov or RBC/UKQCD)
+# $m_{eff}(t)$ bound: above 1) and below 2) (Tov or RBC/UKQCD)
 
 ```{r, results='asis', echo=FALSE, warning=FALSE}
 dir<-"/home/garofalo/analysis/blinded_gm2/data/fit_all/"

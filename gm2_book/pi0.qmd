@@ -26,28 +26,36 @@ myplotly(ggplot())
 
 
 
-```{r, results='asis',echo=FALSE}
+```{r, results='asis',echo=FALSE, eval=FALSE}
 ens <- c(
   # "cA.30.32_mu.0.003000",
   #  "cA.40.24_mu.0.004000",
   #  "cA.53.24_mu.0.005300",
-  "B64.txt"
+  "B64.dat"
   # # "cB.72.96_mu.0.000720",
   # "cC.06.80_mu.0.000600",
   # "cD.54.96_mu.0.000540"
 )
 source("/home/garofalo/programs/Rose/R/read_block.R")
-file <- "/home/garofalo/analysis/pi0/data/B64/out/B64.txt_raw_correlators"
+file <- "/home/garofalo/analysis/pi0/data/B64/out/B64.dat_raw_correlators"
 df <- NULL
 mt <- read_df(file)
 all_obs <- Rose::get_all_corr(mt)
+######
+file <- "/home/garofalo/analysis/pi0/data/B64/out/B64.dat_output"
+mt1 <- read_df(file)
+all_obs1 <- Rose::get_all_corr(mt1)
+#####
+
 df <- add_corr_to_df("", all_obs, mt, df, number = 1, rename = "<LP(t)>")
-#df <- add_corr_to_df("", all_obs, mt, df, number = 2, rename = "<LP(t)>_im")
+# df <- add_corr_to_df("", all_obs, mt, df, number = 2, rename = "<LP(t)>_im")
 
 df <- add_corr_to_df("", all_obs, mt, df, number = 3, rename = "<LP(t)LP(0)>")
-#df <- add_corr_to_df("", all_obs, mt, df, number = 4, rename = "<LP(t)LP(0)>_im")
+# df <- add_corr_to_df("", all_obs, mt, df, number = 4, rename = "<LP(t)LP(0)>_im")
 
+df <- add_corr_to_df("", all_obs, mt, df, number = 5, rename = "<P(t)P(0)>")
 
+df <- add_corr_to_df("{pi0}_full", all_obs1, mt1, df)
 # fit<-get_full_res("ms(MK)",all_obs ,mt)
 # cat("$m_s($",substr( e , start = 1 , stop = 8 ),"$)$=", mean_print(fit[1,1],fit[1,2]), "\n\n")
 
@@ -63,21 +71,21 @@ ens <- c(
   # "cA.30.32_mu.0.003000",
   #  "cA.40.24_mu.0.004000",
   #  "cA.53.24_mu.0.005300",
-  "B64.txt"
+  "B64.dat"
   # # "cB.72.96_mu.0.000720",
   # "cC.06.80_mu.0.000600",
   # "cD.54.96_mu.0.000540"
 )
 source("/home/garofalo/programs/Rose/R/read_block.R")
-file <- "/home/garofalo/analysis/pi0/data/B64/out/B64.txt_log_meff_shifted"
+file <- "/home/garofalo/analysis/pi0/data/B64/out/B64.txt_raw_correlators"
 df <- NULL
 mt <- read_df(file)
 all_obs <- Rose::get_all_corr(mt)
 df <- add_corr_to_df("", all_obs, mt, df, number = 1, rename = "<LP(t)>shift-meff")
 df <- add_corr_to_df("", all_obs, mt, df, number = 2, rename = "<LP(t)LP(0)>shift-meff")
 
-# df <- add_corr_to_df("", all_obs, mt, df, number = 3, rename = "<LP(t)LP(0)>")
-# df <- add_corr_to_df("", all_obs, mt, df, number = 4, rename = "<LP(t)LP(0)>_im")
+ df <- add_corr_to_df("", all_obs, mt, df, number = 3, rename = "<LP(t)LP(0)>")
+ df <- add_corr_to_df("", all_obs, mt, df, number = 4, rename = "<LP(t)LP(0)>_im")
 
 
 # fit<-get_full_res("ms(MK)",all_obs ,mt)
@@ -93,25 +101,62 @@ ens <- c(
   # "cA.30.32_mu.0.003000",
   #  "cA.40.24_mu.0.004000",
   #  "cA.53.24_mu.0.005300",
-  "B64.txt"
+  "B64.dat",
+  "C80.dat",
+  "D96.dat"
   # # "cB.72.96_mu.0.000720",
   # "cC.06.80_mu.0.000600",
   # "cD.54.96_mu.0.000540"
 )
 source("/home/garofalo/programs/Rose/R/read_block.R")
-dir <- "/home/garofalo/analysis/pi0/data/B64/out/"
-df <- NULL
+fileout<-"c2_MeV4_MG.txt"
+cat("\n ", file=fileout,append=FALSE)
+
 for (e in ens) {
+  df <- NULL
+  cat("\n## ", gsub(".dat", "", e), "\n")
+  dir <- paste0("/home/garofalo/analysis/pi0/data/", gsub(".dat", "", e), "/out/")
   mt <- read_df(paste0(dir, e, "_output"))
   all_obs <- Rose::get_all_corr(mt)
   df <- add_corr_to_df("M_{pi0}_disc_shift", all_obs, mt, df)
-  df <- add_corr_to_df("M_{pi0}_disc_shift_log", all_obs, mt, df)
+  # df <- add_corr_to_df("M_{pi0}_disc_shift_log", all_obs, mt, df)
   df <- add_corr_to_df("M_{pi0}_disc_sub_vev", all_obs, mt, df)
-
-
-  # fit<-get_full_res("ms(MK)",all_obs ,mt)
+  # df <- add_corr_to_df("M_{pi0}_full_shift", all_obs, mt, df)
+  df <- add_corr_to_df("M_{pi0}_full_sub_vev", all_obs, mt, df)
+  df <- add_corr_to_df("M_{piOS}", all_obs, mt, df)
+  df <- add_corr_to_df("M_{piTM}", all_obs, mt, df)
+  df <- add_corr_to_df("m_{pi+}-{pi0}", all_obs, mt, df)
+  dfc2 <- add_corr_to_df("c2", all_obs, mt, NULL,rename="$c_2$ [MeV$^{4}$]")
+  # df <- add_corr_to_df("M_{pi0}_full_sub_vev_tau3", all_obs, mt, df)
+  
+  # dfc2 <- add_corr_to_df("c2", all_obs, mt, NULL,rename="$c_2$ [fm$^{-4}$]", print_res = FALSE)
+  cat("\n# ",gsub(".dat", "", e),"_c2\n", file=fileout,append=TRUE)
+  for (i in seq_along(dfc2[,1])){
+    cat(dfc2[i,1],"   ",dfc2[i,2],"   ",dfc2[i,3]," \n  ", file=fileout,append=TRUE)
+  }
+  cat("\n\n", file=fileout,append=TRUE)
+  a_fm<-get_full_res("a_fm",all_obs ,mt)
+  a_MeV<-get_full_res("a_MeV",all_obs ,mt)
+  
+  df$x <- df$x * a_fm[1,1]
+  df$xfit <- df$xfit * a_fm[1,1]
+  df$tmin <- df$tmin * a_fm[1,1]
+  df$tmax <- df$tmax * a_fm[1,1]
+  df$y <- df$y / a_MeV[1,1]
+  df$fit <- df$fit / a_MeV[1,1]
+  df$err <- df$err / a_MeV[1,1]
+  df$errfit <- df$errfit / a_MeV[1,1]
   # cat("$m_s($",substr( e , start = 1 , stop = 8 ),"$)$=", mean_print(fit[1,1],fit[1,2]), "\n\n")
+  gg <- plot_df_corr_ggplot(df,width = 1*a_fm[1,1])
+  fig <- myplotly(gg,"","$t [\\mbox{fm}]$", "$m_{eff} [\\mbox{MeV}]$", to_print = TRUE)
+
+  dfc2$x <- dfc2$x * a_fm[1,1]
+  dfc2$xfit <- dfc2$xfit * a_fm[1,1]
+  dfc2$tmin <- dfc2$tmin * a_fm[1,1]
+  dfc2$tmax <- dfc2$tmax * a_fm[1,1]
+
+  gg <- plot_df_corr_ggplot(dfc2,width = 1*a_fm[1,1])
+  fig <- myplotly(gg,"","$t [\\mbox{fm}]$", "$c_2 [\\mbox{MeV}^4]$", to_print = TRUE)
+  
 }
-gg <- plot_df_corr_ggplot(df)
-fig <- myplotly(gg, to_print = TRUE)
 ```
