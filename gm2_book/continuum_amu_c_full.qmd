@@ -1,0 +1,160 @@
+# $a_{\mu}(c)$ {#amu_c_continuum}
+
+no bounding has been applied
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+# library(hadron)
+# library(kableExtra) # breaks latex
+# library(tidyverse)
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+# widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
+```
+
+
+
+
+
+```{r, echo=FALSE, results='asis'}
+eq_op <- function(x) {
+  if (x == 0) {
+    return("OS")
+  } # equal
+  else {
+    return("TM")
+  } # opposite
+}
+eq_op1 <- function(x) {
+  if (x == 0) {
+    return("OS-a(tau)")
+  } # equal
+  else {
+    return("TM-a(tau)")
+  } # opposite
+}
+
+
+file <- sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_a4_MJPsi_cov_fit_data.txt")
+df <- read.table(file, header = FALSE, fill = TRUE)
+iy <- length(df[1, ]) - 2
+dft <- df[, c(1, iy, iy + 2)]
+names(dft) <- c("$a^2(\\text{fm})$", "$a_{\\mu}(s)$", "r")
+dft[, 2] <- mapply(mean_print, df[, iy], df[, iy + 1])
+kable(dft)
+```
+
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- Rose::read_fit_P_file("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_a4_MJPsi_cov_fit_P.dat")
+Rose::make_table_fit_result(df)
+# df1<-data.frame("P"=df$P[,1], "value"=mapply(mean_print, df$P[,2],df$P[,3] ) )
+# cat("$\\chi^2/dof=$ ",df$chi2,"\n\n")
+# kable(df1)
+```
+
+
+```{r, echo=FALSE, results='asis', dev='tikz', warning=FALSE}
+# file <- sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_a4_MJPsi_cov_fit_data.txt")
+# df <- read.table(file, header = FALSE, fill = TRUE)
+# iy <- length(df[1, ]) - 2
+# 
+# 
+# gg <- myggplot(fill = FALSE)
+# gg <- gg + geom_point(
+#   data = df, mapping = aes(
+#     x = df[, 1], y = df[, iy],
+#     color = as.factor(df[, iy + 2]), shape = as.factor(df[, iy + 2])
+#   ),
+#   width = 1e-4
+# ) + labs(color = "", shape = "")
+# gg <- gg + geom_errorbar(
+#   data = df, mapping = aes(
+#     x = df[, 1], ymin = df[, iy] - df[, iy + 1],
+#     ymax = df[, iy] + df[, iy + 1], color = as.factor(df[, iy + 2]),
+#     shape = as.factor(df[, iy + 2])
+#   ),
+#   width = 1e-4
+# )
+# ##################### à
+# file1 <- sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all_a_from_tau//amu_full_a2_a4_MJPsi_cov_fit_data.txt")
+# df1 <- read.table(file1, header = FALSE, fill = TRUE)
+# 
+# gg <- gg + geom_point(
+#   data = df1, mapping = aes(
+#     x = df1[, 1] + 0.0001, y = df1[, iy],
+#     color = as.factor(df1[, iy + 2]), shape = as.factor(df1[, iy + 2])
+#   ),
+#   width = 1e-4
+# ) + labs(color = "", shape = "")
+# gg <- gg + geom_errorbar(
+#   data = df1, mapping = aes(
+#     x = df1[, 1] + 0.0001, ymin = df1[, iy] - df1[, iy + 1],
+#     ymax = df1[, iy] + df1[, iy + 1], color = as.factor(df1[, iy + 2]),
+#     shape = as.factor(df1[, iy + 2])
+#   ),
+#   width = 1e-4
+# )
+# ################################################
+# df[, iy + 2] <- plyr::laply(df[, iy + 2], eq_op)
+# df1[, iy + 2] <- plyr::laply(df1[, iy + 2], eq_op1)
+# # kable(df)
+# datalist <- list()
+# datalist1 <- list()
+# for (n in c(1:2)) {
+#   file <- sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_a4_MJPsi_cov_fit_out_n%d_afm.txt", n - 1)
+#   datalist[[n]] <- read.table(file,
+#     header = FALSE, fill = TRUE,
+#     col.names = c(paste0("x", n), paste0("fit", n), paste0("fiterr", n))
+#   )
+# 
+#   gg <- gg + geom_ribbon(data = datalist[[n]], mapping = aes_string(x = datalist[[n]][, 1], ymin = datalist[[n]][, 2] - datalist[[n]][, 3], ymax = datalist[[n]][, 2] + datalist[[n]][, 3]), alpha = 0.3, fill = "red")
+#   # gg<-gg + geom_line(data=datalist[[n]], mapping=aes_string(x=datalist[[n]][,1] , y=datalist[[n]][,2]  ),color="red" )
+# 
+#   file1 <- sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all_a_from_tau/amu_full_a2_a4_MJPsi_cov_fit_out_n%d_afm.txt", n - 1)
+#   datalist1[[n]] <- read.table(file1,
+#     header = FALSE, fill = TRUE,
+#     col.names = c(paste0("x", n), paste0("fit", n), paste0("fiterr", n))
+#   )
+# 
+#   gg <- gg + geom_ribbon(data = datalist1[[n]], mapping = aes_string(x = datalist1[[n]][, 1], ymin = datalist1[[n]][, 2] - datalist1[[n]][, 3], ymax = datalist1[[n]][, 2] + datalist1[[n]][, 3]), alpha = 0.3, fill = "blue")
+#   # gg<-gg + geom_line(data=datalist[[n]], mapping=aes_string(x=datalist[[n]][,1] , y=datalist[[n]][,2]  ),color="red" )
+# }
+
+gg<-myggplot()
+gg<-plot_fit(basename = "/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_a4_MJPsi_cov", var="afm",data_type = c("TM","OS"), width=1e-4, gg=gg
+                 ,               id_color = iy+2, id_shape = iy+2,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit"
+             #, nolabel_for_fit = TRUE
+             ,noline=TRUE
+               )
+gg<-plot_fit(basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_a_from_tau/amu_full_a2_a4_MJPsi_cov", var="afm",data_type = c("TM-a(tau)","OS-a(tau)"), width=1e-4, gg=gg
+                 ,               id_color = iy+2, id_shape = iy+2,
+             # , labelfit = "zap"
+                ,single_name_for_fit ="fit-a(tau)"
+             #, nolabel_for_fit = TRUE
+             ,noline=TRUE
+               )
+
+
+fig <- myplotly(gg, "", "$a^2(\\mbox{fm})$", "$a_{\\mu}(c)$", to_print = TRUE)
+
+
+
+# fig<- myplotly(gg,"","$L$", "$E_2- E_{free}^{lat}+E_{free}^{cont}/m$", output = "HTML" ,to_print = FALSE)
+# htmlwidgets::saveWidget(fig, "two_energy_fit.html", selfcontained = T)
+```

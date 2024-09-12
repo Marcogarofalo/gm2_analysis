@@ -83,19 +83,31 @@ fig <- myplotly(gg, "", "$\\xi$", "$af_\\pi$", to_print = TRUE)
 a_tau <- c(0.0908026, 0.07951, 0.06816, 0.05688, 0.04891)
 da_tau <- c(0.000535517, 0.00004, 0.00008, 0.00006, 0.00006)
 gg <- myggplot()
+gg1 <- myggplot()
 
 diff <- (a_tau - fit$P[c(1:5), 2])
-gg <- gg + geom_pointrange(aes(
-  x = a_tau^2, y = diff,
-  ymin = diff - da_tau,
-  ymax = diff + da_tau,
+diff_rel <- (a_tau - fit$P[c(1:5), 2])/a_tau
+err<- (1/a_tau)*fit$P[c(1:5), 3] + (fit$P[c(1:5), 2]/a_tau)^2 *da_tau
+# gg <- gg + geom_pointrange(aes(
+#   x = a_tau^2, y = diff,
+#   ymin = diff - da_tau,
+#   ymax = diff + da_tau,
+#   color = "tau-MG",
+#   shape = "tau-MG",
+#   fill = "tau-MG"
+# ))
+gg1 <- gg1 + geom_pointrange(aes(
+  x = a_tau^2, y = diff_rel,
+  ymin = diff_rel - err,
+  ymax = diff_rel + err,
   color = "tau-MG",
   shape = "tau-MG",
   fill = "tau-MG"
 ))
 
 
-fig <- myplotly(gg, "", "$a^2$", "$a(\\tau)-a(MG)$", to_print = TRUE, xrange = c(0, 0.0085))
+# fig <- myplotly(gg, "", "$a^2$", "$a(\\tau)-a(MG)$", to_print = TRUE, xrange = c(0, 0.0085))
+fig <- myplotly(gg1, "", "$a^2$", "$(a(\\tau)-a(MG))/a(\\tau)$", to_print = TRUE, xrange = c(0, 0.0085))
 ```
 
 
