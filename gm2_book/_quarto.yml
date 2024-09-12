@@ -14,6 +14,7 @@ book:
     - scale_setting.qmd
     - scratch.qmd
     - continuum_amu_s_full.qmd
+    - continuum_amu_c_full.qmd
     - continuum_amu_s_W.qmd
     - continuum_amu_s_sd.qmd
     - continuum_amu_l_W.qmd
