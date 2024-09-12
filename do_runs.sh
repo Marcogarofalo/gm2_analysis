@@ -14,6 +14,8 @@ bad=()
 ./mpi_fpi  read_plateaux -p ../../g-2_new_stat/ cB.25.48  -bin 50  -L 48  jack -mu 0.0025 
 ./mpi_fpi  read_plateaux -p ../../g-2_new_stat/ cC.20.48  -bin 50  -L 48  jack -mu 0.0020 
 
+./VKVK  jack -bin 50  ../data_VKVK/ VKVK_B64.dat
+
 #./g-2 read_plateaux -p ../../../g-2/ test -bin 50  -L 96 jack -mu 0.00054  0.014  0.015   0.165  0.175  0.175|| bad+=("test")
 #./fit_all_gm2  jack ../../g-2_new_stat/jackknife/ ../../g-2_new_stat//fit_all/
 ./some_custom_fits jack ../../g-2_new_stat/jackknife/ ../../g-2_new_stat//fit_all/

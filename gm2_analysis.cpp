@@ -1088,7 +1088,7 @@ int main(int argc, char** argv) {
             fclose(tmp);
         }
         else {
-            printf("files %s do not exist !!!!!\n",correlators[i].c_str());
+            printf("files %s do not exist !!!!!\n", correlators[i].c_str());
         }
 
     }
@@ -1249,8 +1249,25 @@ int main(int argc, char** argv) {
     double* VV = (double*)malloc(sizeof(double) * file_head.l0);
     double mean, err;
     int seed;
-    line_read_param(option, "a", mean, err, seed, namefile_plateaux);
-    double* a = fake_sampling(resampling, mean, err, Njack, seed);
+    // line_read_param(option, "a", mean, err, seed, namefile_plateaux);
+    // double* a = fake_sampling(resampling, mean, err, Njack, seed);
+    double* a = (double*)malloc(sizeof(double) * Njack);// allocate memory 
+    if (strcmp("cA.53.24", argv[4]) == 0 || strcmp("cA.40.24", argv[4]) == 0 || strcmp("cA.30.32", argv[4]) == 0) {
+        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_A.txt");
+    }
+    else if (strcmp("cB.72.64", argv[4]) == 0 || strcmp("cB.72.96", argv[4]) == 0) {
+        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_B.txt");
+    }
+    else if (strcmp("cC.06.80", argv[4]) == 0 || strcmp("cC.06.112", argv[4]) == 0) {
+        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_C.txt");
+    }
+    else if (strcmp("cD.54.96", argv[4]) == 0) {
+        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_D.txt");
+    }
+    else if (strcmp("cE.44.112", argv[4]) == 0) {
+        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_E.txt");
+    }
+
 
     double* jack_Metas_MeV_exp = fake_sampling(resampling, Metas_MeV, Metas_MeV_err, Njack, 1000);
 
@@ -1852,7 +1869,7 @@ int main(int argc, char** argv) {
                     write_jack(asdc_vec[ic], Njack, jack_file);
                     check_correlatro_counter(93 + ic + intgr * (Ncharm + name_M.size()) + tm * (Ncharm + name_M.size()) * name_intgr.size());
                     printf("%s = %g  %g\n", name_corr, asdc_vec[ic][Njack - 1], error_jackboot(resampling, Njack, asdc_vec[ic]));
-                    
+
                 }
                 for (int im = 0; im < name_M.size(); im++) {// etac JPsi
                     mysprintf(name_corr, NAMESIZE, "amu_W_%s(%s,%s)", name_intgr[intgr].c_str(), name_eqop[tm].c_str(), name_M[im].c_str());
@@ -2080,7 +2097,7 @@ int main(int argc, char** argv) {
     int  id_VKVKop_SD_mudm;
     int  id_sea_VKVKeq;
     int  id_sea_VKVKop;
-    
+
     double* M_PS1;
     if (argc >= 19) {
         fit_type fit_info;
@@ -2284,7 +2301,7 @@ int main(int argc, char** argv) {
 
     }
     else { for (int i = 122; i <= 135;i++)  zero_corr(zeros, Njack, jack_file); }
-    
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // amu_full s
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2566,8 +2583,9 @@ int main(int argc, char** argv) {
             outfile, lhs_function_f_PS, "f_{pi}_l1", fit_info, jack_file);
         free_fit_result(fit_info, f_PS1);
         check_correlatro_counter(164);
-    }else {
-        zero_corr(zeros, Njack, jack_file);       check_correlatro_counter(164);    
+    }
+    else {
+        zero_corr(zeros, Njack, jack_file);       check_correlatro_counter(164);
     }
     double* mu_jack = myres->create_fake(mu, mu / 1e+6, 1);
     double* mu1_jack = myres->create_fake(mul1, mul1 / 1e+6, 1);
