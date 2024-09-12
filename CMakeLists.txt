@@ -59,6 +59,8 @@ target_link_libraries(gm2_analysis PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
 add_executable(mpi_fpi mpi_fpi.cpp)
 target_link_libraries(mpi_fpi PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
 
+add_executable(VKVK VKVK.cpp)
+target_link_libraries(VKVK PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
 
 
 add_executable(fit_all_gm2 fit_all_gm2.cpp)
