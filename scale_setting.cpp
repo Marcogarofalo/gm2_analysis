@@ -133,6 +133,7 @@ data_all read_all_the_files(std::vector<std::string> files, const char* resampli
     jackall.ens = files.size();
     int count = 0;
     for (std::string s : files) {
+        std::cout<< "reading:  "<< s<<"\n";
         FILE* f = open_file(s.c_str(), "r");
 
         // read_single_dataj(f, params, &(jackall->en[count]));
@@ -851,15 +852,6 @@ int main(int argc, char** argv) {
     mysprintf(namefile, NAMESIZE, "%s/%s_cD.54.96_mu.0.000540", argv[2], argv[1]);
     files.emplace_back(namefile);
 
-    std::vector<int> myen(files.size());
-    for (int e = 0; e < files.size(); e++) {
-        myen[e] = e;
-        printf("file:  %s\n", files[e].c_str());
-        //printf("Nobs=%d  Njack=%d    mus=", jackall.en[e].Nobs, jackall.en[e].Njack);
-        //for (double mu : jackall.en[e].header.mus)
-        //    printf("%g   ", mu);
-        //printf("\n");
-    }
 
     mysprintf(namefile, NAMESIZE, "%s/%s_cA.53.24_mu.0.005300", argv[2], argv[1]);
     files.emplace_back(namefile);
@@ -882,6 +874,12 @@ int main(int argc, char** argv) {
 
     mysprintf(namefile, NAMESIZE, "%s/%s_cC.20.48_mu.0.002000", argv[2], argv[1]);
     files.emplace_back(namefile);
+
+    std::vector<int> myen(files.size());
+    for (int e = 0; e < files.size(); e++) {
+        myen[e] = e;
+        printf("file:  %s\n", files[e].c_str());
+    }
 
     data_all jackall = read_all_the_files(files, argv[1]);
     jackall.create_generalised_resampling();
