@@ -16,6 +16,10 @@ bad=()
 
 ./VKVK  jack -bin 50  ../data_VKVK/ VKVK_B64.dat
 
+./m_Ds read_plateaux -p ../../g-2_new_stat/ cE.44.112 -bin 50  -L 112 jack -mu 1.1759e-02 0.130  0.140  0.150 
+./m_Ds read_plateaux -p ../../g-2_new_stat/ cD.54.96  -bin 50  -L 96  jack -mu 1.3557e-02 0.130  0.140  0.150 
+
+
 #./g-2 read_plateaux -p ../../../g-2/ test -bin 50  -L 96 jack -mu 0.00054  0.014  0.015   0.165  0.175  0.175|| bad+=("test")
 #./fit_all_gm2  jack ../../g-2_new_stat/jackknife/ ../../g-2_new_stat//fit_all/
 ./some_custom_fits jack ../../g-2_new_stat/jackknife/ ../../g-2_new_stat//fit_all/
