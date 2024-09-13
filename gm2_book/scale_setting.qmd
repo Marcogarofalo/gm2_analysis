@@ -73,6 +73,10 @@ gg <- plot_fit(
   # , nolabel_for_fit = TRUE
   , noline = TRUE
 )
+# filed <- paste0(namefit, "_fit_data.txt")
+# df <- read.table(filed, header = FALSE, fill = TRUE)
+# idy <- ncol(df) - 2
+# kable(df[, c(1,2,3,4,idy,idy+1)],col.names =c("mu","aMpi","afpi","L","afpi-inf","err") )
 gg <- gg + geom_vline(xintercept = 0.00678723)
 fig <- myplotly(gg, "", "$\\xi$", "$af_\\pi$", to_print = TRUE)
 ```
@@ -228,5 +232,5 @@ gg <- gg + geom_pointrange(aes(
 ))
 
 
-fig <- myplotly(gg, "", "$a^2$", "$a(\\tau)-a(MG)$", to_print = TRUE, xrange = c(0, 0.0085))
+fig <- myplotly(gg, "no C48", "$a^2$", "$a(\\tau)-a(MG)$", to_print = TRUE, xrange = c(0, 0.0085))
 ```
