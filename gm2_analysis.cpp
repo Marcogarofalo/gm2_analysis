@@ -24,6 +24,8 @@
 #include "fit_all.hpp"
 #include "functions_amu.hpp"
 #include "gamma_analysis.hpp"
+#include <filesystem>
+
 // #include "lhs_functions.hpp"
 
 #include <string>
@@ -1695,7 +1697,28 @@ int main(int argc, char** argv) {
             check_correlatro_counter(58);
         }
         else {
-            DV = compute_DVt_and_integrate(header.L, Njack, MpiMev /* jack_Mpi_MeV_exp */, jack_Mrho_MeV_exp, a, jack_grhopipi, outfile, "DVt", resampling);
+            char name_GS[NAMESIZE];
+            mysprintf(name_GS, NAMESIZE, "%s/out/%s_gm2_GS", option[3], option[6]);
+            if (std::filesystem::exists(name_GS)) {
+                DV = (double*)malloc(Njack * sizeof(double));
+                FILE* f = open_file(name_GS, "r+");
+                int fi = 00;
+                int read_j = -1;
+                fi += fscanf(f, "%d\n", &read_j);
+                error(read_j != Njack, 1, "main", "Njack in file %g");
+                for (int j = 0; j < Njack;j++)    fi += fscanf(f, "%lf\n", &DV[j]);
+                error(fi!=Njack+1,1," reading DV","fscanf counter wrong: obtained %d expected %d\n", fi, Njack+1 );
+                fclose(f);
+                printf("reading GS complete\n");
+            }
+            else {
+                DV = compute_DVt_and_integrate(header.L, Njack, MpiMev /* jack_Mpi_MeV_exp */, jack_Mrho_MeV_exp, a, jack_grhopipi, outfile, "DVt", resampling);
+                FILE* f = open_file(name_GS, "w+");
+                int fi = 00;
+                fi += fprintf(f, "%d\n", Njack);
+                for (int j = 0; j < Njack;j++)    fi += fprintf(f, "%.12g\n", DV[j]);
+                fclose(f);
+            }
             write_jack(DV, Njack, jack_file);
             check_correlatro_counter(58);
         }
