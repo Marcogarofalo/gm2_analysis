@@ -160,6 +160,63 @@ for (e in ens) {
 }
 ```
 
+
+
+```{r, results='asis',echo=FALSE}
+ens <- c(
+  # "cA.30.32_mu.0.003000",
+  #  "cA.40.24_mu.0.004000",
+  #  "cA.53.24_mu.0.005300",
+  "D96.dat"
+  # # "cB.72.96_mu.0.000720",
+  # "cC.06.80_mu.0.000600",
+  # "cD.54.96_mu.0.000540"
+)
+source("/home/garofalo/programs/Rose/R/read_block.R")
+fileout <- "c2_MeV4_MG.txt"
+cat("\n ", file = fileout, append = FALSE)
+
+for (e in ens) {
+  df <- NULL
+  #cat("\n## ", gsub(".dat", "", e), "\n")
+  dir <- paste0("/home/garofalo/analysis/pi0/data/", gsub(".dat", "", e), "/out/")
+  mt <- read_df(paste0(dir, e, "_output"))
+  all_obs <- Rose::get_all_corr(mt)
+
+  dfc2 <- add_corr_to_df("c2", all_obs, mt, NULL, rename = "$c_2 [MeV^{4}]$")
+  
+  dir <- paste0("/home/garofalo/analysis/pi0/data/", gsub(".dat", "", e), "_old/out/")
+  mt <- read_df(paste0(dir, e, "_output"))
+  all_obs <- Rose::get_all_corr(mt)
+
+  dfc2 <- add_corr_to_df("c2", all_obs, mt, dfc2, rename = "$c_2 [MeV^{4}] old$")
+  
+  
+  # df <- add_corr_to_df("M_{pi0}_full_sub_vev_tau3", all_obs, mt, df)
+
+
+  # df$x <- df$x * a_fm[1, 1]
+  # df$xfit <- df$xfit * a_fm[1, 1]
+  # df$tmin <- df$tmin * a_fm[1, 1]
+  # df$tmax <- df$tmax * a_fm[1, 1]
+  # df$y <- df$y / a_MeV[1, 1]
+  # df$fit <- df$fit / a_MeV[1, 1]
+  # df$err <- df$err / a_MeV[1, 1]
+  # df$errfit <- df$errfit / a_MeV[1, 1]
+  # cat("$m_s($",substr( e , start = 1 , stop = 8 ),"$)$=", mean_print(fit[1,1],fit[1,2]), "\n\n")
+  # gg <- plot_df_corr_ggplot(df, width = 1 * a_fm[1, 1])
+  # fig <- myplotly(gg, "", "$t [\\mbox{fm}]$", "$m_{eff} [\\mbox{MeV}]$", to_print = TRUE)
+
+  # dfc2$x <- dfc2$x * a_fm[1, 1]
+  # dfc2$xfit <- dfc2$xfit * a_fm[1, 1]
+  # dfc2$tmin <- dfc2$tmin * a_fm[1, 1]
+  # dfc2$tmax <- dfc2$tmax * a_fm[1, 1]
+
+}
+  gg <- plot_df_corr_ggplot(dfc2, width = 1 * a_fm[1, 1])
+  fig <- myplotly(gg, "", "$t [\\mbox{fm}]$", "$c_2 [\\mbox{MeV}^4]$", to_print = TRUE)
+```
+
 ## $c_2$ for diferent ensembles
 
 ```{r, results='asis',echo=FALSE}
