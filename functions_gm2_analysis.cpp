@@ -2413,7 +2413,7 @@ double lhs_Mpi_fpi(int n, int e, int j, data_all gjack, struct fit_type fit_info
             count++;
         }
     }
-     for (int ee : fit_info.Nxen[n]) {
+    for (int ee : fit_info.Nxen[n]) {
         if (ee == e) {
             break;
         }
@@ -2425,7 +2425,7 @@ double lhs_Mpi_fpi(int n, int e, int j, data_all gjack, struct fit_type fit_info
     double L = fit_info.x[3][count][j];
     double xi = Mpi / (4 * M_PI * fpi);
     xi = xi * xi;
-    double delta_FVE = FVE_GL_Mpi(L , xi, fpi);
+    double delta_FVE = FVE_GL_Mpi(L, xi, fpi);
     if (n < 2) { // Mpi
         r /= (1 - 0.25 * delta_FVE);
         r *= r; // Mpi^2
@@ -2458,8 +2458,35 @@ double lhs_afpi(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
     double fpi = fit_info.x[2][count][j];
     double L = fit_info.x[3][count][j];
     double xi = fit_info.x[4][count][j];
-    double delta_FVE = FVE_GL_Mpi(L , xi, fpi);
+    double delta_FVE = FVE_GL_Mpi(L, xi, fpi);
     r /= (1 + delta_FVE);
+
+    return r;
+}
+
+double lhs_aMpi(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
+    double r;
+    r = gjack.en[e].jack[fit_info.corr_id[n]][j];
+    int count = 0;
+    for (int in = 0;in < n;in++) {
+        for (int ie : fit_info.Nxen[in]) {
+            count++;
+        }
+    }
+    for (int ee : fit_info.Nxen[n]) {
+        if (ee == e) {
+            break;
+        }
+        count++;
+    }
+
+    double mu = fit_info.x[0][count][j];
+    double Mpi = fit_info.x[1][count][j];
+    double fpi = fit_info.x[2][count][j];
+    double L = fit_info.x[3][count][j];
+    double xi = fit_info.x[4][count][j];
+    double delta_FVE = FVE_GL_Mpi(L, xi, fpi);
+    r /= (1 - 0.25 * delta_FVE);
 
     return r;
 }
@@ -2490,7 +2517,7 @@ double lhs_afpi_remove_FVE(int n, int e, int j, data_all gjack, struct fit_type 
     // printf("%.12g  \n",Mpi- gjack.en[e].jack[123][j]);
     double L = fit_info.x[3][count][j];
     double xi = fit_info.x[4][count][j];
-    double delta_FVE = FVE_GL_Mpi(L , xi, fpi);
+    double delta_FVE = FVE_GL_Mpi(L, xi, fpi);
     // xi *= (1 + delta_FVE) * (1 + delta_FVE) / (1 - 0.25 * delta_FVE) * (1 - 0.25 * delta_FVE);
     r /= (1 + delta_FVE);
     r /= 1 + fit_out.P[7][j] * xi * exp(-Mpi * L) / pow(Mpi * L, 3.0 / 2.0);
@@ -2518,7 +2545,32 @@ double rhs_afpi(int n, int Nvar, double* x, int Npar, double* P) {
     // r = a * P[6] * (1-2*xi*log(xi)+2*P[7]*xi+aMpi*aMpi*(P[8]+P[9]*xi)); 
     r = a * fpi_phys_fm * (1 - 2 * xi * log(xi / xi_phys) - (P[5] + P[6] * a * fpi_phys_fm * a * fpi_phys_fm) * (xi - xi_phys));
     return r;
+}
 
+
+double rhs_afpi_phys_point(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a;
+    if (n < 4) {
+        a = P[(n)]; // B,C,D,E
+    }
+    else {
+        a = P[(n) % 4 +0];// B,C,D
+    }
+    double aMpi = x[1];
+    double afpi = x[2];
+    double xi = x[4];
+    double L = x[3];
+    double Mpi_phys_fm = x[5];
+    double fpi_phys_fm = x[6];
+    double xi_phys = x[7];
+
+    r = a * fpi_phys_fm * (1 - 2 * xi * log(xi / xi_phys) );
+    if (Npar == 6) {
+        r += a * fpi_phys_fm * (-(P[4] + P[5] * a * fpi_phys_fm * a * fpi_phys_fm) * (xi - xi_phys));
+    }
+
+    return r;
 }
 
 double rhs_afpi_FVEres(int n, int Nvar, double* x, int Npar, double* P) {

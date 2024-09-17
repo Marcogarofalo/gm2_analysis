@@ -197,5 +197,9 @@ double rhs_amu_a4_common(int n, int Nvar, double* x, int Npar, double* P);
 double lhs_afpi(int n, int e, int j, data_all gjack, struct fit_type fit_info);
 double lhs_afpi_remove_FVE(int n, int e, int j, data_all gjack, struct fit_type fit_info, struct fit_result fit_out);
 double rhs_afpi(int n, int Nvar, double* x, int Npar, double* P);
+double rhs_afpi_phys_point(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_afpi_FVEres(int n, int Nvar, double* x, int Npar, double* P);
+
+
+double lhs_aMpi(int n, int e, int j, data_all gjack, struct fit_type fit_info);
 #endif

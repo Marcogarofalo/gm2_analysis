@@ -133,7 +133,7 @@ data_all read_all_the_files(std::vector<std::string> files, const char* resampli
     jackall.ens = files.size();
     int count = 0;
     for (std::string s : files) {
-        std::cout<< "reading:  "<< s<<"\n";
+        std::cout << "reading:  " << s << "\n";
         FILE* f = open_file(s.c_str(), "r");
 
         // read_single_dataj(f, params, &(jackall->en[count]));
@@ -983,28 +983,31 @@ int main(int argc, char** argv) {
     fit_info.corr_id = { 163, 163, 163, 163, 163, 164, 164, 164 }; //  fpi(mu1), fpi(mu2)
     fit_info.function = rhs_afpi;
     fit_info.linear_fit = false;
-    fit_info.covariancey = false;
-    // fit_info.acc= 1e-6;
-    // fit_info.chi2_gap_jackboot=0.1;
-    // fit_info.guess_per_jack=5;
-    // fit_info.repeat_start=5;
-    // fit_info.verbosity = 0;
+    // fit_info.covariancey = false;
+    // fit_info.acc= 1e-10;
+    // fit_info.h=1e-7;
+    // fit_info.maxiter=500;
+    // fit_info.NM = true;
+    // // fit_info.chi2_gap_jackboot=0.1;
+    // // fit_info.guess_per_jack=5;
+    // // fit_info.repeat_start=100;
+    // fit_info.verbosity = 1;
     // fit_info.compute_cov_fit(argv, jackall, lhs_afpi);
-    // int ie = 0, ie1 = 0;
-    // for (int n = 0;n < fit_info.N;n++) {
-    //     for (int e = 0;e < fit_info.myen.size();e++) {
-    //         ie1 = 0;
-    //         for (int n1 = 0;n1 < fit_info.N;n1++) {
-    //             for (int e1 = 0;e1 < fit_info.myen.size();e1++) {
-    //                 if (e != e1)   fit_info.cov[ie][ie1] = 0;
-    //                 ie1++;
+    // int ide = 0, ide1 = 0;
+    // for (int n = 0;n < fit_info.Nxen.size();n++) {
+    //     for (int e : fit_info.Nxen[n]) {
+    //         ide1 = 0;
+    //         for (int n1 = 0;n1 < fit_info.Nxen.size();n1++) {
+    //             for (int e1 : fit_info.Nxen[n1]) {
+    //                 if (e != e1)   fit_info.cov[ide][ide1] = 0;
+    //                 ide1++;
     //             }
     //         }
-    //         ie++;
+    //         ide++;
     //     }
     // }
     // fit_info.compute_cov1_fit();
-    fit_info.guess = { 0.0908026, 0.07951 , 0.06816, 0.05688, 0.04891 ,1 ,1 };
+    fit_info.guess = { 0.0908026, 0.07951 , 0.06816, 0.05688, 0.04891 ,-8.75 ,-500 };
     mysprintf(namefit, NAMESIZE, "afpi_cov");
     fit_result fit_afpi = fit_all_data(argv, jackall, lhs_afpi, fit_info, namefit);
     fit_info.band_range = { 0.005,0.035 };
@@ -1023,6 +1026,108 @@ int main(int argc, char** argv) {
     myres->write_jack_in_file(fit_afpi.P[4], "../../g-2_new_stat/out/a_fm_E.txt");
 
     fit_afpi.clear();
+
+
+    //////////////////////////////////////////////////////////////
+    // fit only physical point
+    //////////////////////////////////////////////////////////////
+
+    fit_info.restore_default();
+    fit_info.N = 7;
+    fit_info.Nvar = 8;
+    fit_info.Npar = 6;
+    fit_info.Njack = Njack;
+    fit_info.Nxen = { { B72_64, B72_96},
+                        { C06}, {D54},
+                        {E112},  {B72_64},
+                        {C06}, {D54} };
+    fit_info.init_N_etot_form_Nxen();
+
+    fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+    count = 0;
+    for (int n = 0;n < fit_info.Nxen.size();n++) {
+        for (int e : fit_info.Nxen[n]) {
+            for (int j = 0;j < Njack;j++) {
+                double my_mu, my_M, my_fpi;
+                if (n < 4) {
+                    my_mu = jackall.en[e].jack[165][j];
+                    my_M = jackall.en[e].jack[1][j];
+                    my_fpi = jackall.en[e].jack[163][j];
+                }
+                else if (n >= 4) {
+                    my_mu = jackall.en[e].jack[166][j];
+                    my_M = jackall.en[e].jack[123][j];
+                    my_fpi = jackall.en[e].jack[164][j];
+                }
+
+                fit_info.x[0][count][j] = my_mu; // 
+                fit_info.x[1][count][j] = my_M;  // 
+                fit_info.x[2][count][j] = my_fpi;  //
+                fit_info.x[3][count][j] = jackall.en[e].header.L;
+
+                double xi = my_M / (4 * M_PI * my_fpi);
+                xi *= xi;
+                double delta_FVE = FVE_GL_Mpi(jackall.en[e].header.L, xi, my_fpi);
+                xi *= (1 + delta_FVE) * (1 + delta_FVE) / (1 - 0.25 * delta_FVE) * (1 - 0.25 * delta_FVE);
+                fit_info.x[4][count][j] = xi;
+
+                fit_info.x[5][count][j] = jack_Mpi_phys_MeV[j] / hbarc;
+                fit_info.x[6][count][j] = jack_fpi_phys_MeV[j] / hbarc;
+
+
+                fit_info.x[7][count][j] = jack_Mpi_phys_MeV[j] / (4 * M_PI * jack_fpi_phys_MeV[j]);
+                fit_info.x[7][count][j] *= fit_info.x[7][count][j];
+
+            }
+            count++;
+        }
+    }
+
+    fit_info.corr_id = { 163, 163, 163, 163, 164, 164, 164 }; //  fpi(mu1), fpi(mu2)
+    // fit_info.corr_id = {  1, 1, 1, 1, 123, 123, 123 }; //  Mpi(mu1), .... , Mpi(mu2), ...
+    fit_info.function = rhs_afpi_phys_point;
+    fit_info.linear_fit = false;
+    fit_info.covariancey = false;
+    // fit_info.acc= 1e-6;
+    // fit_info.chi2_gap_jackboot=0.1;
+    // fit_info.guess_per_jack=5;
+    // fit_info.repeat_start=5;
+    // fit_info.verbosity = 0;
+    // fit_info.compute_cov_fit(argv, jackall, lhs_afpi);
+    // ie = 0, ie1 = 0;
+    // for (int n = 0;n < fit_info.N;n++) {
+    //     for (int e = 0;e < fit_info.myen.size();e++) {
+    //         ie1 = 0;
+    //         for (int n1 = 0;n1 < fit_info.N;n1++) {
+    //             for (int e1 = 0;e1 < fit_info.myen.size();e1++) {
+    //                 if (e != e1)   fit_info.cov[ie][ie1] = 0;
+    //                 ie1++;
+    //             }
+    //         }
+    //         ie++;
+    //     }
+    // }
+    // fit_info.compute_cov1_fit();
+    fit_info.guess = { 0.07951 , 0.06816, 0.05688, 0.04891 ,1 ,1 };
+    mysprintf(namefit, NAMESIZE, "afpi_phys_point_cov");
+    fit_afpi = fit_all_data(argv, jackall, lhs_afpi, fit_info, namefit);
+    fit_info.band_range = { 0.005,0.01 };
+
+    xcont = {};
+    print_fit_band(argv, jackall, fit_info, fit_info, namefit, "xi", fit_afpi, fit_afpi, 4, 0, 0.0005, xcont);
+
+    // myres->write_jack_in_file(fit_afpi.P[0], "../../g-2_new_stat/out/a_fm_A.txt");
+    // myres->write_jack_in_file(fit_afpi.P[1], "../../g-2_new_stat/out/a_fm_B.txt");
+    // myres->write_jack_in_file(fit_afpi.P[2], "../../g-2_new_stat/out/a_fm_C.txt");
+    // myres->write_jack_in_file(fit_afpi.P[3], "../../g-2_new_stat/out/a_fm_D.txt");
+    // myres->write_jack_in_file(fit_afpi.P[4], "../../g-2_new_stat/out/a_fm_E.txt");
+
+    fit_afpi.clear();
+
+
+
+
+
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
