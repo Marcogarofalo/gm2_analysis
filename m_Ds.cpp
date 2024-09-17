@@ -824,15 +824,16 @@ int main(int argc, char** argv) {
     else if (strcmp("cE.44.112", argv[4]) == 0) {
         myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_E.txt");
     }
+
+
+    corr_counter = -1;
     write_jack(a, Njack, jack_file);
     check_correlatro_counter(0);
 
 
     ////////////////////////////////////////////////
     double* zeros = (double*)calloc(Njack, sizeof(double));
-    corr_counter = -1;
     double* M_Ds1 = plateau_correlator_function(option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack, namefile_plateaux, outfile, 0, "M_{Ds}^{s,c1}", M_eff_T, jack_file);
-    zero_corr(zeros, Njack, jack_file);
     check_correlatro_counter(1);
 
 
@@ -860,9 +861,8 @@ int main(int argc, char** argv) {
     myres->div(jack_aMDs_exp, jack_aMDs_exp, hbarc);
 
     double* mc_MDs = interpol_Z(string_muc.size(), Njack, MDs, mc, jack_aMDs_exp, outfile, "mc(MDs)", resampling);
-    // write_jack(tmp, Njack, jack_file);
-    // free(ms_MK);
-    check_correlatro_counter(3);
+    write_jack(mc_MDs, Njack, jack_file);
+    check_correlatro_counter(4);
 
 
 
