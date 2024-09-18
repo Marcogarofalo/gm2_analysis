@@ -201,5 +201,9 @@ double rhs_afpi_phys_point(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_afpi_FVEres(int n, int Nvar, double* x, int Npar, double* P);
 
 
-double lhs_aMpi(int n, int e, int j, data_all gjack, struct fit_type fit_info);
+double rhs_aMpi2_over_afpi2(int n, int Nvar, double* x, int Npar, double* P);
+double rhs_aMpi2_over_afpi2_with_A(int n, int Nvar, double* x, int Npar, double* P);
+double rhs_aMpi2_over_afpi2_linear(int n, int Nvar, double* x, int Npar, double* P);
+double lhs_Mpi2_over_afpi2(int n, int e, int j, data_all gjack, struct fit_type fit_info);
+
 #endif
