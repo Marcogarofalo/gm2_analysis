@@ -214,7 +214,7 @@ for (e in ens) {
 
 }
   gg <- plot_df_corr_ggplot(dfc2, width = 1 * a_fm[1, 1])
-  fig <- myplotly(gg, "", "$t [\\mbox{fm}]$", "$c_2 [\\mbox{MeV}^4]$", to_print = TRUE)
+  fig <- myplotly(gg, "", "t/a", "$c_2 [\\mbox{MeV}^4]$", to_print = TRUE)
 ```
 
 ## $c_2$ for diferent ensembles

@@ -24,6 +24,7 @@ ggp # Let knit handle the plot
 myplotly(ggplot())
 # widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
 ```
+
 $$
 f_\pi^j(\xi, \infty) =\frac{f_\pi^j(\xi, L) }{1-\Delta_{FVE}}
 $$
@@ -38,7 +39,7 @@ Different choices of the expansion variable are possible: one can replace $f_\pi
 At NLO (i.e., for the GL formula) the above changes are equivalent, since any difference represents a NNLO effect.
 
 $$
-af_\pi^j(\xi) = af_\pi^j(\xi^{phys}) \left\{1-2\xi\log(\xi/\xi)+ [P+P_{disc} (af_\pi^j(\xi^{phys}))^2] (\xi-\xi^{phys})\right\} 
+af_\pi^j(\xi) = af_\pi^j(\xi^{phys}) \left\{1-2\xi\log(\xi/\xi^{phys})+ [P+P_{disc} (af_\pi^j(\xi^{phys}))^2] (\xi-\xi^{phys})\right\} 
 $$
 
 
