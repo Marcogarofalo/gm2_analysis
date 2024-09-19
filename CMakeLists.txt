@@ -66,6 +66,10 @@ add_executable(m_Ds_2x2 m_Ds_2x2.cpp)
 target_link_libraries(m_Ds_2x2 PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
 target_link_libraries(m_Ds_2x2 PUBLIC functions_gm2_analysis)
 
+add_executable(m_K_2x2 m_K_2x2.cpp)
+target_link_libraries(m_K_2x2 PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(m_K_2x2 PUBLIC functions_gm2_analysis)
+
 add_executable(VKVK VKVK.cpp)
 target_link_libraries(VKVK PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
 
