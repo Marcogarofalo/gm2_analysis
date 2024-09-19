@@ -189,6 +189,34 @@ void sum_lsc(data_all in, const char* outpath, const char* filename) {
 }
 
 
+void compute_amul_print_res(char** argv, char* namefit, fit_type fit_info, int Njack, fit_result fit_aMpi2_over_afpi2, double* Mpi2_fpi2_phys, std::vector<std::string> lattices) {
+    char file_amul[NAMESIZE];
+    mysprintf(file_amul, NAMESIZE, "%s/%s_amul_res.txt", argv[3], namefit);
+    FILE* famul = open_file(file_amul, "w+");
+    fprintf(famul, "# Lattname amul   damul   \n");
+
+    double** tif = swap_indices(fit_info.Npar, Njack, fit_aMpi2_over_afpi2.P);
+    std::vector<double> swapped_x(fit_info.Nvar);
+    std::vector<double> amu(Njack);
+
+    int count = 0;
+    for (int l = 0; l < lattices.size(); l++) {
+        for (size_t j = 0; j < Njack; j++) {
+            for (int i = 0; i < fit_info.Nvar; i++) {
+                swapped_x[i] = fit_info.x[i][count][j];
+            }
+            amu[j] = rtbis_func_eq_input(fit_info.function, l /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, Mpi2_fpi2_phys[j], 1e-6, 2, 1e-10, 2);
+        }
+        printf("amu(%s)=%-20.12g %-20.12g\n",lattices[l].c_str(), amu[Njack - 1], myres->comp_error(amu.data()));
+        fprintf(famul, "%s %-20.12g %-20.12g\n",lattices[l].c_str(), amu[Njack - 1], myres->comp_error(amu.data()));
+
+        char file_amul_jack[NAMESIZE];
+        mysprintf(file_amul_jack, NAMESIZE, "%s/%s_amul_jack_%s.txt", argv[3], namefit,lattices[l].c_str());
+        myres->write_jack_in_file(amu.data(), file_amul_jack);
+
+        count += fit_info.Nxen[l].size();
+    }
+}
 
 
 
@@ -676,48 +704,8 @@ int main(int argc, char** argv) {
 
         print_fit_band(argv, jackall, fit_info, fit_info, namefit, "amu", fit_aMpi2_over_afpi2, fit_aMpi2_over_afpi2, 0 /*amu */, 0, 0.0001, xcont);
 
-        char file_amul[NAMESIZE];
-        mysprintf(file_amul, NAMESIZE, "%s/%s_amul_res.txt", argv[3], namefit);
-        FILE* famul = open_file(file_amul, "w+");
-        fprintf(famul, "#Lattname amul   damul   \n");
+        compute_amul_print_res( argv,  namefit,  fit_info, Njack, fit_aMpi2_over_afpi2,  Mpi2_fpi2_phys, {"B","C","D","E"});
 
-        double** tif = swap_indices(fit_info.Npar, Njack, fit_aMpi2_over_afpi2.P);
-        std::vector<double> swapped_x(fit_info.Nvar);
-        std::vector<double> amu(Njack);
-        for (size_t j = 0; j < Njack; j++) {
-            for (int i = 0; i < fit_info.Nvar; i++) {
-                swapped_x[i] = fit_info.x[i][0][j];
-            }
-            amu[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, Mpi2_fpi2_phys[j], 1e-6, 2, 1e-10, 2);
-        }
-        printf("amu(B)=%-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        fprintf(famul, "B %-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        for (size_t j = 0; j < Njack; j++) {
-            for (int i = 0; i < fit_info.Nvar; i++) {
-                swapped_x[i] = fit_info.x[i][0 + fit_info.Nxen[0].size()][j];
-            }
-            amu[j] = rtbis_func_eq_input(fit_info.function, 1 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, Mpi2_fpi2_phys[j], 1e-6, 2, 1e-10, 2);
-        }
-        printf("amu(C)=%-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        fprintf(famul, "C %-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        for (size_t j = 0; j < Njack; j++) {
-            for (int i = 0; i < fit_info.Nvar; i++) {
-                swapped_x[i] = fit_info.x[i][0 + fit_info.Nxen[1].size()][j];
-            }
-            amu[j] = rtbis_func_eq_input(fit_info.function, 2 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, Mpi2_fpi2_phys[j], 1e-6, 2, 1e-10, 2);
-        }
-        printf("amu(D)=%-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        fprintf(famul, "D %-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        for (size_t j = 0; j < Njack; j++) {
-            for (int i = 0; i < fit_info.Nvar; i++) {
-                swapped_x[i] = fit_info.x[i][0 + fit_info.Nxen[2].size()][j];
-            }
-            amu[j] = rtbis_func_eq_input(fit_info.function, 3 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, Mpi2_fpi2_phys[j], 1e-6, 2, 1e-10, 2);
-        }
-        printf("amu(E)=%-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        fprintf(famul, "E %-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        free_2(Njack, tif);
-        fclose(famul);
     }
     //////////////////////////////////////////////////////////////
      // Mpi with A
@@ -826,56 +814,9 @@ int main(int argc, char** argv) {
 
         print_fit_band(argv, jackall, fit_info, fit_info, namefit, "amu", fit_aMpi2_over_afpi2, fit_aMpi2_over_afpi2, 0 /*amu */, 0, 0.0001, xcont);
 
-        char file_amul[NAMESIZE];
-        mysprintf(file_amul, NAMESIZE, "%s/%s_amul_res.txt", argv[3], namefit);
-        FILE* famul = open_file(file_amul, "w+");
-        fprintf(famul, "# Lattname amul   damul   \n");
+        compute_amul_print_res( argv,  namefit,  fit_info, Njack, fit_aMpi2_over_afpi2,  Mpi2_fpi2_phys, {"A","B","C","D","E"});
 
-        double** tif = swap_indices(fit_info.Npar, Njack, fit_aMpi2_over_afpi2.P);
-        std::vector<double> swapped_x(fit_info.Nvar);
-        std::vector<double> amu(Njack);
-        for (size_t j = 0; j < Njack; j++) {
-            for (int i = 0; i < fit_info.Nvar; i++) {
-                swapped_x[i] = fit_info.x[i][0][j];
-            }
-            amu[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, Mpi2_fpi2_phys[j], 1e-6, 2, 1e-10, 2);
-        }
-        printf("amu(A)=%-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        fprintf(famul, "A %-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        for (size_t j = 0; j < Njack; j++) {
-            for (int i = 0; i < fit_info.Nvar; i++) {
-                swapped_x[i] = fit_info.x[i][0 + fit_info.Nxen[0].size()][j];
-            }
-            amu[j] = rtbis_func_eq_input(fit_info.function, 1 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, Mpi2_fpi2_phys[j], 1e-6, 2, 1e-10, 2);
-        }
-        printf("amu(B)=%-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        fprintf(famul, "B %-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        for (size_t j = 0; j < Njack; j++) {
-            for (int i = 0; i < fit_info.Nvar; i++) {
-                swapped_x[i] = fit_info.x[i][0 + fit_info.Nxen[1].size()][j];
-            }
-            amu[j] = rtbis_func_eq_input(fit_info.function, 2 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, Mpi2_fpi2_phys[j], 1e-6, 2, 1e-10, 2);
-        }
-        printf("amu(C)=%-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        fprintf(famul, "C %-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        for (size_t j = 0; j < Njack; j++) {
-            for (int i = 0; i < fit_info.Nvar; i++) {
-                swapped_x[i] = fit_info.x[i][0 + fit_info.Nxen[2].size()][j];
-            }
-            amu[j] = rtbis_func_eq_input(fit_info.function, 3 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, Mpi2_fpi2_phys[j], 1e-6, 2, 1e-10, 2);
-        }
-        printf("amu(D)=%-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        fprintf(famul, "D %-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        for (size_t j = 0; j < Njack; j++) {
-            for (int i = 0; i < fit_info.Nvar; i++) {
-                swapped_x[i] = fit_info.x[i][0 + fit_info.Nxen[3].size()][j];
-            }
-            amu[j] = rtbis_func_eq_input(fit_info.function, 4 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, Mpi2_fpi2_phys[j], 1e-6, 2, 1e-10, 2);
-        }
-        printf("amu(E)=%-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        fprintf(famul, "E %-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        free_2(Njack, tif);
-        fclose(famul);
+
     }
     //////////////////////////////////////////////////////////////
     // Mpi with A a2
@@ -983,57 +924,14 @@ int main(int argc, char** argv) {
         fit_info.band_range = { 0.00001,0.0055 };
 
         print_fit_band(argv, jackall, fit_info, fit_info, namefit, "amu", fit_aMpi2_over_afpi2, fit_aMpi2_over_afpi2, 0 /*amu */, 0, 0.0001, xcont);
+        
+        compute_amul_print_res( argv,  namefit,  fit_info, Njack, fit_aMpi2_over_afpi2,  Mpi2_fpi2_phys, {"A","B","C","D","E"});
 
-        char file_amul[NAMESIZE];
-        mysprintf(file_amul, NAMESIZE, "%s/%s_amul_res.txt", argv[3], namefit);
-        FILE* famul = open_file(file_amul, "w+");
-        fprintf(famul, "# Lattname amul   damul   \n");
-
-        double** tif = swap_indices(fit_info.Npar, Njack, fit_aMpi2_over_afpi2.P);
-        std::vector<double> swapped_x(fit_info.Nvar);
-        std::vector<double> amu(Njack);
-        for (size_t j = 0; j < Njack; j++) {
-            for (int i = 0; i < fit_info.Nvar; i++) {
-                swapped_x[i] = fit_info.x[i][0][j];
-            }
-            amu[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, Mpi2_fpi2_phys[j], 1e-6, 2, 1e-10, 2);
-        }
-        printf("amu(A)=%-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        fprintf(famul, "A %-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        for (size_t j = 0; j < Njack; j++) {
-            for (int i = 0; i < fit_info.Nvar; i++) {
-                swapped_x[i] = fit_info.x[i][0 + fit_info.Nxen[0].size()][j];
-            }
-            amu[j] = rtbis_func_eq_input(fit_info.function, 1 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, Mpi2_fpi2_phys[j], 1e-6, 2, 1e-10, 2);
-        }
-        printf("amu(B)=%-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        fprintf(famul, "B %-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        for (size_t j = 0; j < Njack; j++) {
-            for (int i = 0; i < fit_info.Nvar; i++) {
-                swapped_x[i] = fit_info.x[i][0 + fit_info.Nxen[1].size()][j];
-            }
-            amu[j] = rtbis_func_eq_input(fit_info.function, 2 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, Mpi2_fpi2_phys[j], 1e-6, 2, 1e-10, 2);
-        }
-        printf("amu(C)=%-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        fprintf(famul, "C %-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        for (size_t j = 0; j < Njack; j++) {
-            for (int i = 0; i < fit_info.Nvar; i++) {
-                swapped_x[i] = fit_info.x[i][0 + fit_info.Nxen[2].size()][j];
-            }
-            amu[j] = rtbis_func_eq_input(fit_info.function, 3 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, Mpi2_fpi2_phys[j], 1e-6, 2, 1e-10, 2);
-        }
-        printf("amu(D)=%-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        fprintf(famul, "D %-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        for (size_t j = 0; j < Njack; j++) {
-            for (int i = 0; i < fit_info.Nvar; i++) {
-                swapped_x[i] = fit_info.x[i][0 + fit_info.Nxen[3].size()][j];
-            }
-            amu[j] = rtbis_func_eq_input(fit_info.function, 4 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, Mpi2_fpi2_phys[j], 1e-6, 2, 1e-10, 2);
-        }
-        printf("amu(E)=%-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        fprintf(famul, "E %-20.12g %-20.12g\n", amu[Njack - 1], myres->comp_error(amu.data()));
-        free_2(Njack, tif);
-        fclose(famul);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    //////////////////////////////////////////////////////////////
+    // mK
+    //////////////////////////////////////////////////////////////
 }
