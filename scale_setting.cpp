@@ -53,8 +53,8 @@ enum enum_ensembles {
 constexpr double fpi_MeV = 130.5;
 constexpr double fpi_MeV_err = 0.04;
 
-// constexpr double Mpi_MeV = 135;
-// constexpr double Mpi_MeV_err = 0.2;
+constexpr double Mpi_MeV = 135;
+constexpr double Mpi_MeV_err = 0.2;
 
 generic_header read_header(FILE* stream) {
     generic_header header;
