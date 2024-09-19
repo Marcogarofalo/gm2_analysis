@@ -65,7 +65,8 @@ constexpr double MK_MeV_err = 0.3;
 
 // constexpr double Mpi_MeV = 139;
 // constexpr double Mpi_MeV_err = 0.001;
-
+constexpr double Mpi_MeV = 135;
+constexpr double Mpi_MeV_err = 0.2;
 using namespace std;
 
 struct  kinematic kinematic_2pt;
@@ -661,8 +662,21 @@ int main(int argc, char** argv) {
     double muc1 = atof(argv[14]);
     double muc2 = atof(argv[15]);
     double muc3 = atof(argv[16]);
+
+    char* c_mu = (argv[11]);
+    char* c_mus1 = (argv[12]);
+    char* c_mus2 = (argv[13]);
+    char* c_muc1 = (argv[14]);
+    char* c_muc2 = (argv[15]);
+    char* c_muc3 = (argv[16]);
+
+
     double mul1 = mu;
-    if (argc > 17 && strcmp(argv[17], "three_corr") != 0) { mul1 = atof(argv[17]); }
+    char* c_mul1 = c_mu;
+    if (argc > 17 && strcmp(argv[17], "three_corr") != 0) {
+        mul1 = atof(argv[17]);
+        c_mul1 = argv[17];
+    }
 
     generic_header header;
     header.L = file_head.l1;
@@ -720,145 +734,145 @@ int main(int argc, char** argv) {
     // if (strcmp(argv[4], "cA.53.24") == 0 || strcmp(argv[4], "cA.40.24") == 0 || strcmp(argv[4], "cA.30.32") == 0) {
     //     printf("OS and tm inverted for light\n");
     //     // light
-    //     mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_P5A0.txt", argv[3], argv[4], mu);//3
+    //     mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5A0.txt", argv[3], argv[4], mu);//3
     //     correlators.emplace_back(namefile);
-    //     mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_P5P5.txt", argv[3], argv[4], mu);//4
+    //     mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5P5.txt", argv[3], argv[4], mu);//4
     //     correlators.emplace_back(namefile);
-    //     mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_VKVK.txt", argv[3], argv[4], mu);//5
+    //     mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_VKVK.txt", argv[3], argv[4], mu);//5
     //     correlators.emplace_back(namefile);
-    //     mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_P5A0.txt", argv[3], argv[4], mu);//0
+    //     mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5A0.txt", argv[3], argv[4], mu);//0
     //     correlators.emplace_back(namefile);
-    //     mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_P5P5.txt", argv[3], argv[4], mu);//1
+    //     mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5P5.txt", argv[3], argv[4], mu);//1
     //     correlators.emplace_back(namefile);
-    //     mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_VKVK.txt", argv[3], argv[4], mu);//2
+    //     mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_VKVK.txt", argv[3], argv[4], mu);//2
     //     correlators.emplace_back(namefile);
     // }
     // else {
         // light
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_P5A0.txt", argv[3], argv[4], mu);//0
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5A0.txt", argv[3], argv[4], c_mu);//0
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_P5P5.txt", argv[3], argv[4], mu);//1
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5P5.txt", argv[3], argv[4], c_mu);//1
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_VKVK.txt", argv[3], argv[4], mu);//2
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_VKVK.txt", argv[3], argv[4], c_mu);//2
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_P5A0.txt", argv[3], argv[4], mu);//3
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5A0.txt", argv[3], argv[4], c_mu);//3
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_P5P5.txt", argv[3], argv[4], mu);//4
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5P5.txt", argv[3], argv[4], c_mu);//4
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_VKVK.txt", argv[3], argv[4], mu);//5
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_VKVK.txt", argv[3], argv[4], c_mu);//5
     correlators.emplace_back(namefile);
     // }
     // stranges
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.3f_P5A0.txt", argv[3], argv[4], mus1);//6
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5A0.txt", argv[3], argv[4], c_mus1);//6
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.3f_P5P5.txt", argv[3], argv[4], mus1);//7
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5P5.txt", argv[3], argv[4], c_mus1);//7
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.3f_VKVK.txt", argv[3], argv[4], mus1);//8
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_VKVK.txt", argv[3], argv[4], c_mus1);//8
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.3f_P5A0.txt", argv[3], argv[4], mus1);//9
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5A0.txt", argv[3], argv[4], c_mus1);//9
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.3f_P5P5.txt", argv[3], argv[4], mus1);//10
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5P5.txt", argv[3], argv[4], c_mus1);//10
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.3f_VKVK.txt", argv[3], argv[4], mus1);//11
-    correlators.emplace_back(namefile);
-
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.3f_P5A0.txt", argv[3], argv[4], mus2);//12
-    correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.3f_P5P5.txt", argv[3], argv[4], mus2);//13
-    correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.3f_VKVK.txt", argv[3], argv[4], mus2);//14
-    correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.3f_P5A0.txt", argv[3], argv[4], mus2);//15
-    correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.3f_P5P5.txt", argv[3], argv[4], mus2);//16
-    correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.3f_VKVK.txt", argv[3], argv[4], mus2);//17
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_VKVK.txt", argv[3], argv[4], c_mus1);//11
     correlators.emplace_back(namefile);
 
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_P5A0.txt", argv[3], argv[4], muc1);//21
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5A0.txt", argv[3], argv[4], c_mus2);//12
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_P5P5.txt", argv[3], argv[4], muc1);//22
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5P5.txt", argv[3], argv[4], c_mus2);//13
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_VKVK.txt", argv[3], argv[4], muc1);//23
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_VKVK.txt", argv[3], argv[4], c_mus2);//14
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_P5A0.txt", argv[3], argv[4], muc1);//18
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5A0.txt", argv[3], argv[4], c_mus2);//15
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_P5P5.txt", argv[3], argv[4], muc1);//19
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5P5.txt", argv[3], argv[4], c_mus2);//16
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_VKVK.txt", argv[3], argv[4], muc1);//20
-    correlators.emplace_back(namefile);
-
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_P5A0.txt", argv[3], argv[4], muc2);//27
-    correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_P5P5.txt", argv[3], argv[4], muc2);//28
-    correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_VKVK.txt", argv[3], argv[4], muc2);//29
-    correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_P5A0.txt", argv[3], argv[4], muc2);//24
-    correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_P5P5.txt", argv[3], argv[4], muc2);//25
-    correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_VKVK.txt", argv[3], argv[4], muc2);//26
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_VKVK.txt", argv[3], argv[4], c_mus2);//17
     correlators.emplace_back(namefile);
 
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5A0.txt", argv[3], argv[4], c_muc1);//21
+    correlators.emplace_back(namefile);
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5P5.txt", argv[3], argv[4], c_muc1);//22
+    correlators.emplace_back(namefile);
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_VKVK.txt", argv[3], argv[4], c_muc1);//23
+    correlators.emplace_back(namefile);
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5A0.txt", argv[3], argv[4], c_muc1);//18
+    correlators.emplace_back(namefile);
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5P5.txt", argv[3], argv[4], c_muc1);//19
+    correlators.emplace_back(namefile);
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_VKVK.txt", argv[3], argv[4], c_muc1);//20
+    correlators.emplace_back(namefile);
 
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_P5A0.txt", argv[3], argv[4], muc3);//33
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5A0.txt", argv[3], argv[4], c_muc2);//27
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_P5P5.txt", argv[3], argv[4], muc3);//34
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5P5.txt", argv[3], argv[4], c_muc2);//28
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.5f_VKVK.txt", argv[3], argv[4], muc3);//35
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_VKVK.txt", argv[3], argv[4], c_muc2);//29
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_P5A0.txt", argv[3], argv[4], muc3);//30
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5A0.txt", argv[3], argv[4], c_muc2);//24
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_P5P5.txt", argv[3], argv[4], muc3);//31
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5P5.txt", argv[3], argv[4], c_muc2);//25
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_VKVK.txt", argv[3], argv[4], muc3);//32
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_VKVK.txt", argv[3], argv[4], c_muc2);//26
+    correlators.emplace_back(namefile);
+
+
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5A0.txt", argv[3], argv[4], c_muc3);//33
+    correlators.emplace_back(namefile);
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5P5.txt", argv[3], argv[4], c_muc3);//34
+    correlators.emplace_back(namefile);
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_VKVK.txt", argv[3], argv[4], c_muc3);//35
+    correlators.emplace_back(namefile);
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5A0.txt", argv[3], argv[4], c_muc3);//30
+    correlators.emplace_back(namefile);
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5P5.txt", argv[3], argv[4], c_muc3);//31
+    correlators.emplace_back(namefile);
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_VKVK.txt", argv[3], argv[4], c_muc3);//32
     correlators.emplace_back(namefile);
 
     // if (argc > 17 && strcmp(argv[17], "three_corr") != 0) { // cott mu+dm
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.7f_P5A0.txt", argv[3], argv[4], mul1);//36
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5A0.txt", argv[3], argv[4], c_mul1);//36
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.7f_P5P5.txt", argv[3], argv[4], mul1);//37
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5P5.txt", argv[3], argv[4], c_mul1);//37
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%.7f_VKVK.txt", argv[3], argv[4], mul1);//38
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_VKVK.txt", argv[3], argv[4], c_mul1);//38
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.7f_P5A0.txt", argv[3], argv[4], mul1);//39
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5A0.txt", argv[3], argv[4], c_mul1);//39
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.7f_P5P5.txt", argv[3], argv[4], mul1);//40
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5P5.txt", argv[3], argv[4], c_mul1);//40
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.7f_VKVK.txt", argv[3], argv[4], mul1);//41
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_VKVK.txt", argv[3], argv[4], c_mul1);//41
     correlators.emplace_back(namefile);
     // }
     // if (argc > 18 && strcmp(argv[17], "three_corr") != 0) {
-    mysprintf(namefile, NAMESIZE, "%s/%s_mu.%.5f_bolla_std.txt", argv[3], argv[4], mu);//42
+    mysprintf(namefile, NAMESIZE, "%s/%s_mu.%s_bolla_std.txt", argv[3], argv[4], c_mu);//42
     correlators.emplace_back(namefile);
     // }
     // if (argc > 17 && strcmp(argv[17], "three_corr") != 0) { /// corr_mu+dm
-    mysprintf(namefile, NAMESIZE, "%s/%s_small_stat_r.equal_mu.%.5f_P5A0.txt", argv[3], argv[4], mu);//43
+    mysprintf(namefile, NAMESIZE, "%s/%s_small_stat_r.equal_mu.%s_P5A0.txt", argv[3], argv[4], c_mu);//43
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_small_stat_r.equal_mu.%.5f_P5P5.txt", argv[3], argv[4], mu);//44
+    mysprintf(namefile, NAMESIZE, "%s/%s_small_stat_r.equal_mu.%s_P5P5.txt", argv[3], argv[4], c_mu);//44
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_small_stat_r.equal_mu.%.5f_VKVK.txt", argv[3], argv[4], mu);//45
+    mysprintf(namefile, NAMESIZE, "%s/%s_small_stat_r.equal_mu.%s_VKVK.txt", argv[3], argv[4], c_mu);//45
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_small_stat_r.opposite_mu.%.5f_P5A0.txt", argv[3], argv[4], mu);//46
+    mysprintf(namefile, NAMESIZE, "%s/%s_small_stat_r.opposite_mu.%s_P5A0.txt", argv[3], argv[4], c_mu);//46
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_small_stat_r.opposite_mu.%.5f_P5P5.txt", argv[3], argv[4], mu);//47
+    mysprintf(namefile, NAMESIZE, "%s/%s_small_stat_r.opposite_mu.%s_P5P5.txt", argv[3], argv[4], c_mu);//47
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_small_stat_r.opposite_mu.%.5f_VKVK.txt", argv[3], argv[4], mu);//48
+    mysprintf(namefile, NAMESIZE, "%s/%s_small_stat_r.opposite_mu.%s_VKVK.txt", argv[3], argv[4], c_mu);//48
     correlators.emplace_back(namefile);
     // }
     // if (argc > 18 && strcmp(argv[17], "three_corr") != 0) {
-    mysprintf(namefile, NAMESIZE, "%s/%s_corr_bolla_r.equal_mu.%.5f_P5A0.txt", argv[3], argv[4], mu);//49
+    mysprintf(namefile, NAMESIZE, "%s/%s_corr_bolla_r.equal_mu.%s_P5A0.txt", argv[3], argv[4], c_mu);//49
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_corr_bolla_r.equal_mu.%.5f_P5P5.txt", argv[3], argv[4], mu);//50
+    mysprintf(namefile, NAMESIZE, "%s/%s_corr_bolla_r.equal_mu.%s_P5P5.txt", argv[3], argv[4], c_mu);//50
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_corr_bolla_r.equal_mu.%.5f_VKVK.txt", argv[3], argv[4], mu);//51
+    mysprintf(namefile, NAMESIZE, "%s/%s_corr_bolla_r.equal_mu.%s_VKVK.txt", argv[3], argv[4], c_mu);//51
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_corr_bolla_r.opposite_mu.%.5f_P5A0.txt", argv[3], argv[4], mu);//52
+    mysprintf(namefile, NAMESIZE, "%s/%s_corr_bolla_r.opposite_mu.%s_P5A0.txt", argv[3], argv[4], c_mu);//52
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_corr_bolla_r.opposite_mu.%.5f_P5P5.txt", argv[3], argv[4], mu);//53
+    mysprintf(namefile, NAMESIZE, "%s/%s_corr_bolla_r.opposite_mu.%s_P5P5.txt", argv[3], argv[4], c_mu);//53
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_corr_bolla_r.opposite_mu.%.5f_VKVK.txt", argv[3], argv[4], mu);//54
+    mysprintf(namefile, NAMESIZE, "%s/%s_corr_bolla_r.opposite_mu.%s_VKVK.txt", argv[3], argv[4], c_mu);//54
     correlators.emplace_back(namefile);
     // }
 
@@ -1069,9 +1083,9 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // declare
     int idD = correlators.size();
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_mu.%.3f_P5P5.txt", argv[3], argv[4], mu, mus1);//var+15 
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_mu.%s_P5P5.txt", argv[3], argv[4], c_mu, c_mus1);//var+15 
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_mu.%.3f_P5P5.txt", argv[3], argv[4], mu, mus2);//var+16
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_mu.%s_P5P5.txt", argv[3], argv[4], c_mu, c_mus2);//var+16
     correlators.emplace_back(namefile);
 
     // parse and read
@@ -1094,6 +1108,80 @@ int main(int argc, char** argv) {
         }
 
     }
+
+    // int iK_l1 = correlators.size();
+    // /// K meson with different mul1
+    // if (argc > 18 && strcmp(argv[17], "three_corr") != 0 && strcmp(argv[4], "cB.72.96") != 0 && strcmp(argv[4], "cD.54.96") != 0) {
+    //     mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_mu.%.4e_P5P5.txt", argv[3], argv[4], c_mul1, c_mus1);
+    //     correlators.emplace_back(namefile);
+    //     mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_mu.%.4e_P5P5.txt", argv[3], argv[4], c_mul1, c_mus2);
+    //     correlators.emplace_back(namefile);
+    //     // parse and read
+    //     for (int i = iK_l1; i < iK_l1 + 2;i++) {
+    //         // check if file exist
+    //         FILE* tmp = NULL;
+    //         tmp = fopen(correlators[i].c_str(), "r");
+    //         // read if file exist
+    //         if (tmp != NULL) {
+    //             printf("reading  confs from file: %s\n", correlators[i].c_str());
+    //             myconfs.emplace_back(correlators[i].c_str());
+    //             printf("%d  %ld \n", i, myconfs.size());
+    //             myconfs[i].check_binnign();
+    //             cout << "number of different configurations:" << myconfs[i].confs_after_binning << endl;
+    //             read_twopt(correlators[i].c_str(), myconfs[i], T, data, i, bin);
+    //             fclose(tmp);
+    //         }
+    //         else {
+    //             printf("files %s do not exist !!!!!\n", correlators[i].c_str());
+    //         }
+    //     }
+    //     // if we want to try to extract the sea errors
+    //     // int Nconf_bolla = myconfs[42].iconfs.size();
+    //     // double**** data_no_bin = calloc_corr(Nconf_bolla, 4 + 3, file_head.l0);
+    //     // // error(Nconf_bolla!= myconfs[53].iconfs.size(),1,"main","conf of P5P5 correlated bolla are not the same of bolla");
+    //     // // error(Nconf_bolla!= myconfs[51].iconfs.size(),1,"main","conf of VKVKeq correlated bolla are not the same of bolla");
+    //     // // error(Nconf_bolla!= myconfs[54].iconfs.size(),1,"main","conf of VKVKop correlated bolla are not the same of bolla");
+    //     // check_confs_correlated(myconfs, correlators, 42, 53);
+    //     // check_confs_correlated(myconfs, correlators, 42, 51);
+    //     // check_confs_correlated(myconfs, correlators, 42, 54);
+    //     // for (int i = 0;i < 6;i++)
+    //     //     check_confs_correlated(myconfs, correlators, 36 + i, 43 + i);
+
+    //     // read_twopt(correlators[42].c_str(), myconfs[42], 0, data_no_bin, 0, Nconf_bolla);
+    //     // read_twopt(correlators[53].c_str(), myconfs[53], T, data_no_bin, 1, Nconf_bolla);
+    //     // read_twopt(correlators[51].c_str(), myconfs[51], T, data_no_bin, 2, Nconf_bolla);
+    //     // read_twopt(correlators[54].c_str(), myconfs[54], T, data_no_bin, 3, Nconf_bolla);
+
+
+    //     // for (int b = 0; b < Nconf_bolla; b++) {
+    //     //     data_no_bin[b][0][0][0] = -data_no_bin[b][0][0][0];
+    //     //     for (int t = 0;t < T / 2 + 1;t++) {
+    //     //         data_no_bin[b][0][t][0] = data_no_bin[b][0][0][0];
+    //     //         data_no_bin[b][4][t][0] = data_no_bin[b][0][0][0] * data_no_bin[b][1][t][0]; // bolla * P5P5_op // 55
+    //     //         data_no_bin[b][5][t][0] = data_no_bin[b][0][0][0] * data_no_bin[b][2][t][0]; // bolla * VKVK_eq // 56
+    //     //         data_no_bin[b][6][t][0] = data_no_bin[b][0][0][0] * data_no_bin[b][3][t][0]; // bolla * VKVK_op // 57
+    //     //     }
+    //     // }
+
+
+    //     // bin_data(data, 42, data_no_bin, 0, T, Nconf_bolla, bin); // bolla 
+    //     // bin_data(data, var + 0, data_no_bin, 4, T, Nconf_bolla, bin); // bolla * P5P5_op // 55
+    //     // bin_data(data, var + 1, data_no_bin, 5, T, Nconf_bolla, bin); // bolla * P5P5_op // 56
+    //     // bin_data(data, var + 2, data_no_bin, 6, T, Nconf_bolla, bin); // bolla * P5P5_op // 57
+    //     // error(var + 0 != 55, 1, "main", "error index do not match var+0=%d  expected 57", var + 0);
+    //     // error(var + 1 != 56, 1, "main", "error index do not match var+1=%d  expected 57", var + 1);
+    //     // error(var + 2 != 57, 1, "main", "error index do not match var+2=%d  expected 57", var + 2);
+    //     // free_corr(Nconf_bolla, 4 + 3, file_head.l0, data_no_bin);
+
+    // }
+
+    // correlators.emplace_back("bP5P5");
+    // correlators.emplace_back("bVKVKeq");
+    // correlators.emplace_back("bVKVKop");
+    // myconfs.emplace_back();
+    // myconfs.emplace_back();
+    // myconfs.emplace_back();
+
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2127,30 +2215,30 @@ int main(int argc, char** argv) {
         fit_info.N = 1;
         fit_info.Njack = Njack;
         printf("Ncorrelator=%d\n", ncorr_new);
-        fit_info.corr_id = { 53,40,var/*55*/ };//P5P5_corr_bolla, P5P5dmu , bolla*P5P5dmu
+        fit_info.corr_id = { 53, 40, var/*55*/ };//P5P5_corr_bolla, P5P5dmu , bolla*P5P5dmu
         fit_info.guess = { mu,mul1 };
         id_P5P5_mudmu = ncorr_new;
         add_correlators(option, ncorr_new, conf_jack, corr_plus_dm, fit_info);
 
-        fit_info.corr_id = { 2,2,var + 1 };//VKVKeq, VKVKeqdmu , bolla*VKVKeqdmu
+        fit_info.corr_id = { 2, 2, var + 1 };//VKVKeq, VKVKeqdmu , bolla*VKVKeqdmu
         fit_info.guess = { mu,mul1 };
         add_correlators(option, ncorr_new, conf_jack, corr_plus_dm, fit_info);
 
-        fit_info.corr_id = { 5,5,var + 2 };//VKVKop, VKVKopdmu , bolla*VKVKopdmu
+        fit_info.corr_id = { 5, 5, var + 2 };//VKVKop, VKVKopdmu , bolla*VKVKopdmu
         fit_info.guess = { mu,mul1 };
         add_correlators(option, ncorr_new, conf_jack, corr_plus_dm, fit_info);
 
-        fit_info.corr_id = { 4,47, 40, 53,var/*55*/ };//P5P5, P5P5_corr_dmu,  P5P5_mu+dm ,P5P5_corr_bolla, bolla*P5P5_cor_bolla
+        fit_info.corr_id = { 4, 47, 40, 53, var/*55*/ };//P5P5, P5P5_corr_dmu,  P5P5_mu+dm ,P5P5_corr_bolla, bolla*P5P5_cor_bolla
         fit_info.guess = { mu,mul1 };
         id_P5P5_cor_mudmu = ncorr_new;
         add_correlators(option, ncorr_new, conf_jack, corr_plus_dm_correlated, fit_info);
 
-        fit_info.corr_id = { 2,45, 38, 51,var + 1/*56*/ };//VKVK, VKVK_corr_dmu,  VKVK_mu+dm ,VKVK_corr_bolla, bolla*VKVK_cor_bolla
+        fit_info.corr_id = { 2, 45, 38, 51, var + 1/*56*/ };//VKVK, VKVK_corr_dmu,  VKVK_mu+dm ,VKVK_corr_bolla, bolla*VKVK_cor_bolla
         fit_info.guess = { mu,mul1 };
         id_VKVKeq_mudm = ncorr_new;
         add_correlators(option, ncorr_new, conf_jack, corr_plus_dm_correlated, fit_info);
 
-        fit_info.corr_id = { 5,48, 41, 54,var + 2/*57*/ };//VKVK, VKVK_corr_dmu,  VKVK_mu+dm ,VKVK_corr_bolla, bolla*VKVK_cor_bolla //op
+        fit_info.corr_id = { 5, 48, 41, 54, var + 2/*57*/ };//VKVK, VKVK_corr_dmu,  VKVK_mu+dm ,VKVK_corr_bolla, bolla*VKVK_cor_bolla //op
         fit_info.guess = { mu,mul1 };
         id_VKVKop_mudm = ncorr_new;
         add_correlators(option, ncorr_new, conf_jack, corr_plus_dm_correlated, fit_info);
@@ -2421,6 +2509,14 @@ int main(int argc, char** argv) {
 
     ///  ms from MK
     double* ms_MK = interpol_Z(Nstrange, Njack, MK, ms, jack_aMK_MeV_exp, outfile, "ms(MK)", resampling);
+    printf("jack_aMK_MeV_exp = %g %g\n", jack_aMK_MeV_exp[Njack - 1], myres->comp_error(jack_aMK_MeV_exp));
+    printf("MK = %g %g\n", MK[0][Njack - 1], myres->comp_error(MK[0]));
+    printf("MK = %g %g\n", MK[1][Njack - 1], myres->comp_error(MK[1]));
+    printf("ms0 = %g %g\n", ms[0][Njack - 1], myres->comp_error(ms[0]));
+    printf("ms1 = %g %g\n", ms[1][Njack - 1], myres->comp_error(ms[1]));
+    // char namefile_ms[NAMESIZE];
+    // mysprintf(namefile_ms, NAMESIZE, "%s/out/%s_ms", argv[3], argv[4]);
+    // myres->write_jack_in_file(ms_MK, namefile_ms);
     write_jack(tmp, Njack, jack_file);
     check_correlatro_counter(148);
     free(ms_MK);
@@ -2616,6 +2712,27 @@ int main(int argc, char** argv) {
     write_jack(mu1_jack, Njack, jack_file);        check_correlatro_counter(166);
 
 
+
+    // if (argc > 18 && strcmp(argv[17], "three_corr") != 0 && strcmp(argv[4], "cB.72.96") != 0 && strcmp(argv[4], "cD.54.96") != 0) {
+
+    //     write_jack(ms[0], Njack, jack_file); check_correlatro_counter(167);
+    //     write_jack(ms[1], Njack, jack_file); check_correlatro_counter(168);
+
+
+    //     /////////////////
+    //     /// K meson l1
+    //     /////////
+    //     double* M_K1l1_op = plateau_correlator_function(option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack, namefile_plateaux, outfile, iK_l1, "M_{K1l1}^{op}", M_eff_T, jack_file);
+    //     check_correlatro_counter(169);
+
+    //     double* M_K2l1_op = plateau_correlator_function(option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack, namefile_plateaux, outfile, iK_l1 + 1, "M_{K2l1}^{op}", M_eff_T, jack_file);
+    // }else {
+    //     zero_corr(zeros, Njack, jack_file);
+    //     zero_corr(zeros, Njack, jack_file);
+    //     zero_corr(zeros, Njack, jack_file);
+    //     zero_corr(zeros, Njack, jack_file);
+    // }
+    // check_correlatro_counter(170);
 
     //////////////////////
     free_2(2, ms);
