@@ -61,10 +61,9 @@ constexpr double Jpsi_MeV_err = 0.001 * 1000;
 constexpr double Metac_MeV = 2.9839 * 1000;
 constexpr double Metac_MeV_err = 0.004 * 1000;
 
-// constexpr double MK_MeV = 494.2;
-// constexpr double MK_MeV_err = 0.3;
-constexpr double MK_MeV = 494.6 ;
-constexpr double MK_MeV_err = 0.0000;
+constexpr double MK_MeV = 494.2;
+constexpr double MK_MeV_err = 0.3;
+
 // constexpr double Mpi_MeV = 139;
 // constexpr double Mpi_MeV_err = 0.001;
 
@@ -582,6 +581,23 @@ void check_confs_correlated(std::vector<configuration_class> in_confs, std::vect
 
     }
 }
+
+double MK_fit(int n, int Nvar, double* x, int Npar, double* P) {
+    double mul = x[0];
+    double mus = x[1];
+    return P[0] * mul + P[1] * mus;
+}
+
+
+double lhs_MK2(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
+    double r;
+    r = gjack.en[e].jack[fit_info.corr_id[n]][j];
+    r *= r;
+
+    return r;
+}
+
+
 int main(int argc, char** argv) {
     int size;
     int i, j, t;
@@ -652,12 +668,25 @@ int main(int argc, char** argv) {
 
     double mus1 = atof(argv[11]);
     double mus2 = atof(argv[12]);
-    std::vector<std::string> string_mus = { argv[11], argv[12] };
-    double mul1 = atof(argv[13]);
-    double mul2 = atof(argv[14]);
+
+    double mul = atof(argv[13]);
+
+    int Ndata = (argc - 10) / 2;
+    std::vector<std::string> string_mul(Ndata);
+    std::vector<std::string> string_mus(Ndata);
+    std::vector<double> vec_mul(Ndata);
+    std::vector<double> vec_mus(Ndata);
+
+    for (size_t i = 0; i < Ndata; i++) {
+        string_mul[i] = argv[11 + i * 2];
+        string_mus[i] = argv[11 + i * 2 + 1];
+        vec_mul[i] = atof(argv[11 + i * 2]);
+        vec_mus[i] = atof(argv[11 + i * 2 + 1]);
+        /* code */
+    }
 
 
-    std::vector<std::string> string_mul = { argv[13], argv[14] };
+
     // double mus1 = atof(argv[12]);
     // double mus2 = atof(argv[13]);
 
@@ -670,7 +699,7 @@ int main(int argc, char** argv) {
     generic_header header;
     header.L = file_head.l1;
     header.T = file_head.l0;
-    header.mus = { mus1 , mus2, mul1, mul2 };
+    header.mus = { vec_mul[0] };
     // if (argc > 17 && strcmp(argv[17], "three_corr") != 0)  header.mus.emplace_back(mul1);
     header.thetas = {};
 
@@ -726,19 +755,13 @@ int main(int argc, char** argv) {
         std::cout << e << "\n";
     }
     std::vector<std::string>  correlators;
-    // mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%.5f_P5A0.txt", argv[3], argv[4], mus, string_mul);//0
-    // correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_mu.%s_P5P5.txt", argv[3], argv[4], string_mul[0].c_str(), string_mus[0].c_str());//0
-    correlators.emplace_back(namefile);
 
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_mu.%s_P5P5.txt", argv[3], argv[4], string_mul[1].c_str(), string_mus[0].c_str());//0
-    correlators.emplace_back(namefile);
+    for (size_t i = 0; i < Ndata; i++) {
+        mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_mu.%s_P5P5.txt", argv[3], argv[4], string_mul[i].c_str(), string_mus[i].c_str());//0
+        correlators.emplace_back(namefile);
+    }
 
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_mu.%s_P5P5.txt", argv[3], argv[4], string_mul[0].c_str(), string_mus[1].c_str());//0
-    correlators.emplace_back(namefile);
 
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_mu.%s_P5P5.txt", argv[3], argv[4], string_mul[1].c_str(), string_mus[1].c_str());//0
-    correlators.emplace_back(namefile);
 
 
     std::vector<configuration_class> myconfs;
@@ -837,12 +860,10 @@ int main(int argc, char** argv) {
         myres->read_jack_from_file(ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_E.txt");
         latt = "E";
     }
-    // a= myres->create_fake(0.07951 , 0.00004,2);
-    // ml= myres->create_fake( 0.0006675 ,1e-10,1);
-    // ml= myres->create_fake( 0.00072 ,1e-10,1);
-    
     corr_counter = -1;
     write_jack(a, Njack, jack_file);
+    // a= myres->create_fake(0.07951 , 0.00004,2);
+    // ml= myres->create_fake( 0.0006675 ,1e-10,1);
 
     // double* ms = (double*)malloc(sizeof(double) * Njack);// allocate memory 
     // char namefile_ms[NAMESIZE];
@@ -852,42 +873,81 @@ int main(int argc, char** argv) {
     check_correlatro_counter(0);
     printf("reading a   =  %g  %g fm\n", a[Njack - 1], myres->comp_error(a));
     printf("reading amul^phys=  %g  %g\n", ml[Njack - 1], myres->comp_error(ml));
+
     ////////////////////////////////////////////////
     printf("################### fitting  the correlaators #################\n");
     double* zeros = (double*)calloc(Njack, sizeof(double));
-    printf("ms =  %g  ml = %g\n", mus1, mul1);
-    double* M_K1l1 = plateau_correlator_function(option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack, namefile_plateaux, outfile, 0, "M_{K}^{s1,l1}", M_eff_T, jack_file);
-    check_correlatro_counter(1);
+    std::vector<double*> M_K(Ndata);
+    char namefit[NAMESIZE];
+    for (size_t i = 0; i < Ndata; i++) {
+        mysprintf(namefit, NAMESIZE, "M_{K%d}", i);
+        M_K[i] = plateau_correlator_function(option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack, namefile_plateaux, outfile, i, namefit, M_eff_T, jack_file);
+        check_correlatro_counter(1 + i);
+    }
 
-    printf("ms =  %g  ml = %g\n", mus1, mul2);
-    double* M_K1l2 = plateau_correlator_function(option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack, namefile_plateaux, outfile, 1, "M_{K}^{s1,l2}", M_eff_T, jack_file);
-    check_correlatro_counter(2);
 
-    printf("ms =  %g  ml = %g\n", mus2, mul1);
-    double* M_K2l1 = plateau_correlator_function(option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack, namefile_plateaux, outfile, 2, "M_{K}^{s2,l1}", M_eff_T, jack_file);
-    check_correlatro_counter(3);
-    printf("ms =  %g  ml = %g\n", mus2, mul2);
-    double* M_K2l2 = plateau_correlator_function(option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack, namefile_plateaux, outfile, 3, "M_{K}^{s2,l2}", M_eff_T, jack_file);
-    check_correlatro_counter(4);
-
+    //////////////////////////////////////////////////////////////
+    // global fit
+    //////////////////////////////////////////////////////////////
     printf("################### interpolating #################\n");
-    double** MK2_s1_interl = (double**)malloc(sizeof(double*) * string_mul.size());
-    MK2_s1_interl[0] = M_K1l1;
-    MK2_s1_interl[1] = M_K1l2;
-    myres->mult(MK2_s1_interl[0], MK2_s1_interl[0], MK2_s1_interl[0]);
-    myres->mult(MK2_s1_interl[1], MK2_s1_interl[1], MK2_s1_interl[1]);
 
-    double** ms_vec = (double**)malloc(sizeof(double*) * string_mul.size());
-    ms_vec[0] = fake_sampling(resampling, header.mus[0], 1e-10, Njack, 1);
-    ms_vec[1] = fake_sampling(resampling, header.mus[1], 1e-10, Njack, 1);
+    data_all jackall;
+    jackall.resampling = resampling;
+    jackall.ens = Ndata;
+    jackall.en = new data_single[jackall.ens];
+    for (int i = 0;i < jackall.ens;i++) {
+        jackall.en[i].header = header;
+        jackall.en[i].Nobs = 1;
+        jackall.en[i].Njack = header.Njack;
+        jackall.en[i].jack = (double**)malloc(sizeof(double*) * jackall.en[i].Nobs);
+    }
+    for (size_t i = 0; i < Ndata; i++) {
+        jackall.en[i].jack[0] = M_K[i];
+    }
 
-    double** ml_vec = (double**)malloc(sizeof(double*) * string_mul.size());
-    ml_vec[0] = fake_sampling(resampling, header.mus[2], 1e-10, Njack, 1);
-    ml_vec[1] = fake_sampling(resampling, header.mus[3], 1e-10, Njack, 1);
+    fit_type fit_info;
+    // fit in sigma
+    fit_info.restore_default();
+    fit_info.Npar = 2;
+    fit_info.Nvar = 2;
+    fit_info.Njack = header.Njack;
+    fit_info.N = 1;
+    int offset = 6;
+    fit_info.myen = std::vector<int>(Ndata);
+    for (size_t i = 0; i < Ndata; i++)fit_info.myen[i] = i;
+    fit_info.entot = fit_info.myen.size() * fit_info.N;
+    fit_info.malloc_x();
+    count = 0;
+    for (int j = 0;j < fit_info.Njack;j++) {
+        for (size_t i = 0; i < Ndata; i++) {
+            fit_info.x[0][i][j] = vec_mul[i]; // mul1 
+            fit_info.x[1][i][j] = vec_mus[i]; // mul2
+        }
 
-    ///  ms from MDs
-    printf("interpolating to MK= %g  %g  MeV\n", MK_MeV, MK_MeV_err);
-    printf("interpolating to aMK= %g  \n", MK_MeV * a[Njack - 1] / hbarc);
+    }
+    count++;
+
+    fit_info.corr_id = { 0 };
+    fit_info.function = MK_fit;//constant_fit;
+    fit_info.linear_fit = true;
+    fit_info.covariancey = false;
+    fit_info.verbosity = 0;
+    mysprintf(namefit, NAMESIZE, "%s/out/%s_MK_fit", argv[3], option[6]);
+    char** temp_argv = malloc_2<char>(5, NAMESIZE);
+    mysprintf(temp_argv[1], NAMESIZE, "%s", resampling);// resampling
+    mysprintf(temp_argv[3], NAMESIZE, "%s/out", option[3]);// resampling
+
+    fit_result fit_Z0_sigma = fit_all_data(temp_argv, jackall, lhs_MK2, fit_info, namefit);
+    printf("chi2/dof = %g\n", fit_Z0_sigma.chi2[Njack - 1]);
+    printf("Ndata = %d\n", fit_Z0_sigma.dof + fit_Z0_sigma.Npar);
+    printf("Npar = %d\n", fit_Z0_sigma.Npar);
+    printf("dof = %d\n", fit_Z0_sigma.dof);
+    fit_info.band_range = { 0,0.5 };
+    // print_fit_band(temp_argv, jackall, fit_info, fit_info, namefit, "mus_l", fit_Z0_sigma, fit_Z0_sigma, 1, 0/*en*/, 0.01);
+    // print_fit_band(temp_argv, jackall, fit_info, fit_info, namefit, "mus_l1", fit_Z0_sigma, fit_Z0_sigma, 1, 2/*en*/, 0.01);
+    // print_fit_band(temp_argv, jackall, fit_info, fit_info, namefit, "mus_l2", fit_Z0_sigma, fit_Z0_sigma, 1, 3/*en*/, 0.01);
+
+    // write_jack(fit_Z0_sigma.P[0], Njack, jack_file);
 
     double* jack_MK_Mev = myres->create_fake(MK_MeV, MK_MeV_err, 1);
     double* jack_aMK2_exp = myres->create_copy(jack_MK_Mev);
@@ -895,35 +955,33 @@ int main(int argc, char** argv) {
     myres->div(jack_aMK2_exp, jack_aMK2_exp, hbarc);
     myres->mult(jack_aMK2_exp, jack_aMK2_exp, jack_aMK2_exp);
 
-    double* MK2s1 = interpol_Z(string_mul.size(), Njack, ml_vec, MK2_s1_interl, ml, outfile, "(MKs1_mulphys)^2", resampling);
-    write_jack(MK2s1, Njack, jack_file);
-    check_correlatro_counter(5);
+    std::vector<double> ms_MK(Njack);
+    for (int j = 0;j < Njack;j++) {
+        ms_MK[j] = (jack_aMK2_exp[j] - fit_Z0_sigma.P[0][j] * ml[j]) / fit_Z0_sigma.P[1][j];
+    }
 
-    double** MK2_s2_interl = (double**)malloc(sizeof(double*) * string_mul.size());
-    MK2_s2_interl[0] = M_K2l1;
-    MK2_s2_interl[1] = M_K2l2;
-    myres->mult(MK2_s2_interl[0], MK2_s2_interl[0], MK2_s2_interl[0]);
-    myres->mult(MK2_s2_interl[1], MK2_s2_interl[1], MK2_s2_interl[1]);
+    // zero_corr(zeros, Njack, jack_file);
+    // zero_corr(zeros, Njack, jack_file);
 
 
-    double* MK2s2 = interpol_Z(string_mul.size(), Njack, ml_vec, MK2_s2_interl, ml, outfile, "(MKs2_mulphys)^2", resampling);
-    write_jack(MK2s2, Njack, jack_file);
-    check_correlatro_counter(6);
-
-    double** MK2_vec = (double**)malloc(sizeof(double*) * string_mul.size());
-    MK2_vec[0] = MK2s1;
-    MK2_vec[1] = MK2s2;
-
-    // double** mc = (double**)malloc(sizeof(double*) * string_mul.size());
-    // mc[0] = fake_sampling(resampling, header.mus[2], 1e-10, Njack, 1);
-    // mc[1] = fake_sampling(resampling, header.mus[3], 1e-10, Njack, 1);
+    write_jack(ms_MK.data(), Njack, jack_file);
+    // check_correlatro_counter(7);
+    printf("interpolating to MK= %g  %g  MeV\n", MK_MeV, MK_MeV_err);
+    printf("interpolating to aMK= %g  \n", MK_MeV * a[Njack - 1] / hbarc);
     printf("################### result #################\n");
-    double* ms_MK = interpol_Z(string_mul.size(), Njack, MK2_vec, ms_vec, jack_aMK2_exp, outfile, "ms(MK)", resampling);
-    write_jack(ms_MK, Njack, jack_file);
-    check_correlatro_counter(7);
+
+    const char* description = "ms(MK)";
+    fprintf(outfile, " \n\n# aMetas_exp  Zint  err\n");
+
+    fprintf(outfile, "%.15g   %.15g   %.15g\t", ms_MK[Njack - 1], ms_MK[Njack - 1], error_jackboot(resampling, Njack, ms_MK.data()));
+
+    fprintf(outfile, "\n\n #%s fit in [%d,%d] chi2=%.5g  %.5g\n", description, 0, 0, 0.0, 0.0);
+    fprintf(outfile, "   %.15g   %.15g\n", ms_MK[Njack - 1], error_jackboot(resampling, Njack, ms_MK.data()));
+    printf("%s (%.15g) =  %.15g   %.15g\n", description, ms_MK[Njack - 1], ms_MK[Njack - 1], error_jackboot(resampling, Njack, ms_MK.data()));
+
 
     mysprintf(namefile, NAMESIZE, "%s/out/ms_from_MK_%s.txt", argv[3], latt.c_str());
-    myres->write_jack_in_file(ms_MK, namefile);
+    myres->write_jack_in_file(ms_MK.data(), namefile);
 
 
     //////////////////////
