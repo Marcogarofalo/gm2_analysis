@@ -136,6 +136,7 @@ kable(dft, col.names = c("Ens.","$a\\mu_\\ell$"))
 
 ```
 
+## fit used to quote $a\mu_\ell$
 
  adding an extra parameter
  $$

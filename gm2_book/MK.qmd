@@ -22,7 +22,7 @@ ggp # Let knit handle the plot
 myplotly(ggplot())
 # widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
 ```
-
+## MK without correction in $\mu_\ell$
 
 ```{r, results='asis',echo=FALSE}
 ens <- c(
@@ -153,6 +153,114 @@ fig <- myplotly(gg, "", "Ensemble", "$(\\mu_s(corr) -\\mu_s)/\\mu_s(corr)$", to_
 
 ```
 
+
+## ms
+
+
+```{r, results='asis',echo=FALSE}
+ens <- c(
+  # "cA.30.32_mu.0.003000",
+  #  "cA.40.24_mu.0.004000",
+  #  "cA.53.24_mu.0.005300",
+  "cB.72.64_K",
+  # "cB.72.96_K",
+  "cC.06.80_K"
+  # "cC.06.112_K",
+  # "cD.54.96_K",
+  #"cE.44.112_K"
+)
+dir <- "/home/garofalo/analysis/g-2_new_stat/out/"
+df <- NULL
+for (e in ens) {
+  mt <- read_df(paste0(dir, e, "_output"))
+  all_obs <- Rose::get_all_corr(mt)
+  df <- add_corr_to_df("M_{K1}", all_obs, mt, df,
+    rename = paste0("MK_s1l1-", substr(e, start = 1, stop = 8))
+  )
+  # df <- add_corr_to_df("M_{K}^{s1,l2}", all_obs, mt, df,
+  #   rename = paste0("MK_s1l2-", substr(e, start = 1, stop = 8))
+  # )
+  # df <- add_corr_to_df("M_{K}^{s2,l1}", all_obs, mt, df,
+  #   rename = paste0("MK_s2l1-", substr(e, start = 1, stop = 8))
+  # )
+  # df <- add_corr_to_df("M_{K}^{s2,l2}", all_obs, mt, df,
+  #   rename = paste0("MK_s2l2-", substr(e, start = 1, stop = 8))
+  # )
+  
+ 
+}
+gg <- plot_df_corr_ggplot(df)
+fig <- myplotly(gg, to_print = TRUE)
+```
+
+
+
+```{r, results='asis',echo=FALSE}
+ens <- c(
+  # "cA.30.32_mu.0.003000",
+  #  "cA.40.24_mu.0.004000",
+  #  "cA.53.24_mu.0.005300",
+  "cB.72.64_K",
+  #"cB.72.96_mu.0.000720",
+  "cC.06.80_K",
+  #"cC.06.112_mu.0.000600",
+  "cD.54.96_K",
+  "cE.44.112_K"
+)
+source("/home/garofalo/programs/Rose/R/read_block.R")
+dir <- "/home/garofalo/analysis/g-2_new_stat/out/"
+df <- data.frame(
+  "ms" = rep(0, length(ens)), "ms_err" = rep(0, length(ens)), "en" = gsub("_mu.*", "", ens)
+)
+GG <- c(
+  0.0182782,
+  0.0160434,
+  0.013576,
+  0.0117933 
+)
+GG_err <- c(
+  2.3907e-05,
+  4.22547e-05,
+  3.34999e-05,
+  3.5766e-05
+)
+
+
+
+count <- 1
+for (e in ens) {
+  mt <- read_df(paste0(dir, e, "_output"))
+  all_obs <- Rose::get_all_corr(mt)
+  # df<-add_corr_to_df("M_{K1}^{op}",all_obs ,mt,df,
+  #                    rename = paste0("MK1-",substr( e , start = 1 , stop = 8 )))
+  # df<-add_corr_to_df("M_{K2}^{op}",all_obs ,mt,df,
+  #                    rename = paste0("MK2-",substr( e , start = 1 , stop = 8 )))
+  #
+
+  fit <- get_full_res("ms(MK)", all_obs, mt)
+  df[count, c(1, 2)] <- fit[1, c(1, 2)]
+  # cat("$m_s($",gsub("\\_mu.*","",e),"$)$=", mean_print(fit[1,1],fit[1,2]), "\n\n")
+  count <- count + 1
+}
+diff_rel <- (GG - df[, 1]) / GG
+err <- (1 / GG) * df[, 2] + (df[, 1] / GG)^2 * GG_err
+sting_mus<-mapply(mean_print, df[,1],df[,2])
+dft<-data.frame("Ens"=ens, "amus"=sting_mus,"amus_GG"=mapply(mean_print, GG,GG_err) )
+kable(dft, col.names = c("Ens.","$a\\mu_s$","$a\\mu_s(GG)$"))
+
+gg <- myggplot()
+gg <- gg + geom_pointrange(aes(
+  x = df[, 3], y = diff_rel,
+  ymin = diff_rel - err,
+  ymax = diff_rel + err,
+))
+gg<- gg+ geom_hline(yintercept = 0)
+fig <- myplotly(gg, "", "Ensemble", "$(\\mu_s(GG) -\\mu_s)/\\mu_s(GG)$", to_print = TRUE)
+
+```
+
+## $\eta_s$ and Jpsi
+
 ```{r, results='asis',echo=FALSE}
 ens <- c(
   # "cA.30.32_mu.0.003000",
@@ -183,6 +291,7 @@ gg <- plot_df_corr_ggplot(df)
 fig <- myplotly(gg, to_print = TRUE)
 ```
 
+## Z
 
 ```{r, results='asis',echo=FALSE}
 ens <- c(
