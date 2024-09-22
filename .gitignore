@@ -81,5 +81,5 @@ gm2_book/cover.png
 *.aux
 *.fdb_latexmk
 *.gz
-
+unnamed-chunk*
 data_VKVK/
