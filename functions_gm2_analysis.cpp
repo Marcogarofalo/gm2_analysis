@@ -2677,3 +2677,26 @@ double lhs_Mpi2_over_afpi2(int n, int e, int j, data_all gjack, struct fit_type 
     r *= r;
     return r;
 }
+
+
+double rhs_amu_a4OS_common(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    if (n == 0)      r = P[0] + a * P[1] + a * a * P[3];
+    else if (n == 1) r = P[0] + a * P[2];
+    return r;
+}
+double rhs_amu_a4TM_common(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    if (n == 0)      r = P[0] + a * P[1];
+    else if (n == 1) r = P[0] + a * P[2] + a * a * P[3];
+    return r;
+}
+double rhs_amu_a4OS_a4TM_common(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    if (n == 0)      r = P[0] + a * P[1] + a * a * P[3];
+    else if (n == 1) r = P[0] + a * P[2] + a * a * P[4];
+    return r;
+}

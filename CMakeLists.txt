@@ -90,6 +90,11 @@ target_link_libraries(fit_all_gm2 PUBLIC functions_gm2_analysis)
 add_executable(some_custom_fits some_custom_fits.cpp)
 target_link_libraries(some_custom_fits PUBLIC functions_gm2_analysis)
 
+add_executable(fit_strange fit_strange.cpp)
+target_link_libraries(fit_strange PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(fit_strange PUBLIC functions_gm2_analysis)
+
+
 add_executable(scale_setting scale_setting.cpp)
 target_link_libraries(scale_setting PUBLIC functions_gm2_analysis)
 target_link_libraries(scale_setting PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
