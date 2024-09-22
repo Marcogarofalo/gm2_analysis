@@ -61,7 +61,7 @@ constexpr double Jpsi_MeV_err = 0.001 * 1000;
 constexpr double Metac_MeV = 2.9839 * 1000;
 constexpr double Metac_MeV_err = 0.004 * 1000;
 
-constexpr double MK_MeV = 494.2;
+constexpr double MK_MeV = 494.6;
 constexpr double MK_MeV_err = 0.3;
 
 // constexpr double Mpi_MeV = 139;
@@ -870,6 +870,17 @@ int main(int argc, char** argv) {
     // mysprintf(namefile_ms, NAMESIZE, "/home/garofalo/analysis/g-2_new_stat/out/%s_ms",  argv[4]);
     // myres->read_jack_from_file(ms, namefile_ms);
 
+    // a from GG
+    // double mean,err;
+    // int seed;
+    // char** option1;
+    // option1 = (char**)malloc(sizeof(char*) * 7);
+    // option1[3] =option[3];
+    // option1[6] =(char*)malloc(sizeof(char) * NAMESIZE);// argv[4];
+    // mysprintf(option1[6],NAMESIZE,"%s_mu.%.6f",argv[4], vec_mul[0]);
+    // line_read_param(option1, "a", mean, err, seed, namefile_plateaux);
+    // a = fake_sampling(resampling, mean, err, Njack, seed);
+    
     check_correlatro_counter(0);
     printf("reading a   =  %g  %g fm\n", a[Njack - 1], myres->comp_error(a));
     printf("reading amul^phys=  %g  %g\n", ml[Njack - 1], myres->comp_error(ml));

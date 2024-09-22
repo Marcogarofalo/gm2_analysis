@@ -58,7 +58,7 @@ constexpr double Jpsi_MeV_err = 0.001 * 1000;
 constexpr double Metac_MeV = 2.9839 * 1000;
 constexpr double Metac_MeV_err = 0.004 * 1000;
 
-constexpr double MK_MeV = 494.2;
+constexpr double MK_MeV = 494.6;
 constexpr double MK_MeV_err = 0.3;
 
 // constexpr double Mpi_MeV = 139;
