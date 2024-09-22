@@ -898,7 +898,7 @@ int main(int argc, char** argv) {
         // // fit_info.chi2_gap_jackboot=0.1;
         // // fit_info.guess_per_jack=5;
         // fit_info.repeat_start=1000;
-        fit_info.verbosity = 1;
+        // fit_info.verbosity = 1;
         // fit_info.compute_cov_fit(argv, jackall, lhs_Mpi2_over_afpi2);
         // int ide = 0, ide1 = 0;
         // for (int n = 0;n < fit_info.Nxen.size();n++) {
