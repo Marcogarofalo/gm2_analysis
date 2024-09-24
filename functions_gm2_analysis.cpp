@@ -2465,6 +2465,43 @@ double lhs_afpi(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
 }
 
 
+double lhs_afpi_max_twist(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
+    double r;
+    r = gjack.en[e].jack[fit_info.corr_id[n]][j];
+    int count = 0;
+    for (int in = 0;in < n;in++) {
+        for (int ie : fit_info.Nxen[in]) {
+            count++;
+        }
+    }
+    for (int ee : fit_info.Nxen[n]) {
+        if (ee == e) {
+            break;
+        }
+        count++;
+    }
+
+    double mu = fit_info.x[0][count][j];
+    double Mpi = fit_info.x[1][count][j];
+    double fpi = fit_info.x[2][count][j];
+    double L = fit_info.x[3][count][j];
+    double xi = fit_info.x[4][count][j];
+    double mpcac_mu = fit_info.x[8][count][j];
+    double ZA = fit_info.x[9][count][j];
+
+    double mr = ZA * mpcac_mu;
+    double cl = sqrt(1 + mr * mr);
+    Mpi /= sqrt(cl);
+    fpi *= cl;
+    xi /= cl * cl * cl;
+    double delta_FVE = FVE_GL_Mpi(L, xi, fpi);
+    r = fpi / (1 + delta_FVE);
+
+    return r;
+}
+
+
+
 
 double lhs_afpi_remove_FVE(int n, int e, int j, data_all gjack, struct fit_type fit_info, struct fit_result fit_out) {
     double r;

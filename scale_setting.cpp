@@ -207,11 +207,11 @@ void compute_amul_print_res(char** argv, char* namefit, fit_type fit_info, int N
             }
             amu[j] = rtbis_func_eq_input(fit_info.function, l /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, Mpi2_fpi2_phys[j], 1e-6, 2, 1e-10, 2);
         }
-        printf("amu(%s)=%-20.12g %-20.12g\n",lattices[l].c_str(), amu[Njack - 1], myres->comp_error(amu.data()));
-        fprintf(famul, "%s %-20.12g %-20.12g\n",lattices[l].c_str(), amu[Njack - 1], myres->comp_error(amu.data()));
+        printf("amu(%s)=%-20.12g %-20.12g\n", lattices[l].c_str(), amu[Njack - 1], myres->comp_error(amu.data()));
+        fprintf(famul, "%s %-20.12g %-20.12g\n", lattices[l].c_str(), amu[Njack - 1], myres->comp_error(amu.data()));
 
         char file_amul_jack[NAMESIZE];
-        mysprintf(file_amul_jack, NAMESIZE, "%s/%s_amul_jack_%s.txt", argv[3], namefit,lattices[l].c_str());
+        mysprintf(file_amul_jack, NAMESIZE, "%s/%s_amul_jack_%s.txt", argv[3], namefit, lattices[l].c_str());
         myres->write_jack_in_file(amu.data(), file_amul_jack);
 
         count += fit_info.Nxen[l].size();
@@ -309,6 +309,17 @@ int main(int argc, char** argv) {
     myres->div(Mpi2_fpi2_phys, jack_Mpi_phys_MeV, jack_fpi_phys_MeV);
     myres->mult(Mpi2_fpi2_phys, Mpi2_fpi2_phys, Mpi2_fpi2_phys);
 
+    //////////////////////////////////////////////////////////////
+    // read mpcac
+    //////////////////////////////////////////////////////////////
+    FILE* f_mpcac = open_file("/home/garofalo/analysis/g-2_new_stat/mpcac/mpcac_over_tau.txt","r+");
+    std::vector<double> vev_mpcac(files.size());
+    std::vector<char [NAMESIZE]> ens_name(files.size());
+    for (int e = 0; e < files.size();e++) {
+        fscanf(f_mpcac, "%s  %lf \n", ens_name[e],&(vev_mpcac[e]) );
+        printf("%s  %lf \n", ens_name[e],(vev_mpcac[e]) );
+    }
+    
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
     fit_info.restore_default();
@@ -407,15 +418,120 @@ int main(int argc, char** argv) {
     std::vector<double> xcont = {};
     print_fit_band(argv, jackall, fit_info, fit_info, namefit, "xi", fit_afpi, fit_afpi, 4, 0, 0.0005, xcont);
 
-    myres->write_jack_in_file(fit_afpi.P[0], "../../g-2_new_stat/out/a_fm_A.txt");
-    myres->write_jack_in_file(fit_afpi.P[1], "../../g-2_new_stat/out/a_fm_B.txt");
-    myres->write_jack_in_file(fit_afpi.P[2], "../../g-2_new_stat/out/a_fm_C.txt");
-    myres->write_jack_in_file(fit_afpi.P[3], "../../g-2_new_stat/out/a_fm_D.txt");
-    myres->write_jack_in_file(fit_afpi.P[4], "../../g-2_new_stat/out/a_fm_E.txt");
+    myres->write_jack_in_file(fit_afpi.P[0], "../../g-2_new_stat/out/a_fm_no_max_twist_A.txt");
+    myres->write_jack_in_file(fit_afpi.P[1], "../../g-2_new_stat/out/a_fm_no_max_twist_B.txt");
+    myres->write_jack_in_file(fit_afpi.P[2], "../../g-2_new_stat/out/a_fm_no_max_twist_C.txt");
+    myres->write_jack_in_file(fit_afpi.P[3], "../../g-2_new_stat/out/a_fm_no_max_twist_D.txt");
+    myres->write_jack_in_file(fit_afpi.P[4], "../../g-2_new_stat/out/a_fm_no_max_twist_E.txt");
 
     // fit_afpi.clear();
 
+    //////////////////////////////////////////////////////////////
+    // correct maxima twist
+    //////////////////////////////////////////////////////////////
+    fit_info.restore_default();
+    fit_info.N = 8;
+    fit_info.Nvar = 10;
+    fit_info.Npar = 7;
+    fit_info.Njack = Njack;
+    fit_info.Nxen = { {A53, A40, A30}, {B25_48, B14_64, B72_64, B72_96},
+                        {C20, C06, C112}, {D54},
+                        {E112},  {B72_64},
+                        {C06}, {D54} };
+    fit_info.init_N_etot_form_Nxen();
 
+    fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+    count = 0;
+    for (int n = 0;n < fit_info.Nxen.size();n++) {
+        for (int e : fit_info.Nxen[n]) {
+            for (int j = 0;j < Njack;j++) {
+                double my_mu, my_M, my_fpi;
+                if (n < 5) {
+                    my_mu = jackall.en[e].jack[165][j];
+                    my_M = jackall.en[e].jack[1][j];
+                    my_fpi = jackall.en[e].jack[163][j];
+                }
+                else if (n >= 5) {
+                    my_mu = jackall.en[e].jack[166][j];
+                    my_M = jackall.en[e].jack[123][j];
+                    my_fpi = jackall.en[e].jack[164][j];
+                }
+
+                fit_info.x[0][count][j] = my_mu; // 
+                fit_info.x[1][count][j] = my_M;  // 
+                fit_info.x[2][count][j] = my_fpi;  //
+                fit_info.x[3][count][j] = jackall.en[e].header.L;
+
+                double xi = my_M / (4 * M_PI * my_fpi);
+                xi *= xi;
+                double delta_FVE = FVE_GL_Mpi(jackall.en[e].header.L, xi, my_fpi);
+                xi *= (1 + delta_FVE) * (1 + delta_FVE) / (1 - 0.25 * delta_FVE) * (1 - 0.25 * delta_FVE);
+                fit_info.x[4][count][j] = xi;
+
+                fit_info.x[5][count][j] = jack_Mpi_phys_MeV[j] / hbarc;
+                fit_info.x[6][count][j] = jack_fpi_phys_MeV[j] / hbarc;
+
+
+                fit_info.x[7][count][j] = jack_Mpi_phys_MeV[j] / (4 * M_PI * jack_fpi_phys_MeV[j]);
+                fit_info.x[7][count][j] *= fit_info.x[7][count][j];
+
+                fit_info.x[8][count][j] = vev_mpcac[e];// mpcac/mu
+                fit_info.x[9][count][j] = jackall.en[e].jack[23][j];// Z_A
+                // fit_info.x[3][count][j] = jack_Mpi_MeV_exp[j];
+                // fit_info.x[4][count][j] = l + 1e-6;
+                // fit_info.x[5][count][j] = a + 1e-6;
+                // fit_info.x[6][count][j] = 0 + 1e-6;
+                // fit_info.x[7][count][j] = w + 1.0;
+            }
+            count++;
+        }
+    }
+
+    // fit_info.corr_id = { 1, 123, 163, 164 }; // Mpi(mu1), Mpi(mu2), fpi(mu1), fpi(mu2)
+    fit_info.corr_id = { 163, 163, 163, 163, 163, 164, 164, 164 }; //  fpi(mu1), fpi(mu2)
+    fit_info.function = rhs_afpi;
+    fit_info.linear_fit = false;
+    // fit_info.covariancey = false;
+    // fit_info.acc= 1e-10;
+    // fit_info.h=1e-7;
+    // fit_info.maxiter=500;
+    // fit_info.NM = true;
+    // // fit_info.chi2_gap_jackboot=0.1;
+    // // fit_info.guess_per_jack=5;
+    // // fit_info.repeat_start=100;
+    // fit_info.verbosity = 1;
+    // fit_info.compute_cov_fit(argv, jackall, lhs_afpi_max_twist);
+    // int ide = 0, ide1 = 0;
+    // for (int n = 0;n < fit_info.Nxen.size();n++) {
+    //     for (int e : fit_info.Nxen[n]) {
+    //         ide1 = 0;
+    //         for (int n1 = 0;n1 < fit_info.Nxen.size();n1++) {
+    //             for (int e1 : fit_info.Nxen[n1]) {
+    //                 if (e != e1)   fit_info.cov[ide][ide1] = 0;
+    //                 ide1++;
+    //             }
+    //         }
+    //         ide++;
+    //     }
+    // }
+    // fit_info.compute_cov1_fit();
+    fit_info.guess = { 0.0908026, 0.07951 , 0.06816, 0.05688, 0.04891 ,-8.75 ,-500 };
+    mysprintf(namefit, NAMESIZE, "afpi_max_twist_cov");
+    fit_result fit_afpi_max_twist = fit_all_data(argv, jackall, lhs_afpi_max_twist, fit_info, namefit);
+    fit_info.band_range = { 0.005,0.035 };
+    // std::vector<double> xcont = { 0, 0 /*Delta*/, 0, 0,/*l, a,m*/ fit_info.x[4][0][Njack - 1],
+    //      fit_info.x[5][0][Njack - 1] , fit_info.x[6][0][Njack - 1], fit_info.x[7][0][Njack - 1] };
+
+
+    //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
+    // std::vector<double> xcont = {};
+    print_fit_band(argv, jackall, fit_info, fit_info, namefit, "xi", fit_afpi_max_twist, fit_afpi_max_twist, 4, 0, 0.0005, xcont);
+
+    myres->write_jack_in_file(fit_afpi_max_twist.P[0], "../../g-2_new_stat/out/a_fm_A.txt");
+    myres->write_jack_in_file(fit_afpi_max_twist.P[1], "../../g-2_new_stat/out/a_fm_B.txt");
+    myres->write_jack_in_file(fit_afpi_max_twist.P[2], "../../g-2_new_stat/out/a_fm_C.txt");
+    myres->write_jack_in_file(fit_afpi_max_twist.P[3], "../../g-2_new_stat/out/a_fm_D.txt");
+    myres->write_jack_in_file(fit_afpi_max_twist.P[4], "../../g-2_new_stat/out/a_fm_E.txt");
     //////////////////////////////////////////////////////////////
     // fit only physical point
     //////////////////////////////////////////////////////////////
@@ -704,7 +820,7 @@ int main(int argc, char** argv) {
 
         print_fit_band(argv, jackall, fit_info, fit_info, namefit, "amu", fit_aMpi2_over_afpi2, fit_aMpi2_over_afpi2, 0 /*amu */, 0, 0.0001, xcont);
 
-        compute_amul_print_res( argv,  namefit,  fit_info, Njack, fit_aMpi2_over_afpi2,  Mpi2_fpi2_phys, {"B","C","D","E"});
+        compute_amul_print_res(argv, namefit, fit_info, Njack, fit_aMpi2_over_afpi2, Mpi2_fpi2_phys, { "B","C","D","E" });
 
     }
     //////////////////////////////////////////////////////////////
@@ -814,7 +930,7 @@ int main(int argc, char** argv) {
 
         print_fit_band(argv, jackall, fit_info, fit_info, namefit, "amu", fit_aMpi2_over_afpi2, fit_aMpi2_over_afpi2, 0 /*amu */, 0, 0.0001, xcont);
 
-        compute_amul_print_res( argv,  namefit,  fit_info, Njack, fit_aMpi2_over_afpi2,  Mpi2_fpi2_phys, {"A","B","C","D","E"});
+        compute_amul_print_res(argv, namefit, fit_info, Njack, fit_aMpi2_over_afpi2, Mpi2_fpi2_phys, { "A","B","C","D","E" });
 
 
     }
@@ -924,8 +1040,8 @@ int main(int argc, char** argv) {
         fit_info.band_range = { 0.00001,0.0055 };
 
         print_fit_band(argv, jackall, fit_info, fit_info, namefit, "amu", fit_aMpi2_over_afpi2, fit_aMpi2_over_afpi2, 0 /*amu */, 0, 0.0001, xcont);
-        
-        compute_amul_print_res( argv,  namefit,  fit_info, Njack, fit_aMpi2_over_afpi2,  Mpi2_fpi2_phys, {"A","B","C","D","E"});
+
+        compute_amul_print_res(argv, namefit, fit_info, Njack, fit_aMpi2_over_afpi2, Mpi2_fpi2_phys, { "A","B","C","D","E" });
 
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
