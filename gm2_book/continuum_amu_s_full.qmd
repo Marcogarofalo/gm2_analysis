@@ -141,6 +141,7 @@ plot_the_Ambaradam <- function(name) {
   #   widths = c(1, 3.5),
   #   ncol = 2, nrow = 1
   # )
+  df$AIC<- ave_AIC$AIC
   return(df)
 }
 
@@ -212,6 +213,34 @@ df <- plot_the_Ambaradam("W")
 df <- plot_the_Ambaradam("LD")
 ```
 
+## MAX twist correction
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+gg<-plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_SDpWpLD_3b_BOS_BTM_a4OS_a4TM",
+  var = "afm",
+  id_x = 1,
+  data_type = c("OS", "TM"),
+  width = 1e-4,
+  gg = NULL,
+  single_name_for_fit = "fit",
+  noribbon = FALSE,  noline = TRUE
+)
+gg<-plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat_no_max_twist/fit_all_strange/amu_SDpWpLD_3b_BOS_BTM_a4OS_a4TM",
+  var = "afm",
+  id_x = 1,
+  data_type = c("OS-no-max_twist", "TM-no-max_twist"),
+  width = 1e-4,
+  gg = gg,
+  single_name_for_fit = "fit-no-max-twist",
+  noribbon = FALSE, noline = TRUE
+)
+
+fig <- myplotly(gg, "", "$a^2$", "$a_{\\mu}(s)$", to_print = TRUE, output = "HTML", legend_position = c(0, 0))
+```
+
+
 <!-- ```{r, echo=FALSE, results='asis',  warning=FALSE} -->
 <!-- df <- Rose::read_fit_P_file("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_a4_MK_cov_fit_P.dat") -->
 <!-- Rose::make_table_fit_result(df) -->
@@ -220,11 +249,12 @@ df <- plot_the_Ambaradam("LD")
 <!-- # kable(df1) -->
 <!-- ``` -->
 
+<!-- #  Lattice spacing change -->
 
 <!-- ```{r, echo=FALSE, results='asis', dev='tikz', warning=FALSE} -->
-<!-- # file=sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_a4_MK_cov_fit_data.txt") -->
-<!-- # df<- read.table(file, header=FALSE, fill=TRUE) -->
-<!-- # iy<-length(df[1,])-2 -->
+<!-- file=sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_a4_MK_cov_fit_data.txt") -->
+<!-- df<- read.table(file, header=FALSE, fill=TRUE) -->
+<!-- iy<-length(df[1,])-2 -->
 <!-- # -->
 <!-- # -->
 <!-- # gg<- myggplot(fill=FALSE) -->
@@ -265,7 +295,7 @@ df <- plot_the_Ambaradam("LD")
 <!-- # } -->
 <!-- gg <- myggplot() -->
 <!-- gg <- plot_fit( -->
-<!--   basename = "/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_a4_MK_cov", var = "afm", data_type = c("TM", "OS"), width = 1e-4, gg = gg, -->
+<!--   basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_fulltree_3b_BOS_BTM_a4OS_a4TM", var = "afm", data_type = c("TM", "OS"), width = 1e-4, gg = gg, -->
 <!--   id_color = iy + 2, id_shape = iy + 2, -->
 <!--   # , labelfit = "zap" -->
 <!--   , single_name_for_fit = "fit" -->
