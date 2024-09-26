@@ -2500,6 +2500,42 @@ double lhs_afpi_max_twist(int n, int e, int j, data_all gjack, struct fit_type f
     return r;
 }
 
+double lhs_Mpi2_over_afpi2_max_twist(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
+    double r;
+    r = gjack.en[e].jack[fit_info.corr_id[n]][j];
+    int count = 0;
+    for (int in = 0;in < n;in++) {
+        for (int ie : fit_info.Nxen[in]) {
+            count++;
+        }
+    }
+    for (int ee : fit_info.Nxen[n]) {
+        if (ee == e) {
+            break;
+        }
+        count++;
+    }
+
+    double mu = fit_info.x[0][count][j];
+    double Mpi = fit_info.x[1][count][j];
+    double fpi = fit_info.x[2][count][j];
+    double L = fit_info.x[3][count][j];
+    double xi = fit_info.x[4][count][j];
+    double mpcac_mu = fit_info.x[9][count][j];
+    double ZA = fit_info.x[10][count][j];
+
+    double mr = ZA * mpcac_mu;
+    double cl = sqrt(1 + mr * mr);
+    Mpi /= sqrt(cl);
+    fpi *= cl;
+    xi /= cl * cl * cl;
+    double delta_FVE = FVE_GL_Mpi(L, xi, fpi);
+    r = Mpi / fpi;
+    r *= (1 + delta_FVE) / (1 - 0.25 * delta_FVE);
+    r *= r;
+
+    return r;
+}
 
 
 
@@ -2715,7 +2751,25 @@ double lhs_Mpi2_over_afpi2(int n, int e, int j, data_all gjack, struct fit_type 
     return r;
 }
 
+double rhs_amu_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    r = P[0] + a * P[1];
+    return r;
+}
+double rhs_amu_alog_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    r = P[0] + a * P[1] + P[2] * a / log(a);
+    return r;
+}
 
+double rhs_amu_a4_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    r = P[0] + a * P[1] + a * a * P[2];
+    return r;
+}
 double rhs_amu_a4OS_common(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
     double a = x[0];
@@ -2735,5 +2789,28 @@ double rhs_amu_a4OS_a4TM_common(int n, int Nvar, double* x, int Npar, double* P)
     double a = x[0];
     if (n == 0)      r = P[0] + a * P[1] + a * a * P[3];
     else if (n == 1) r = P[0] + a * P[2] + a * a * P[4];
+    return r;
+}
+
+
+double rhs_amu_alogOS_common(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    if (n == 0)      r = P[0] + a * P[1] + P[3] * a / log(a);
+    else if (n == 1) r = P[0] + a * P[2];
+    return r;
+}
+double rhs_amu_alogTM_common(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    if (n == 0)      r = P[0] + a * P[1];
+    else if (n == 1) r = P[0] + a * P[2] + P[3] * a / log(a);
+    return r;
+}
+double rhs_amu_alogOS_alogTM_common(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    if (n == 0)      r = P[0] + a * P[1] + P[3] * a / log(a);
+    else if (n == 1) r = P[0] + a * P[2] + P[4] * a / log(a);
     return r;
 }

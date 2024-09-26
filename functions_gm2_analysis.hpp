@@ -206,10 +206,20 @@ double rhs_aMpi2_over_afpi2(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_aMpi2_over_afpi2_with_A(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_aMpi2_over_afpi2_linear(int n, int Nvar, double* x, int Npar, double* P);
 double lhs_Mpi2_over_afpi2(int n, int e, int j, data_all gjack, struct fit_type fit_info);
+double lhs_Mpi2_over_afpi2_max_twist(int n, int e, int j, data_all gjack, struct fit_type fit_info);
 
 
 double rhs_amu_a4OS_common(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_amu_a4TM_common(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_amu_a4OS_a4TM_common(int n, int Nvar, double* x, int Npar, double* P);
+
+
+double rhs_amu_alogOS_common(int n, int Nvar, double* x, int Npar, double* P);
+double rhs_amu_alogTM_common(int n, int Nvar, double* x, int Npar, double* P);
+double rhs_amu_alogOS_alogTM_common(int n, int Nvar, double* x, int Npar, double* P);
+
+double rhs_amu_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P);
+double rhs_amu_a4_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P);
+double rhs_amu_alog_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P);
 
 #endif

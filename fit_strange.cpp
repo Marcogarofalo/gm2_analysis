@@ -271,8 +271,15 @@ int main(int argc, char** argv) {
 
 
     for (int iW = 0;iW < 6;iW++) {
-        for (int ie = 0;ie < 4;ie++) {
-            for (int fi = 0;fi < 4;fi++) {
+        for (int ie = 0;ie < 13;ie++) {
+
+            std::vector<int> fi_list;
+            if (ie < 7)
+                fi_list = { 0,1,2,3,4,5,6 };
+            else
+                fi_list = { 7,8,9 };
+
+            for (int fi : fi_list) {
 
                 namefit = "amu";
 
@@ -307,13 +314,54 @@ int main(int argc, char** argv) {
                     fit_info.Nxen = { { B72_64, C06 ,D54, E112},
                                       {B72_64, C06, D54, E112} };
                     break;
+                case 4:
+                    namefit = namefit + "_3b_noC";
+                    fit_info.Nxen = { {  B72_64 ,D54, E112},
+                                      { B72_64, D54, E112} };
+                    break;
+                case 5:
+                    namefit = namefit + "_3b_noC_BOS";
+                    fit_info.Nxen = { { B72_64, C06 ,D54, E112},
+                                      { B72_64, D54, E112} };
+                    break;
+                case 6:
+                    namefit = namefit + "_3b_noC_BTM";
+                    fit_info.Nxen = { {  B72_64 ,D54, E112},
+                                      {B72_64, C06, D54, E112} };
+                    break;
+                case 7:
+                    namefit = namefit + "_3b_onlyOS";
+                    fit_info.Nxen = { {  C06 ,D54, E112} };
+                    break;
+                case 8:
+                    namefit = namefit + "_3b_onlyTM";
+                    fit_info.Nxen = { {  C06 ,D54, E112} };
+                    break;
+                case 9:
+                    namefit = namefit + "_4b_onlyOS";
+                    fit_info.Nxen = { { B72_64, C06 ,D54, E112} };
+                    break;
+                case 10:
+                    namefit = namefit + "_4b_onlyTM";
+                    fit_info.Nxen = { { B72_64, C06 ,D54, E112} };
+                    break;
+                case 11:
+                    namefit = namefit + "_3b_noC_onlyOS";
+                    fit_info.Nxen = { {  B72_64 ,D54, E112} };
+                    break;
+                case 12:
+                    namefit = namefit + "_3b_noC_onlyTM";
+                    fit_info.Nxen = { {  B72_64 ,D54, E112} };
+                    break;
                 default:
                     break;
                 }
+                fit_info.N = fit_info.Nxen.size();
 
 
                 switch (fi) {
                 case 0:
+                    namefit = namefit + "";
                     fit_info.Npar = 3;
                     fit_info.function = rhs_amu_common;
                     break;
@@ -332,30 +380,89 @@ int main(int argc, char** argv) {
                     fit_info.Npar = 5;
                     fit_info.function = rhs_amu_a4OS_a4TM_common;
                     break;
+                case 4:
+                    namefit = namefit + "_alogOS";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_alogOS_common;
+                    break;
+                case 5:
+                    namefit = namefit + "_alogTM";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_alogTM_common;
+                    break;
+                case 6:
+                    namefit = namefit + "_alogOS_alogTM";
+                    fit_info.Npar = 5;
+                    fit_info.function = rhs_amu_alogOS_alogTM_common;
+                    break;
+                case 7:
+                    namefit = namefit + "";
+                    fit_info.Npar = 2;
+                    fit_info.function = rhs_amu_onlyOSTM;
+                    break;
+                case 8:
+                    namefit = namefit + "_a4";
+                    fit_info.Npar = 3;
+                    fit_info.function = rhs_amu_a4_onlyOSTM;
+                    break;
+                case 9:
+                    namefit = namefit + "_alog";
+                    fit_info.Npar = 3;
+                    fit_info.function = rhs_amu_alog_onlyOSTM;
+                    break;
+
+
+
                 default:
                     break;
                 }
 
                 switch (iW) {
-                case 0: fit_info.corr_id = { 167, 168 }; break;
-                case 1: fit_info.corr_id = { 169, 170 }; break;
-                case 2: fit_info.corr_id = { 175, 176 }; break;
-                case 3: fit_info.corr_id = { 146, 147 }; break;
-                case 4: fit_info.corr_id = { 181, 182 }; break;
-                case 5: fit_info.corr_id = { 167, 168,169, 170, 175, 176 }; break;
+                case 0:
+                    fit_info.corr_id = { 167, 168 };
+                    break;
+                case 1:
+                    fit_info.corr_id = { 169, 170 };
+                    break;
+                case 2:
+                    fit_info.corr_id = { 175, 176 };
+                    break;
+                case 3:
+                    fit_info.corr_id = { 146, 147 };
+                    break;
+                case 4:
+                    fit_info.corr_id = { 181, 182 };
+                    break;
+                case 5:
+                    fit_info.corr_id = { 167, 168,169, 170, 175, 176 };
+                    break;
                 default: break;
                 }
+
+                // if (ie == 7 || ie == 9 || ie == 11) {// it is already like this
+                //     for (int i = 0;i < fit_info.corr_id.size() / 2;i++)
+                //         fit_info.corr_id[i * 2] = fit_info.corr_id[i * 2];
+                // }
+                // if fititng only the TM we need to put the id only in the even slots so that 
+                // the function lhs_sum sum them when n=0
+                if (ie == 8 || ie == 10 || ie == 12) {
+                    for (int i = 0;i < fit_info.corr_id.size() / 2;i++)
+                        fit_info.corr_id[i * 2] = fit_info.corr_id[i * 2 + 1];
+                }
+
+
                 double (*lhs_fun)(int, int, int, data_all, struct fit_type);
-                if (iW >= 0 && iW < 5)lhs_fun = lhs_amu;
+                if (iW >= 0 && iW < 5) lhs_fun = lhs_amu;
                 else lhs_fun = lhs_sum;
 
 
-                fit_info.N = 2;
+
                 fit_info.Nvar = 8;
                 fit_info.Njack = Njack;
                 fit_info.init_N_etot_form_Nxen();
                 fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
 
+                if (fit_info.entot <= fit_info.Npar) continue;
 
                 count = 0;
                 for (int n = 0;n < fit_info.N;n++) {
@@ -404,7 +511,7 @@ int main(int argc, char** argv) {
 
 
                 //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
-                print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0005, xcont);
+                print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0002, xcont);
 
                 free_fit_result(fit_info, amu_SD_l_common_a4);
             }
