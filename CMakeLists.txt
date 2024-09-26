@@ -84,6 +84,11 @@ target_link_libraries(m_K_ndata PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
 target_link_libraries(m_K_ndata PUBLIC functions_gm2_analysis)
 
 
+add_executable(m_Ds_ndata m_Ds_ndata.cpp)
+target_link_libraries(m_Ds_ndata PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(m_Ds_ndata PUBLIC functions_gm2_analysis)
+
+
 add_executable(VKVK VKVK.cpp)
 target_link_libraries(VKVK PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
 

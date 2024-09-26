@@ -22,6 +22,8 @@ bad=()
 ./VKVK  jack -bin 50  ../data_VKVK/ VKVK_B64_0.5_40.dat|| bad+=("VKVK_0.5_40")
 ./VKVK  jack -bin 50  ../data_VKVK/ VKVK_B64_0.5_80.dat|| bad+=("VKVK_0.5_80")
 
+
+
 # ./m_K_2x2 read_plateaux -p ../../g-2_new_stat/ cB.72.64 -bin 50  -L 64 jack -mu 1.7500e-02  1.8500e-02   0.0006675 0.00072 || bad+=("mK cB.72.64") # D/Ds
 # ./m_K_ndata read_plateaux -p ../../g-2_new_stat/ cB.72.64 -bin 50  -L 64 jack -mu 0.0006675 1.7500e-02 0.0006675 1.8500e-02   0.00072  1.7500e-02   0.00072 1.8500e-02|| bad+=("mK cB.72.64") # # D/Ds
 # ./m_K_ndata read_plateaux -p ../../g-2_new_stat/ cB.72.64 -bin 50  -L 64 jack -mu 0.00072  0.018  0.00072 0.020   0.0006675  0.018254  0.00072  0.018254  || bad+=("mK cB.72.64") # tau
@@ -43,12 +45,21 @@ bad=()
 # ./m_K_2p2 read_plateaux -p ../../g-2_new_stat/ cE.44.112 -bin 50  -L 112 jack -mu 0.011  0.012  0.00044    4.3100e-4 0.00044  1.1759e-02|| bad+=("mK cE.44.112")
 # ./m_K_ndata read_plateaux -p ../../g-2_new_stat/ cE.44.112 -bin 50  -L 112 jack -mu 0.00044 0.011    0.00044 0.012     4.3100e-4 1.1759e-02  0.00044  1.1759e-02|| bad+=("mK cE.44.112")
 
-./m_Ds_2x2 read_plateaux -p ../../g-2_new_stat/ cB.72.64 -bin 50  -L 64 jack -mu 1.7500e-02  1.8500e-02 0.230  0.240  || bad+=("mDs cB.72.64")
-./m_Ds_2x2 read_plateaux -p ../../g-2_new_stat/ cC.06.80 -bin 50  -L 80 jack -mu 1.6000e-02  1.7000e-02 0.180  0.190  || bad+=("mDs cC.06.80")
 
-./m_Ds read_plateaux -p ../../g-2_new_stat/ cC.06.112 -bin 50  -L 112 jack -mu 1.6067e-02 0.180  0.190  0.200 || bad+=("mDs cC.06.112")
-./m_Ds read_plateaux -p ../../g-2_new_stat/ cD.54.96  -bin 50  -L 96  jack -mu 1.3557e-02 0.150  0.160  0.170 || bad+=("mDs cD.54.96")
-./m_Ds read_plateaux -p ../../g-2_new_stat/ cE.44.112 -bin 50  -L 112 jack -mu 1.1759e-02 0.130  0.140  0.150 || bad+=("mDs cE.44.112")
+./m_Ds_ndata read_plateaux -p ../../g-2_new_stat/ cB.72.64 -bin 50  -L 64 jack -mu 1.7500e-02 0.23000  1.7500e-02 0.24000\
+                                                                                   1.8500e-02 0.23000  1.8500e-02 0.24000|| bad+=("mDs cB.72.64")
+./m_Ds_ndata read_plateaux -p ../../g-2_new_stat/ cC.06.80 -bin 50  -L 80 jack -mu 1.6000e-02 0.18000    1.6000e-02 0.19000\
+                                                                                   1.7000e-02 0.18000    1.7000e-02 0.19000|| bad+=("mDs cC.06.80")
+./m_Ds_ndata read_plateaux -p ../../g-2_new_stat/ cD.54.96 -bin 50  -L 96 jack -mu 1.3557e-02   0.15000   1.3557e-02 0.16000 \
+                                                                                   1.3557e-02 0.17000  || bad+=("mDs cD.54.96")
+./m_Ds_ndata read_plateaux -p ../../g-2_new_stat/ cE.44.112 -bin 50  -L 112 jack -mu 1.1759e-02   0.13000   1.1759e-02 0.14000 \
+                                                                                   1.1759e-02 0.15000  || bad+=("mDs cE.44.112")
+
+# ./m_Ds_2x2 read_plateaux -p ../../g-2_new_stat/ cB.72.64 -bin 50  -L 64 jack -mu 1.7500e-02  1.8500e-02 0.230  0.240  || bad+=("mDs cB.72.64")
+# ./m_Ds_2x2 read_plateaux -p ../../g-2_new_stat/ cC.06.80 -bin 50  -L 80 jack -mu 1.6000e-02  1.7000e-02 0.180  0.190  || bad+=("mDs cC.06.80")
+# ./m_Ds read_plateaux -p ../../g-2_new_stat/ cC.06.112 -bin 50  -L 112 jack -mu 1.6067e-02 0.180  0.190  0.200 || bad+=("mDs cC.06.112")
+# ./m_Ds read_plateaux -p ../../g-2_new_stat/ cD.54.96  -bin 50  -L 96  jack -mu 1.3557e-02 0.150  0.160  0.170 || bad+=("mDs cD.54.96")
+# ./m_Ds read_plateaux -p ../../g-2_new_stat/ cE.44.112 -bin 50  -L 112 jack -mu 1.1759e-02 0.130  0.140  0.150 || bad+=("mDs cE.44.112")
 
 
 #./g-2 read_plateaux -p ../../../g-2/ test -bin 50  -L 96 jack -mu 0.00054  0.014  0.015   0.165  0.175  0.175|| bad+=("test")
