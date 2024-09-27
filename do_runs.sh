@@ -1,4 +1,22 @@
 bad=()
+./mpi_fpi read_plateaux -p ../../g-2_new_stat_try/ cA.53.24  -bin 50  -L 24  jack -mu 0.00530 || bad+=("cA.53.24")
+./mpi_fpi read_plateaux -p ../../g-2_new_stat_try/ cA.40.24  -bin 50  -L 24  jack -mu 0.00400 || bad+=("cA.40.24")
+./mpi_fpi read_plateaux -p ../../g-2_new_stat_try/ cA.30.32  -bin 50  -L 32  jack -mu 0.00300 || bad+=("cA.30.32")
+if [  $1 == "first_run" ]
+then
+./mpi_fpi read_plateaux -p ../../g-2_new_stat_try/ cB.72.64  -bin 50  -L 64  jack -mu 0.00072 || bad+=("cB.72.64")
+./mpi_fpi read_plateaux -p ../../g-2_new_stat_try/ cB.72.96  -bin 50  -L 96  jack -mu 0.00072 || bad+=("cB.72.96")
+./mpi_fpi read_plateaux -p ../../g-2_new_stat_try/ cC.06.80  -bin 50  -L 80  jack -mu 0.00060 || bad+=("cC.06.80")
+./mpi_fpi read_plateaux -p ../../g-2_new_stat_try/ cC.06.112 -bin 50  -L 112 jack -mu 0.00060 || bad+=("cC.06.112")
+./mpi_fpi read_plateaux -p ../../g-2_new_stat_try/ cD.54.96  -bin 50  -L 96  jack -mu 0.00054 || bad+=("cD.54.96") 
+./mpi_fpi read_plateaux -p ../../g-2_new_stat_try/ cE.44.112 -bin 50  -L 112 jack -mu 0.00044 || bad+=("cE.44.112")
+./mpi_fpi  read_plateaux -p ../../g-2_new_stat_try/ cB.14.64  -bin 50  -L 64  jack -mu 0.0014 || bad+=("mpi cB.14.64")
+./mpi_fpi  read_plateaux -p ../../g-2_new_stat_try/ cB.25.48  -bin 50  -L 48  jack -mu 0.0025 || bad+=("mpi cB.25.48")
+./mpi_fpi  read_plateaux -p ../../g-2_new_stat_try/ cC.20.48  -bin 50  -L 48  jack -mu 0.0020 || bad+=("mpi cB.20.48")
+fi
+./scale_setting jack ../../g-2_new_stat_try/jackknife/ ../../g-2_new_stat_try//fit_all/|| bad+=("scale setting 1")
+
+
 ./gm2_analysis read_plateaux -p ../../g-2_new_stat/ cA.53.24  -bin 50  -L 24  jack -mu 0.00530  0.010  0.020   0.26500   0.29000   0.30000 three_corr || bad+=("cA.53.24")
 ./gm2_analysis read_plateaux -p ../../g-2_new_stat/ cA.40.24  -bin 50  -L 24  jack -mu 0.00400  0.010  0.020   0.26500   0.29000   0.30000 three_corr || bad+=("cA.40.24")
 ./gm2_analysis read_plateaux -p ../../g-2_new_stat/ cA.30.32  -bin 50  -L 32  jack -mu 0.00300  0.010  0.020   0.26500   0.29000   0.30000 three_corr || bad+=("cA.30.32") # the strange are fake
@@ -65,7 +83,6 @@ bad=()
 #./g-2 read_plateaux -p ../../../g-2/ test -bin 50  -L 96 jack -mu 0.00054  0.014  0.015   0.165  0.175  0.175|| bad+=("test")
 #./fit_all_gm2  jack ../../g-2_new_stat/jackknife/ ../../g-2_new_stat//fit_all/
 ./some_custom_fits jack ../../g-2_new_stat/jackknife/ ../../g-2_new_stat//fit_all/  || bad+=("custom fit ")
-./scale_setting jack ../../g-2_new_stat/jackknife/ ../../g-2_new_stat//fit_all/|| bad+=("scale setting ")
 
 ./fit_strange jack ../../g-2_new_stat/jackknife/ ../../g-2_new_stat//fit_all_strange/ ||bad+=("fit strange ")
 
