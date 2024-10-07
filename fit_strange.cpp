@@ -271,13 +271,16 @@ int main(int argc, char** argv) {
 
 
     for (int iW = 0;iW < 6;iW++) {
-        for (int ie = 0;ie < 13;ie++) {
+        for (int ie = 0;ie < 14;ie++) {
 
             std::vector<int> fi_list;
             if (ie < 7)
                 fi_list = { 0,1,2,3,4,5,6 };
-            else
+            else if (ie > 7 && ie < 13)
                 fi_list = { 7,8,9 };
+            else if (ie > 12)
+                fi_list = { 0,1,2,3,4,5,6 };
+
 
             for (int fi : fi_list) {
 
@@ -352,6 +355,11 @@ int main(int argc, char** argv) {
                 case 12:
                     namefit = namefit + "_3b_noC_onlyTM";
                     fit_info.Nxen = { {  B72_64 ,D54, E112} };
+                    break;
+                case 13:
+                    namefit = namefit + "_3b_BOS_BTM_FVE";
+                    fit_info.Nxen = { { B72_64, B72_96, C06, C112 ,D54, E112},
+                                      { B72_64, B72_96, C06, C112, D54, E112} };
                     break;
                 default:
                     break;
@@ -517,4 +525,8 @@ int main(int argc, char** argv) {
             }
         }
     }
+
+    //////////////////////////////////////////////////////////////
+    // all ens
+    //////////////////////////////////////////////////////////////
 }
