@@ -6,6 +6,7 @@
 #include <time.h>
 #include <string.h>
 #include <complex.h>
+#include <algorithm>
 
 #include "global.hpp"
 #include "resampling.hpp"
@@ -37,7 +38,7 @@
 // equal=OS
 // opposite=TM
 
-constexpr double MDs_MeV = 1969.0;
+constexpr double MDs_MeV = 1967.0;
 constexpr double MDs_MeV_err = 0.4;
 
 constexpr double Metas_MeV = 689.89;
@@ -587,7 +588,12 @@ void check_confs_correlated(std::vector<configuration_class> in_confs, std::vect
 double MDs_fit(int n, int Nvar, double* x, int Npar, double* P) {
     double mus = x[0];
     double muc = x[1];
-    return P[0] * mus + P[1] * muc;
+    return P[0] + P[1] * mus + P[2] * muc;
+}
+double MDs_fit_one_ms(int n, int Nvar, double* x, int Npar, double* P) {
+    double mus = x[0];
+    double muc = x[1];
+    return P[0] + P[1] * muc + P[2] * muc * muc;
 }
 
 
@@ -862,7 +868,7 @@ int main(int argc, char** argv) {
     printf("reading a   =  %g  %g fm\n", a[Njack - 1], myres->comp_error(a));
     corr_counter = -1;
     write_jack(a, Njack, jack_file);
-    
+
     check_correlatro_counter(0);
     printf("reading a   =  %g  %g fm\n", a[Njack - 1], myres->comp_error(a));
     printf("reading amul^phys=  %g  %g\n", phys_ml[Njack - 1], myres->comp_error(phys_ml));
@@ -893,15 +899,12 @@ int main(int argc, char** argv) {
         jackall.en[i].Nobs = 1;
         jackall.en[i].Njack = header.Njack;
         jackall.en[i].jack = (double**)malloc(sizeof(double*) * jackall.en[i].Nobs);
-    }
-    for (size_t i = 0; i < Ndata; i++) {
         jackall.en[i].jack[0] = M_Ds[i];
     }
 
     fit_type fit_info;
     // fit in sigma
     fit_info.restore_default();
-    fit_info.Npar = 2;
     fit_info.Nvar = 2;
     fit_info.Njack = header.Njack;
     fit_info.N = 1;
@@ -921,11 +924,21 @@ int main(int argc, char** argv) {
     count++;
 
     fit_info.corr_id = { 0 };
-    fit_info.function = MDs_fit;//constant_fit;
+    fit_info.function = MDs_fit_one_ms;//constant_fit;
+    fit_info.Npar = 3;
+    bool all_mus_equal = true;
+    for (int i = 0;i < string_mus.size();i++) {
+        if (string_mus[i].compare(string_mus[0]) != 0) {
+            fit_info.function = MDs_fit;//constant_fit;
+            fit_info.Npar = 3;
+            all_mus_equal = false;
+        }
+    }
+
     fit_info.linear_fit = true;
     fit_info.covariancey = false;
     fit_info.verbosity = 0;
-    mysprintf(namefit, NAMESIZE, "%s/out/%s_MDs_fit", argv[3], option[6]);
+    mysprintf(namefit, NAMESIZE, "%s/out/%s_MDs", argv[3], option[6]);
     char** temp_argv = malloc_2<char>(5, NAMESIZE);
     mysprintf(temp_argv[1], NAMESIZE, "%s", resampling);// resampling
     mysprintf(temp_argv[3], NAMESIZE, "%s/out", option[3]);// resampling
@@ -935,8 +948,19 @@ int main(int argc, char** argv) {
     printf("Ndata = %d\n", fit_Z0_sigma.dof + fit_Z0_sigma.Npar);
     printf("Npar = %d\n", fit_Z0_sigma.Npar);
     printf("dof = %d\n", fit_Z0_sigma.dof);
-    fit_info.band_range = { 0,0.5 };
-    // print_fit_band(temp_argv, jackall, fit_info, fit_info, namefit, "mus_l", fit_Z0_sigma, fit_Z0_sigma, 1, 0/*en*/, 0.01);
+    auto min = std::ranges::min_element(vec_muc.begin(), vec_muc.end());
+    auto max = std::ranges::max_element(vec_muc.begin(), vec_muc.end());
+    fit_info.band_range = std::vector<double>(2);
+    fit_info.band_range[0] = *min - 0.02;
+    fit_info.band_range[1] = *max + 0.02;
+    std::vector<double> xcont = { vec_mus[0], vec_muc[0] };
+    char nameband[NAMESIZE];
+    for (int i = 0; i < vec_mus.size();i++) {
+        xcont[0] = vec_mus[i];
+        mysprintf(nameband, NAMESIZE, "mus%d_muc", i);
+        print_fit_band(temp_argv, jackall, fit_info, fit_info, namefit, nameband, fit_Z0_sigma, fit_Z0_sigma, 1, 0/*en*/, 0.001, xcont);
+
+    }
     // print_fit_band(temp_argv, jackall, fit_info, fit_info, namefit, "mus_l1", fit_Z0_sigma, fit_Z0_sigma, 1, 2/*en*/, 0.01);
     // print_fit_band(temp_argv, jackall, fit_info, fit_info, namefit, "mus_l2", fit_Z0_sigma, fit_Z0_sigma, 1, 3/*en*/, 0.01);
 
@@ -947,10 +971,24 @@ int main(int argc, char** argv) {
     myres->mult(jack_aMDs_exp, jack_aMDs_exp, a);
     myres->div(jack_aMDs_exp, jack_aMDs_exp, hbarc);
 
+    double** tif = swap_indices(fit_info.Npar, Njack, fit_Z0_sigma.P);
     std::vector<double> mc_MDs(Njack);
-    for (int j = 0;j < Njack;j++) {
-        mc_MDs[j] = (jack_aMDs_exp[j] - fit_Z0_sigma.P[0][j] * phys_ms[j]) / fit_Z0_sigma.P[1][j];
-    }
+    std::vector<double> swapped_x(fit_info.Nvar);
+
+    // if (all_mus_equal) {
+        for (int j = 0;j < Njack;j++) {
+
+            swapped_x[0] = phys_ms[j];
+            swapped_x[1] = 9999999; // it does not mater it is not used
+            mc_MDs[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 1/* ivar*/, jack_aMDs_exp[j], 0.1, 0.3, 1e-10, 2);
+            // (jack_aMDs_exp[j] - fit_Z0_sigma.P[0][j] * phys_ms[j]) / fit_Z0_sigma.P[1][j];
+        }
+    // }
+    // else {
+    //     for (int j = 0;j < Njack;j++) {
+    //         mc_MDs[j] = (jack_aMDs_exp[j] - fit_Z0_sigma.P[0][j] * phys_ms[j]) / fit_Z0_sigma.P[1][j];
+    //     }
+    // }
 
     // zero_corr(zeros, Njack, jack_file);
     // zero_corr(zeros, Njack, jack_file);
@@ -969,7 +1007,7 @@ int main(int argc, char** argv) {
 
     fprintf(outfile, "\n\n #%s fit in [%d,%d] chi2=%.5g  %.5g\n", description, 0, 0, 0.0, 0.0);
     fprintf(outfile, "   %.15g   %.15g\n", mc_MDs[Njack - 1], error_jackboot(resampling, Njack, mc_MDs.data()));
-    printf("%s (%.15g) =  %.15g   %.15g\n", description, mc_MDs[Njack - 1], mc_MDs[Njack - 1], error_jackboot(resampling, Njack, mc_MDs.data()));
+    printf("%s (%.15g) =  %.15g   %.15g\n", description, jack_aMDs_exp[Njack - 1], mc_MDs[Njack - 1], error_jackboot(resampling, Njack, mc_MDs.data()));
 
 
     mysprintf(namefile, NAMESIZE, "%s/out/mc_from_MDs_%s.txt", argv[3], latt.c_str());
