@@ -2668,7 +2668,7 @@ double rhs_aMpi2_over_afpi2(int n, int Nvar, double* x, int Npar, double* P) {
     double Mpi_phys_fm = x[5];
     double fpi_phys_fm = x[6];
     double xi = 2 * aB_Zp_afpi2 * amu / ((4 * M_PI) * (4 * M_PI));
-    r = 2 * aB_Zp_afpi2 * amu * (1 + 3 * xi * log(xi) + P[4] * xi/*  + P[5] * a * a */);
+    r = 2 * aB_Zp_afpi2 * amu * (1 + 5 * xi * log(xi) + P[4] * xi/*  + P[5] * a * a */);
     return r;
 }
 
@@ -2692,7 +2692,7 @@ double rhs_aMpi2_over_afpi2_with_A(int n, int Nvar, double* x, int Npar, double*
     double Mpi_phys_fm = x[5];
     double fpi_phys_fm = x[6];
     double xi = 2 * aB_Zp_afpi2 * amu / ((4 * M_PI) * (4 * M_PI));
-    r = 2 * aB_Zp_afpi2 * amu * (1 + 3 * xi * log(xi) + P[5] * xi);
+    r = 2 * aB_Zp_afpi2 * amu * (1 + 5 * xi * log(xi) + P[5] * xi);
     if (Npar >= 7)
         r += 2 * aB_Zp_afpi2 * amu * (P[6] * a * a);
 
