@@ -37,7 +37,7 @@
 // equal=OS
 // opposite=TM
 
-constexpr double MDs_MeV = 1969.0;
+constexpr double MDs_MeV = 1967.0;
 constexpr double MDs_MeV_err = 0.4;
 
 constexpr double Metas_MeV = 689.89;
