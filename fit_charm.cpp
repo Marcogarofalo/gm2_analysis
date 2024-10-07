@@ -269,8 +269,8 @@ int main(int argc, char** argv) {
     fit_info.restore_default();
     std::string namefit;
 
-
-    for (int iW = 0;iW < 6;iW++) {
+    std::vector<int> iWs = { 0,1,2,3,5 };
+    for (int iW :iWs) {
         for (int ie = 0;ie < 13;ie++) {
 
             std::vector<int> fi_list;
@@ -419,22 +419,23 @@ int main(int argc, char** argv) {
 
                 switch (iW) {
                 case 0:
-                    fit_info.corr_id = { 167, 168 };
+                    fit_info.corr_id = { 183, 184 };
                     break;
                 case 1:
-                    fit_info.corr_id = { 169, 170 };
+                    fit_info.corr_id = { 185, 186 };
                     break;
                 case 2:
-                    fit_info.corr_id = { 175, 176 };
+                    fit_info.corr_id = { 207, 208 };
                     break;
                 case 3:
-                    fit_info.corr_id = { 146, 147 };
+                    fit_info.corr_id = { 209, 210 }; //<- MDs, in you want  JPsi then { 156, 161 };  
                     break;
                 case 4:
+                    printf(" analysis not done in gm2_analysis.cpp"); exit(1);
                     fit_info.corr_id = { 181, 182 };
                     break;
                 case 5:
-                    fit_info.corr_id = { 167, 168,169, 170, 175, 176 };
+                    fit_info.corr_id = { 183, 184, 185, 186,  207, 208  };
                     break;
                 default: break;
                 }
