@@ -62,6 +62,11 @@ target_link_libraries(mpi_fpi PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
 add_executable(m_Ds m_Ds.cpp)
 target_link_libraries(m_Ds PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
 
+add_executable(perturbative_sd perturbative_sd.cpp)
+target_link_libraries(perturbative_sd PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(perturbative_sd PUBLIC functions_gm2_analysis)
+
+
 add_executable(mpcac mpcac.cpp)
 target_link_libraries(mpcac PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
 target_link_libraries(mpcac PUBLIC functions_gm2_analysis)
