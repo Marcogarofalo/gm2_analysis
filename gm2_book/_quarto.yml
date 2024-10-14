@@ -14,12 +14,17 @@ book:
     - VKVK.qmd
     - scale_setting.qmd
     - scratch.qmd
+    - SD_tmin.qmd
     - continuum_amu_s_full.qmd
     - continuum_amu_c_full.qmd
-    - continuum_amu_s_W.qmd
-    - continuum_amu_s_sd.qmd
-    - continuum_amu_l_W.qmd
-    - continuum_amu_l_sd.qmd
+    - unitary_K_B64.qmd
+    - unitary_K_C80.qmd
+    - unitary_K_D96.qmd
+    - unitary_K_E112.qmd
+    # - continuum_amu_s_W.qmd
+    # - continuum_amu_s_sd.qmd
+    # - continuum_amu_l_W.qmd
+    # - continuum_amu_l_sd.qmd
     - blinded_B64.qmd
     - blinded_C80.qmd
     - blinded_D96.qmd
