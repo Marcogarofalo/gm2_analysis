@@ -217,9 +217,19 @@ double rhs_amu_a4OS_a4TM_common(int n, int Nvar, double* x, int Npar, double* P)
 double rhs_amu_alogOS_common(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_amu_alogTM_common(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_amu_alogOS_alogTM_common(int n, int Nvar, double* x, int Npar, double* P);
+double rhs_amu_alog2OS_common(int n, int Nvar, double* x, int Npar, double* P);
+double rhs_amu_alog2TM_common(int n, int Nvar, double* x, int Npar, double* P);
+double rhs_amu_alog2OS_alog2TM_common(int n, int Nvar, double* x, int Npar, double* P);
+double rhs_amu_alog3OS_common(int n, int Nvar, double* x, int Npar, double* P);
+double rhs_amu_alog3TM_common(int n, int Nvar, double* x, int Npar, double* P);
+double rhs_amu_alog3OS_alog3TM_common(int n, int Nvar, double* x, int Npar, double* P);
+
+
 
 double rhs_amu_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_amu_a4_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_amu_alog_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P);
+double rhs_amu_alog2_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P);
+double rhs_amu_alog3_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P);
 
 #endif

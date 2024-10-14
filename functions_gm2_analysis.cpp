@@ -2763,6 +2763,18 @@ double rhs_amu_alog_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P) {
     r = P[0] + a * P[1] + P[2] * a / log(a);
     return r;
 }
+double rhs_amu_alog2_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    r = P[0] + a * P[1] + P[2] * a / pow(log(a),2);
+    return r;
+}
+double rhs_amu_alog3_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    r = P[0] + a * P[1] + P[2] * a / pow(log(a),3);
+    return r;
+}
 
 double rhs_amu_a4_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
@@ -2812,5 +2824,50 @@ double rhs_amu_alogOS_alogTM_common(int n, int Nvar, double* x, int Npar, double
     double a = x[0];
     if (n == 0)      r = P[0] + a * P[1] + P[3] * a / log(a);
     else if (n == 1) r = P[0] + a * P[2] + P[4] * a / log(a);
+    return r;
+}
+
+double rhs_amu_alog2OS_common(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    if (n == 0)      r = P[0] + a * P[1] + P[3] * a / pow(log(a), 2);
+    else if (n == 1) r = P[0] + a * P[2];
+    return r;
+}
+double rhs_amu_alog2TM_common(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    if (n == 0)      r = P[0] + a * P[1];
+    else if (n == 1) r = P[0] + a * P[2] + P[3] * a / pow(log(a), 2);
+    return r;
+}
+double rhs_amu_alog2OS_alog2TM_common(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    if (n == 0)      r = P[0] + a * P[1] + P[3] * a / pow(log(a), 2);
+    else if (n == 1) r = P[0] + a * P[2] + P[4] * a / pow(log(a), 2);
+    return r;
+}
+
+
+double rhs_amu_alog3OS_common(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    if (n == 0)      r = P[0] + a * P[1] + P[3] * a / pow(log(a), 3);
+    else if (n == 1) r = P[0] + a * P[2];
+    return r;
+}
+double rhs_amu_alog3TM_common(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    if (n == 0)      r = P[0] + a * P[1];
+    else if (n == 1) r = P[0] + a * P[2] + P[3] * a / pow(log(a), 3);
+    return r;
+}
+double rhs_amu_alog3OS_alog3TM_common(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    if (n == 0)      r = P[0] + a * P[1] + P[3] * a / pow(log(a), 3);
+    else if (n == 1) r = P[0] + a * P[2] + P[4] * a / pow(log(a), 3);
     return r;
 }
