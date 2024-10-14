@@ -425,7 +425,7 @@ int main(int argc, char** argv) {
                     fit_info.corr_id = { 185, 186 };
                     break;
                 case 2:
-                    fit_info.corr_id = { 207, 208 };
+                    fit_info.corr_id = { 207, 208 };//LD
                     break;
                 case 3:
                     fit_info.corr_id = { 209, 210 }; //<- MDs, in you want  JPsi then { 156, 161 };  
