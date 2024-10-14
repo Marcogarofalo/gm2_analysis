@@ -1,0 +1,73 @@
+# unitary K E112
+
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+# library(hadron)
+# library(kableExtra) # breaks latex
+# library(tidyverse)
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+# widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
+```
+
+
+
+## $M_\pi$ 
+
+```{r, results='asis',echo=FALSE}
+mt <- read_df("/home/garofalo/analysis/online_measuraments_test/out/E112.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df<-NULL
+df <- add_corr_to_df("M_{PS}", all_obs, mt, df)
+######
+# mt1 <- read_df("/home/garofalo/analysis/online_measuraments_test/out/E112_light.dat_output")
+# all_obs1 <- Rose::get_all_corr(mt1)
+# df <- add_corr_to_df("M_{PS}", all_obs1, mt1, df,rename = "M_{PS}-online")
+
+
+gg <- plot_df_corr_ggplot(df)
+fig <- myplotly(gg, to_print = TRUE)
+```
+
+
+## $m_{pcac}$ 
+
+```{r, results='asis',echo=FALSE}
+df<-NULL
+df <- add_corr_to_df("mpcac", all_obs, mt, df)
+gg <- plot_df_corr_ggplot(df)
+fig <- myplotly(gg, to_print = TRUE)
+```
+
+
+## heavy sector 
+
+```{r, results='asis',echo=FALSE}
+df<-NULL
+df <- add_corr_to_df("M_{heavy0}", all_obs, mt, df)
+df <- add_corr_to_df("M_{heavy1}", all_obs, mt, df)
+df <- add_corr_to_df("M_{heavy2}", all_obs, mt, df)
+df <- add_corr_to_df("M_{heavy3}", all_obs, mt, df)
+df <- add_corr_to_df("meff_GEVP_l0", all_obs, mt, df)
+df <- add_corr_to_df("meff_GEVP_l1", all_obs, mt, df)
+
+
+gg <- plot_df_corr_ggplot(df)
+fig <- myplotly(gg, to_print = TRUE)
+```
+
+

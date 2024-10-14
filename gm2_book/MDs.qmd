@@ -30,38 +30,223 @@ ens <- c(
   # "cA.30.32_mu.0.003000",
   #  "cA.40.24_mu.0.004000",
   #  "cA.53.24_mu.0.005300",
-  # "cB.72.64_Ds",
-  # "cB.72.96_Ds",
-  # "cC.06.80_Ds",
-  # "cC.06.112_Ds",
-  # "cD.54.96_Ds",
+  "cB.72.64_Ds",
+  # "cB.72.96_mu.0.000720",
+  "cC.06.80_Ds",
+  # "cC.06.112_mu.0.000600",
+  "cD.54.96_Ds",
   "cE.44.112_Ds"
 )
-# source("/home/garofalo/programs/Rose/R/read_block.R")
+source("/home/garofalo/programs/Rose/R/read_block.R")
 dir <- "/home/garofalo/analysis/g-2_new_stat/out/"
 df <- NULL
+dft <- data.frame("en" = ens, "mcDs" = ens)
+dfv <- data.frame(
+  "en" = ens,
+  "mcDs" = rep(0, length(ens)),
+  "dmcDs" = rep(0, length(ens)),
+  "mcJpsi" = rep(0, length(ens)),
+  "dmcJpsi" = rep(0, length(ens))
+)
+count <- 1
 for (e in ens) {
   mt <- read_df(paste0(dir, e, "_output"))
   all_obs <- Rose::get_all_corr(mt)
-   df <- add_corr_to_df("M_{Ds}^{s,c1}", all_obs, mt, df,
+  df <- add_corr_to_df("M_{Ds0}", all_obs, mt, df,
+    rename = paste0("MDs0-", substr(e, start = 1, stop = 8))
+  )
+  df <- add_corr_to_df("M_{Ds1}", all_obs, mt, df,
     rename = paste0("MDs1-", substr(e, start = 1, stop = 8))
   )
-  df <- add_corr_to_df("M_{Ds}^{s,c2}", all_obs, mt, df,
-    rename = paste0("MDs2-", substr(e, start = 1, stop = 8))
-  )
-  df <- add_corr_to_df("M_{Ds}^{s,c3}", all_obs, mt, df,
-    rename = paste0("MDs3-", substr(e, start = 1, stop = 8))
-  )
-  
-
   # df<-add_corr_to_df("M_{PS}^{op}",all_obs ,mt,df,
   #                    rename = paste0("MPS_OP-",substr( e , start = 1 , stop = 8 )))
   #
+
   fit <- get_full_res("mc(MDs)", all_obs, mt)
-  cat("$m_c($", gsub("\\_mu.*", "", e), "$)$=", mean_print(fit[1, 1], fit[1, 2]), "\n\n")
-  # fit <- get_full_res("ms(MK)", all_obs, mt)
+  dft$mcDs[count] <- mean_print(fit[1, 1], fit[1, 2])
+  dfv[count,c(2,3)]<- fit[1,c(1,2)]
+  count <- count + 1
   # cat("$m_s($", gsub("\\_mu.*", "", e), "$)$=", mean_print(fit[1, 1], fit[1, 2]), "\n\n")
 }
 gg <- plot_df_corr_ggplot(df)
 fig <- myplotly(gg, to_print = TRUE)
+# kable(dft)
+```
+
+
+
+```{r, results='asis',echo=FALSE, warning=FALSE}
+ens <- c(
+  # "cA.30.32_mu.0.003000",
+  #  "cA.40.24_mu.0.004000",
+  #  "cA.53.24_mu.0.005300",
+  "cB.72.64_mu.0.000720",
+  # "cB.72.96_mu.0.000720",
+  "cC.06.80_mu.0.000600",
+  # "cC.06.112_mu.0.000600",
+  "cD.54.96_mu.0.000540",
+  "cE.44.112_mu.0.000440"
+)
+source("/home/garofalo/programs/Rose/R/read_block.R")
+dir <- "/home/garofalo/analysis/g-2_new_stat/out/"
+df <- NULL
+dft1 <- data.frame("en" = ens, "mc" = ens)
+count <- 1
+for (e in ens) {
+  mt <- read_df(paste0(dir, e, "_output"))
+  all_obs <- Rose::get_all_corr(mt)
+  # df <- add_corr_to_df("M_{Ds0}", all_obs, mt, df,
+  #   rename = paste0("MDs0-", substr(e, start = 1, stop = 8))
+  # )
+  # df <- add_corr_to_df("M_{Ds1}", all_obs, mt, df,
+  #   rename = paste0("MDs1-", substr(e, start = 1, stop = 8))
+  # )
+  # df<-add_corr_to_df("M_{PS}^{op}",all_obs ,mt,df,
+  #                    rename = paste0("MPS_OP-",substr( e , start = 1 , stop = 8 )))
+  #
+
+  fit <- get_full_res("mc(Jpsi)", all_obs, mt)
+  dft1$mc[count] <- mean_print(fit[1, 1], fit[1, 2])
+  dfv[count,c(4,5)]<- fit[1,c(1,2)]
+  count <- count + 1
+  # cat("$m_s($", gsub("\\_mu.*", "", e), "$)$=", mean_print(fit[1, 1], fit[1, 2]), "\n\n")
+}
+# gg <- plot_df_corr_ggplot(df)
+# fig <- myplotly(gg, to_print = TRUE)
+dft$mcJpsi <- dft1$mc
+gg<-myggplot() + geom_pointrange(aes(x=dfv[,1], y= dfv[,2]-dfv[,4], ymin=dfv[,2]-dfv[,4]-dfv[,3],
+                               , ymax=dfv[,2]-dfv[,4]+dfv[,3]))
+fig<-myplotly(gg,"")
+# kable(dft)
+```
+
+
+
+
+```{r, results='asis',echo=FALSE, warning=FALSE}
+ens <- c(
+  # "cA.30.32_mu.0.003000",
+  #  "cA.40.24_mu.0.004000",
+  #  "cA.53.24_mu.0.005300",
+  "cB.72.64_mu.0.000720",
+  # "cB.72.96_mu.0.000720",
+  "cC.06.80_mu.0.000600",
+  # "cC.06.112_mu.0.000600",
+  "cD.54.96_mu.0.000540",
+  "cE.44.112_mu.0.000440"
+)
+source("/home/garofalo/programs/Rose/R/read_block.R")
+dir <- "/home/garofalo/analysis/g-2_new_stat/out/"
+df <- NULL
+dft2 <- data.frame("en" = ens, "mc" = ens)
+count <- 1
+for (e in ens) {
+  mt <- read_df(paste0(dir, e, "_output"))
+  all_obs <- Rose::get_all_corr(mt)
+  # df <- add_corr_to_df("M_{Ds0}", all_obs, mt, df,
+  #   rename = paste0("MDs0-", substr(e, start = 1, stop = 8))
+  # )
+  # df <- add_corr_to_df("M_{Ds1}", all_obs, mt, df,
+  #   rename = paste0("MDs1-", substr(e, start = 1, stop = 8))
+  # )
+  # df<-add_corr_to_df("M_{PS}^{op}",all_obs ,mt,df,
+  #                    rename = paste0("MPS_OP-",substr( e , start = 1 , stop = 8 )))
+  #
+
+  fit <- get_full_res("mc(etac)", all_obs, mt)
+  dft2$mc[count] <- mean_print(fit[1, 1], fit[1, 2])
+  count <- count + 1
+  # cat("$m_s($", gsub("\\_mu.*", "", e), "$)$=", mean_print(fit[1, 1], fit[1, 2]), "\n\n")
+}
+# gg <- plot_df_corr_ggplot(df)
+# fig <- myplotly(gg, to_print = TRUE)
+dft$mcEtac <- dft2$mc
+kable(dft)
+```
+
+
+
+## fit of MDs
+
+
+```{r, results='asis',echo=FALSE, warning=FALSE}
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/out/cB.72.64_Ds_MDs",
+  var = "mus0_muc",
+  id_x = 2,
+  data_type = c("ms0"),
+  width = 0.0015
+  # gg = gg,
+  # single_name_for_fit = "fit",
+  # noribbon = TRUE
+)
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/out/cB.72.64_Ds_MDs",
+  var = "mus2_muc",
+  id_x = 2,
+  data_type = c("ms2"),
+  width = 0.0015,
+  gg = gg,
+  # single_name_for_fit = "fit",
+  # noribbon = TRUE
+)
+fig <- myplotly(gg, "B64", "$a\\mu_c$", "M_{Ds}")
+```
+
+
+```{r, results='asis',echo=FALSE, warning=FALSE}
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/out/cC.06.80_Ds_MDs",
+  var = "mus0_muc",
+  id_x = 2,
+  data_type = c("ms0"),
+  width = 0.0015
+  # gg = gg,
+  # single_name_for_fit = "fit",
+  # noribbon = TRUE
+)
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/out/cC.06.80_Ds_MDs",
+  var = "mus2_muc",
+  id_x = 2,
+  data_type = c("ms2"),
+  width = 0.0015,
+  gg = gg,
+  # single_name_for_fit = "fit",
+  # noribbon = TRUE
+)
+fig <- myplotly(gg, "c80", "$a\\mu_c$", "M_{Ds}")
+```
+
+For the ensembles with only 3 data at the same $\mu_s$ we did a fit 
+$M_{D_s} = P_0 +P_1 (a\mu_c)+ P_2(a\mu_c)^2$
+
+```{r, results='asis',echo=FALSE, warning=FALSE}
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/out/cD.54.96_Ds_MDs",
+  var = "mus0_muc",
+  id_x = 2,
+  data_type = c("ms0"),
+  # width = 1e-4,
+  # gg = gg,
+  # single_name_for_fit = "fit",
+  # noribbon = TRUE,
+  width = 0.0015
+)
+fig <- myplotly(gg, "D96", "$a\\mu_c$", "M_{Ds}")
+```
+
+```{r, results='asis',echo=FALSE , warning=FALSE}
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/out/cE.44.112_Ds_MDs",
+  var = "mus0_muc",
+  id_x = 2,
+  data_type = c("ms0"),
+  # width = 1e-4,
+  # gg = gg,
+  # single_name_for_fit = "fit",
+  # noribbon = TRUE,
+  width = 0.0015
+)
+fig <- myplotly(gg, "E112", "$a\\mu_c$", "M_{Ds}")
 ```

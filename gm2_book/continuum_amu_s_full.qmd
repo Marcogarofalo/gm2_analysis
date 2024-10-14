@@ -25,13 +25,29 @@ myplotly(ggplot())
 # widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
 ```
 
+Ensemble fitted:
 
+- Only one regularization with 4 beta or 3 beta exlcuding B or C 
 
+- Both regularization with a common continuum limit, 
+  4 beta or 3 beta exlcuding B or C for each regularization
+
+list of fits:
+
+- linear in $a^2$
+
+- quadratic in $a^2$, on both or one regularization only
+
+- $a^2/\log(a)$ , on both or one regularization only
+
+Tot 59 fits
 
 
 ```{r, echo=FALSE, results='asis'}
 library("gridExtra")
 library("ggpubr")
+library(stringr)
+
 eq_op <- function(x) {
   if (x == 0) {
     return("OS")
@@ -48,10 +64,10 @@ eq_op1 <- function(x) {
     return("TM-a(tau)")
   } # opposite
 }
-AIC <- function(v, err, chi2dof, dof, npar) {
+AIC <- function(v, err, chi2dof, dof, npar, multiplicity=1) {
   l <- list()
   Nmeas <- dof + npar
-  AIC <- exp(-0.5 * (chi2dof * dof + 2 * npar - Nmeas))
+  AIC <- exp(-0.5 * (chi2dof * dof + 2 * npar - Nmeas))/multiplicity
   N <- sum(AIC)
   AIC <- AIC / N
   l$AIC <- AIC
@@ -63,59 +79,139 @@ AIC <- function(v, err, chi2dof, dof, npar) {
   l$syst <- sqrt(syst)
   return(l)
 }
-
+AIC2 <- function(v, err, chi2dof, dof, npar,  multiplicity=1) {
+  l <- list()
+  Nmeas <- dof + npar
+  AIC <- exp(-0.5 * (chi2dof * dof + 2 * npar - 2 * Nmeas))/multiplicity
+  N <- sum(AIC)
+  AIC <- AIC / N
+  l$AIC <- AIC
+  l$m <- sum(v * AIC)
+  stat <- sum(AIC * err^2)
+  syst <- sum(AIC * (v - l$m)^2)
+  l$dm <- sqrt(stat + syst)
+  l$stat <- sqrt(stat)
+  l$syst <- sqrt(syst)
+  return(l)
+}
 plot_the_Ambaradam <- function(name) {
-  df <- data.frame(
-    "fit" = rep("", 16),
-    "res" = rep(0, 16),
-    "err" = rep(0, 16),
-    "chi2dof" = rep(0, 16),
-    "dof" = rep(0, 16),
-    "Npar" = rep(0, 16),
-    "Ndat" = rep(0, 16)
+  list_lat <- c(
+    "_3b", "_3b_BOS", "_3b_BTM", "_3b_BOS_BTM",
+    "_3b_noC", "_3b_noC_BOS", "_3b_noC_BTM",
+    "_3b_onlyOS", "_3b_onlyTM", "_4b_onlyOS", "_4b_onlyTM",
+    "_3b_noC_onlyOS", "_3b_noC_onlyTM"
   )
-  gg <- myggplot(repeat_color = 1)
+  list_a <- c(
+    "", "_a4OS", "_a4TM", "_a4OS_a4TM",
+    "_alogOS", "_alogTM", "_alogOS_alogTM",
+    "_alog2OS", "_alog2TM", "_alog2OS_alog2TM",
+    "_alog3OS", "_alog3TM", "_alog3OS_alog3TM",
+    "_a4", 
+    "_alog", "_alog2", "_alog3"
+  )
   source("/home/garofalo/programs/Rose/R/read_block.R")
   dir <- "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/"
+  count <- 0
+  for (lat in list_lat) {
+    for (a2 in list_a) {
+      namefit <- paste0("amu_", name, lat, a2)
+      namefile <- paste0(dir, namefit)
+
+      file <- paste0(namefile, "_fit_P.dat")
+      if (file.exists(file)) {
+        count <- count + 1
+      }
+    }
+  }
+  df <- data.frame(
+    "fit" = rep("", count),
+    "res" = rep(0, count),
+    "err" = rep(0, count),
+    "chi2dof" = rep(0, count),
+    "dof" = rep(0, count),
+    "Npar" = rep(0, count),
+    "Ndat" = rep(0, count),
+    "mult" = rep(0,count)
+  )
+  gg <- myggplot(repeat_color = 1)
   count <- 1
-  for (lat in c("_3b", "_3b_BOS", "_3b_BTM", "_3b_BOS_BTM")) {
+  for (lat in list_lat) {
     # for (lat in c("_3b_BOS_BTM" )){
-    for (a2 in c("", "_a4OS", "_a4TM", "_a4OS_a4TM")) {
+    for (a2 in list_a) {
       # for (a2 in c( "_a4OS_a4TM")) {
       namefit <- paste0("amu_", name, lat, a2)
       namefile <- paste0(dir, namefit)
 
       file <- paste0(namefile, "_fit_P.dat")
-      fit <- read_fit_P_file(file)
-      # if (fit$dof == 1) next
-      df[count, 1] <- namefit
-      df[count, c(2, 3)] <- fit$P[1, c(2, 3)]
-      df[count, 4] <- fit$chi2dof
-      df[count, 5] <- fit$dof
-      df[count, 6] <- fit$npar
-      df[count, 7] <- fit$ndata
-      gg <- plot_fit(
-        basename = namefile,
-        var = "afm",
-        id_x = 1,
-        data_type = c("OS", "TM"),
-        width = 1e-4,
-        gg = gg,
-        single_name_for_fit = "fit",
-        noribbon = TRUE
-      )
-      count <- count + 1
+      if (file.exists(file)) {
+        fit <- read_fit_P_file(file)
+        mydata <- c("OS", "TM")
+        if (str_detect(namefit, "onlyOS")) mydata <- c("OS")
+        if (str_detect(namefit, "onlyTM")) mydata <- c("TM")
+        # if (fit$dof == 1) next
+        df[count, 1] <- namefit
+        df[count, c(2, 3)] <- fit$P[1, c(2, 3)]
+        df[count, 4] <- fit$chi2dof
+        df[count, 5] <- fit$dof
+        df[count, 6] <- fit$npar
+        df[count, 7] <- fit$ndata
+        if (str_detect(namefit, "log"))
+          df[count, 8] <- 3
+        else 
+          df[count, 8] <- 1
+        gg <- plot_fit(
+          basename = namefile,
+          var = "afm",
+          id_x = 1,
+          data_type = mydata,
+          width = 1e-4,
+          gg = gg,
+          single_name_for_fit = "fit",
+          noribbon = TRUE
+        )
+        count <- count + 1
+      }
     }
   }
   a <- which(df$fit == "")
   if (length(a) > 0) df <- df[-a, ]
-  ave_AIC <- AIC(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar)
-  cat("AIC average = ", mean_print(ave_AIC$m, ave_AIC$dm), "\n\n")
+  ave_AIC <- AIC(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity =  df$mult)
+  cat("AIC (chi2 + 2Npar - Ndat)/2 = ", mean_print(ave_AIC$m, ave_AIC$dm), "\n\n")
   a <- which(df$dof == 1)
   if (length(a) > 0) df1 <- df[-a, ]
-  ave_AIC1 <- AIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar)
-  cat("AIC average (no dof =1) = ", mean_print(ave_AIC1$m, ave_AIC1$dm), "\n\n")
+  else df1<-df
+  ave_AIC1 <- AIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity =  df1$mult)
+  cat("AIC (chi2 + 2Npar - Ndat)/2 (no dof =1) = ", mean_print(ave_AIC1$m, ave_AIC1$dm), "\n\n")
 
+  ave_AIC2 <- AIC2(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar,  multiplicity = df$mult)
+  cat("AIC (chi2 + 2Npar -2 Ndat)/2 = ", mean_print(ave_AIC2$m, ave_AIC2$dm), "\n\n")
+
+  a <- which(str_detect(df$fit, "only"))
+  df1 <- df[-a, ]
+  ave_AIC11 <- AIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar,  multiplicity = df1$mult)
+  cat("AIC (chi2 + 2Npar - Ndat)/2 (only TM/OS combined) = ", mean_print(ave_AIC11$m, ave_AIC11$dm), "\n\n")
+  ave_AIC11 <- AIC2(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar,  multiplicity = df1$mult)
+  cat("AIC (chi2 + 2Npar -2 Ndat)/2 (only TM/OS combined) = ", mean_print(ave_AIC11$m, ave_AIC11$dm), "\n\n")
+
+  a <- which(str_detect(df$fit, "alog"))
+  df1 <- df[-a, ]
+  ave_AIC11 <- AIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar,  multiplicity = df1$mult)
+  cat("AIC (chi2 + 2Npar - Ndat)/2 (no log ) = ", mean_print(ave_AIC11$m, ave_AIC11$dm), "\n\n")
+  ave_AIC11 <- AIC2(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar,  multiplicity = df1$mult)
+  cat("AIC (chi2 + 2Npar -2 Ndat)/2 (no log ) = ", mean_print(ave_AIC11$m, ave_AIC11$dm), "\n\n")
+  
+  a <- which(str_detect(df$fit, "_3b_BOS_BTM"))
+  df1 <- df[a, ]
+  ave_AIC11 <- AIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar,  multiplicity = df1$mult)
+  cat("AIC (chi2 + 2Npar - Ndat)/2 (always 4 latt) = ", mean_print(ave_AIC11$m, ave_AIC11$dm), "\n\n")
+
+  
+  
+  a <- c(which(str_detect(df$fit, "alog2")), which(str_detect(df$fit, "alog3")))
+  df1 <- df[-a, ]
+  ave_AIC11 <- AIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar,  multiplicity = 1)
+  cat("AIC (chi2 + 2Npar - Ndat)/2 (no a/log^2(3) a) = ", mean_print(ave_AIC11$m, ave_AIC11$dm), "\n\n")
+  
   gg <- gg + geom_pointrange(aes(
     x = 0, y = ave_AIC$m, ymin = ave_AIC$m - ave_AIC$dm,
     ymax = ave_AIC$m + ave_AIC$dm, color = "AIC", shape = "AIC", fill = "AIC"
@@ -141,11 +237,11 @@ plot_the_Ambaradam <- function(name) {
   #   widths = c(1, 3.5),
   #   ncol = 2, nrow = 1
   # )
-  df$AIC<- ave_AIC$AIC
+  df$AIC <- ave_AIC$AIC
   return(df)
 }
 
-file <- sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_a4_MK_cov_fit_data.txt")
+file <- sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all_strange//amu_SDpWpLD_3b_BOS_a4TM_fit_data.txt")
 df <- read.table(file, header = FALSE, fill = TRUE)
 iy <- length(df[1, ]) - 2
 dft <- df[, c(1, iy, iy + 2)]
@@ -155,25 +251,18 @@ kable(dft)
 ```
 
 
-```{r, echo=FALSE, results='asis',  warning=FALSE}
-df <- plot_the_Ambaradam("full")
-```
+<!-- ```{r, echo=FALSE, results='asis',  warning=FALSE} -->
+<!-- df <- plot_the_Ambaradam("full") -->
+<!-- ``` -->
 
-## tree level subtraction
-
-
-```{r, echo=FALSE, results='asis',  warning=FALSE}
-df <- plot_the_Ambaradam("fulltree")
-```
+<!-- ## tree level subtraction -->
 
 
+<!-- ```{r, echo=FALSE, results='asis',  warning=FALSE} -->
+<!-- df <- plot_the_Ambaradam("fulltree") -->
+<!-- ``` -->
 
-## tree level subtraction in the SD window only
 
-
-```{r, echo=FALSE, results='asis',  warning=FALSE}
-df <- plot_the_Ambaradam("SDpWpLD")
-```
 
 ## SD window
 
@@ -181,11 +270,14 @@ df <- plot_the_Ambaradam("SDpWpLD")
 df <- plot_the_Ambaradam("SD")
 ```
 
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- plot_the_Ambaradam("SDtmin0")
+```
 
 here there are some bad fits for example the linear with 4 beta
 
 ```{r, echo=FALSE, results='asis',  warning=FALSE}
-gg<-plot_fit(
+gg <- plot_fit(
   basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_SD_3b_BOS_BTM",
   var = "afm",
   id_x = 1,
@@ -213,10 +305,76 @@ df <- plot_the_Ambaradam("W")
 df <- plot_the_Ambaradam("LD")
 ```
 
-## MAX twist correction
+
+
+## SUM
+
 
 ```{r, echo=FALSE, results='asis',  warning=FALSE}
-gg<-plot_fit(
+df <- plot_the_Ambaradam("SDpWpLD")
+```
+
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_SDpWpLD_3b_BOS_BTM_a4OS_a4TM",
+  var = "afm",
+  id_x = 1,
+  data_type = c("OS", "TM"),
+  width = 1e-4,
+  gg = NULL,
+  single_name_for_fit = "fit_4b-a4",
+  noribbon = FALSE
+)
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_SDpWpLD_3b",
+  var = "afm",
+  id_x = 1,
+  data_type = c("OS", "TM"),
+  width = 1e-4,
+  gg = gg,
+  single_name_for_fit = "fit-3b-a2",
+  noribbon = FALSE
+)
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_SDpWpLD_3b_BOS_BTM",
+  var = "afm",
+  id_x = 1,
+  data_type = c("OS", "TM"),
+  width = 1e-4,
+  gg = gg,
+  single_name_for_fit = "fit-4b-a2",
+  noribbon = FALSE
+)
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_SDpWpLD_3b_BOS_BTM_alog2OS_alog2TM",
+  var = "afm",
+  id_x = 1,
+  data_type = c("OS", "TM"),
+  width = 1e-4,
+  gg = gg,
+  single_name_for_fit = "fit-log",
+  noribbon = FALSE
+)
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_SDpWpLD_3b_BOS_BTM_alog2OS",
+  var = "afm",
+  id_x = 1,
+  data_type = c("OS", "TM"),
+  width = 1e-4,
+  gg = gg,
+  single_name_for_fit = "fit-logOS",
+  noribbon = FALSE
+)
+
+
+fig <- myplotly(gg, "", "$a^2$", "$a_{\\mu}(s)$", to_print = TRUE, output = "HTML", legend_position = c(0, 0))
+```
+
+## MAX twist correction in scale setting
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+gg <- plot_fit(
   basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_SDpWpLD_3b_BOS_BTM_a4OS_a4TM",
   var = "afm",
   id_x = 1,
@@ -224,9 +382,9 @@ gg<-plot_fit(
   width = 1e-4,
   gg = NULL,
   single_name_for_fit = "fit",
-  noribbon = FALSE,  noline = TRUE
+  noribbon = FALSE, noline = TRUE
 )
-gg<-plot_fit(
+gg <- plot_fit(
   basename = "/home/garofalo/analysis/g-2_new_stat_no_max_twist/fit_all_strange/amu_SDpWpLD_3b_BOS_BTM_a4OS_a4TM",
   var = "afm",
   id_x = 1,
@@ -241,6 +399,56 @@ fig <- myplotly(gg, "", "$a^2$", "$a_{\\mu}(s)$", to_print = TRUE, output = "HTM
 ```
 
 
+
+## FVE
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_SDpWpLD_3b_BOS_BTM_FVE_a4OS_a4TM",
+  var = "afm",
+  id_x = 1,
+  data_type = c("OS-sum", "TM-sum"),
+  width = 1e-4,
+  gg = NULL,
+  single_name_for_fit = "fit-sum",
+  noribbon = FALSE, noline = TRUE
+)
+
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_SD_3b_BOS_BTM_FVE_a4OS_a4TM",
+  var = "afm",
+  id_x = 1,
+  data_type = c("OS-SD", "TM-SD"),
+  width = 1e-4,
+  gg = gg,
+  single_name_for_fit = "fit-SD",
+  noribbon = FALSE, noline = TRUE
+)
+
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_W_3b_BOS_BTM_FVE_a4OS_a4TM",
+  var = "afm",
+  id_x = 1,
+  data_type = c("OS-W", "TM-W"),
+  width = 1e-4,
+  gg = gg,
+  single_name_for_fit = "fit-W",
+  noribbon = FALSE, noline = TRUE
+)
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_LD_3b_BOS_BTM_FVE_a4OS_a4TM",
+  var = "afm",
+  id_x = 1,
+  data_type = c("OS-LD", "TM-LD"),
+  width = 1e-4,
+  gg = gg,
+  single_name_for_fit = "fit-LD",
+  noribbon = FALSE, noline = TRUE
+)
+
+
+fig <- myplotly(gg, "", "$a^2$", "$a_{\\mu}(s)$", to_print = TRUE, output = "HTML", legend_position = c(0, 0))
+```
 <!-- ```{r, echo=FALSE, results='asis',  warning=FALSE} -->
 <!-- df <- Rose::read_fit_P_file("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_a4_MK_cov_fit_P.dat") -->
 <!-- Rose::make_table_fit_result(df) -->

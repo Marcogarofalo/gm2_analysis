@@ -1,0 +1,492 @@
+# SD tmin
+
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+library(stringr)
+# library(hadron)
+# library(kableExtra) # breaks latex
+# library(tidyverse)
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+# widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
+```
+
+
+```{r, results='asis',echo=FALSE}
+e <- "cB.72.64_mu.0.000720_output"
+dir <- "/home/garofalo/analysis/g-2_new_stat/out/"
+df <- NULL
+mt <- read_df(paste0(dir, e))
+all_obs <- Rose::get_all_corr(mt)
+
+df <- data.frame("t" = rep(0, 6), "amu" = rep(0, 6), "damu" = rep(0, 6))
+df_ref <- data.frame("t_ref" = rep(0, 5), "amu_ref" = rep(0, 5), "damu_ref" = rep(0, 5))
+fit <- get_full_res("a_fm", all_obs, mt)
+a_fm <- fit[1, 1]
+for (t in c(1:6)) {
+  fit <- get_full_res(paste0("amu_sdtmin", t - 1, "_eq_MK"), all_obs, mt)
+  df$t[t] <- (t - 1) * a_fm
+  df$amu[t] <- fit[1, 1]
+  df$damu[t] <- fit[1, 2]
+}
+for (t in c(1:5)) {
+  fit <- get_full_res(paste0("tmin_ref", t - 1), all_obs, mt)
+  df_ref$t_ref[t] <- fit[1, 1]
+  fit <- get_full_res(paste0("amu_sdtminref", t - 1, "_eq_MK"), all_obs, mt)
+  df_ref$amu_ref[t] <- fit[1, 1]
+  df_ref$damu_ref[t] <- fit[1, 2]
+}
+gg <- myggplot(fill = FALSE, shape = FALSE) + geom_pointrange(aes(
+  x = df$t, y = df$amu, ymin = df$amu - df$damu,
+  ymax = df$amu + df$damu, color = "integer time OS"
+), size = 2)
+gg <- gg + geom_pointrange(aes(
+  x = df_ref$t_ref, y = df_ref$amu_ref, ymin = df_ref$amu_ref - df_ref$damu_ref,
+  ymax = df_ref$amu_ref + df_ref$damu_ref, color = "reference time OS"
+))
+
+df_op <- data.frame("t" = rep(0, 6), "amu" = rep(0, 6), "damu" = rep(0, 6))
+df_op_ref <- data.frame("t_ref" = rep(0, 5), "amu_ref" = rep(0, 5), "damu_ref" = rep(0, 5))
+for (t in c(1:6)) {
+  fit <- get_full_res(paste0("amu_sdtmin", t - 1, "_op_MK"), all_obs, mt)
+  df_op$t[t] <- (t - 1) * a_fm
+  df_op$amu[t] <- fit[1, 1]
+  df_op$damu[t] <- fit[1, 2]
+}
+for (t in c(1:5)) {
+  fit <- get_full_res(paste0("tmin_ref", t - 1), all_obs, mt)
+  df_op_ref$t_ref[t] <- fit[1, 1]
+  fit <- get_full_res(paste0("amu_sdtminref", t - 1, "_op_MK"), all_obs, mt)
+  df_op_ref$amu_ref[t] <- fit[1, 1]
+  df_op_ref$damu_ref[t] <- fit[1, 2]
+}
+gg <- gg + geom_pointrange(aes(
+  x = df_op$t, y = df_op$amu, ymin = df_op$amu - df_op$damu,
+  ymax = df_op$amu + df_op$damu, color = "integer time TM"
+), size = 2)
+gg <- gg + geom_pointrange(aes(
+  x = df_op_ref$t_ref, y = df_op_ref$amu_ref, ymin = df_op_ref$amu_ref - df_op_ref$damu_ref,
+  ymax = df_op_ref$amu_ref + df_op_ref$damu_ref, color = "reference time TM"
+))
+##### SD with subtraction
+fit <- get_full_res(paste0("amu_{sd}_(eq,MK)"), all_obs, mt)
+amu <- fit[1, 1]
+damu <- fit[1, 2]
+gg <- gg + geom_pointrange(aes(
+  x = 0, y = !!amu, ymin = !!(amu - damu),
+  ymax = !!(amu + damu), color = "subtracted SD OS"
+),  shape=3,size=1.5)
+fit <- get_full_res(paste0("amu_{sd}_(op,MK)"), all_obs, mt)
+amu <- fit[1, 1]
+damu <- fit[1, 2]
+gg <- gg + geom_pointrange(aes(
+  x = 0, y = amu, ymin = amu - damu,
+  ymax = amu + damu, color = "subtracted SD TM"
+), shape=3,size=1.5)
+####
+fig <- myplotly(gg, e, "$t_{min}$", "$a_\\mu^{SD}(t_{min})$", to_print = TRUE, legend_position = c(0, 0))
+```
+
+
+
+```{r, results='asis',echo=FALSE}
+e <- "cC.06.80_mu.0.000600_output"
+dir <- "/home/garofalo/analysis/g-2_new_stat/out/"
+df <- NULL
+mt <- read_df(paste0(dir, e))
+all_obs <- Rose::get_all_corr(mt)
+
+df <- data.frame("t" = rep(0, 6), "amu" = rep(0, 6), "damu" = rep(0, 6))
+df_ref <- data.frame("t_ref" = rep(0, 5), "amu_ref" = rep(0, 5), "damu_ref" = rep(0, 5))
+fit <- get_full_res("a_fm", all_obs, mt)
+a_fm <- fit[1, 1]
+for (t in c(1:6)) {
+  fit <- get_full_res(paste0("amu_sdtmin", t - 1, "_eq_MK"), all_obs, mt)
+  df$t[t] <- (t - 1) * a_fm
+  df$amu[t] <- fit[1, 1]
+  df$damu[t] <- fit[1, 2]
+}
+for (t in c(1:5)) {
+  fit <- get_full_res(paste0("tmin_ref", t - 1), all_obs, mt)
+  df_ref$t_ref[t] <- fit[1, 1]
+  fit <- get_full_res(paste0("amu_sdtminref", t - 1, "_eq_MK"), all_obs, mt)
+  df_ref$amu_ref[t] <- fit[1, 1]
+  df_ref$damu_ref[t] <- fit[1, 2]
+}
+gg <- myggplot(fill = FALSE, shape = FALSE) + geom_pointrange(aes(
+  x = df$t, y = df$amu, ymin = df$amu - df$damu,
+  ymax = df$amu + df$damu, color = "integer time OS"
+), size = 2)
+gg <- gg + geom_pointrange(aes(
+  x = df_ref$t_ref, y = df_ref$amu_ref, ymin = df_ref$amu_ref - df_ref$damu_ref,
+  ymax = df_ref$amu_ref + df_ref$damu_ref, color = "reference time OS"
+))
+
+df_op <- data.frame("t" = rep(0, 6), "amu" = rep(0, 6), "damu" = rep(0, 6))
+df_op_ref <- data.frame("t_ref" = rep(0, 5), "amu_ref" = rep(0, 5), "damu_ref" = rep(0, 5))
+for (t in c(1:6)) {
+  fit <- get_full_res(paste0("amu_sdtmin", t - 1, "_op_MK"), all_obs, mt)
+  df_op$t[t] <- (t - 1) * a_fm
+  df_op$amu[t] <- fit[1, 1]
+  df_op$damu[t] <- fit[1, 2]
+}
+for (t in c(1:5)) {
+  fit <- get_full_res(paste0("tmin_ref", t - 1), all_obs, mt)
+  df_op_ref$t_ref[t] <- fit[1, 1]
+  fit <- get_full_res(paste0("amu_sdtminref", t - 1, "_op_MK"), all_obs, mt)
+  df_op_ref$amu_ref[t] <- fit[1, 1]
+  df_op_ref$damu_ref[t] <- fit[1, 2]
+}
+gg <- gg + geom_pointrange(aes(
+  x = df_op$t, y = df_op$amu, ymin = df_op$amu - df_op$damu,
+  ymax = df_op$amu + df_op$damu, color = "integer time TM"
+), size = 2)
+gg <- gg + geom_pointrange(aes(
+  x = df_op_ref$t_ref, y = df_op_ref$amu_ref, ymin = df_op_ref$amu_ref - df_op_ref$damu_ref,
+  ymax = df_op_ref$amu_ref + df_op_ref$damu_ref, color = "reference time TM"
+))
+##### SD with subtraction
+fit <- get_full_res(paste0("amu_{sd}_(eq,MK)"), all_obs, mt)
+amu <- fit[1, 1]
+damu <- fit[1, 2]
+gg <- gg + geom_pointrange(aes(
+  x = 0, y = !!amu, ymin = !!(amu - damu),
+  ymax = !!(amu + damu), color = "subtracted SD OS"
+),  shape=3,size=1.5)
+fit <- get_full_res(paste0("amu_{sd}_(op,MK)"), all_obs, mt)
+amu <- fit[1, 1]
+damu <- fit[1, 2]
+gg <- gg + geom_pointrange(aes(
+  x = 0, y = amu, ymin = amu - damu,
+  ymax = amu + damu, color = "subtracted SD TM"
+), shape=3,size=1.5)
+fig <- myplotly(gg, e, "$t_{min}$", "$a_\\mu^{SD}(t_{min})$", to_print = TRUE, legend_position = c(0, 0))
+```
+
+
+
+```{r, results='asis',echo=FALSE}
+e <- "cD.54.96_mu.0.000540_output"
+dir <- "/home/garofalo/analysis/g-2_new_stat/out/"
+df <- NULL
+mt <- read_df(paste0(dir, e))
+all_obs <- Rose::get_all_corr(mt)
+
+df <- data.frame("t" = rep(0, 6), "amu" = rep(0, 6), "damu" = rep(0, 6))
+df_ref <- data.frame("t_ref" = rep(0, 5), "amu_ref" = rep(0, 5), "damu_ref" = rep(0, 5))
+fit <- get_full_res("a_fm", all_obs, mt)
+a_fm <- fit[1, 1]
+for (t in c(1:6)) {
+  fit <- get_full_res(paste0("amu_sdtmin", t - 1, "_eq_MK"), all_obs, mt)
+  df$t[t] <- (t - 1) * a_fm
+  df$amu[t] <- fit[1, 1]
+  df$damu[t] <- fit[1, 2]
+}
+for (t in c(1:5)) {
+  fit <- get_full_res(paste0("tmin_ref", t - 1), all_obs, mt)
+  df_ref$t_ref[t] <- fit[1, 1]
+  fit <- get_full_res(paste0("amu_sdtminref", t - 1, "_eq_MK"), all_obs, mt)
+  df_ref$amu_ref[t] <- fit[1, 1]
+  df_ref$damu_ref[t] <- fit[1, 2]
+}
+gg <- myggplot(fill = FALSE, shape = FALSE) + geom_pointrange(aes(
+  x = df$t, y = df$amu, ymin = df$amu - df$damu,
+  ymax = df$amu + df$damu, color = "integer time OS"
+), size = 2)
+gg <- gg + geom_pointrange(aes(
+  x = df_ref$t_ref, y = df_ref$amu_ref, ymin = df_ref$amu_ref - df_ref$damu_ref,
+  ymax = df_ref$amu_ref + df_ref$damu_ref, color = "reference time OS"
+))
+
+df_op <- data.frame("t" = rep(0, 6), "amu" = rep(0, 6), "damu" = rep(0, 6))
+df_op_ref <- data.frame("t_ref" = rep(0, 5), "amu_ref" = rep(0, 5), "damu_ref" = rep(0, 5))
+for (t in c(1:6)) {
+  fit <- get_full_res(paste0("amu_sdtmin", t - 1, "_op_MK"), all_obs, mt)
+  df_op$t[t] <- (t - 1) * a_fm
+  df_op$amu[t] <- fit[1, 1]
+  df_op$damu[t] <- fit[1, 2]
+}
+for (t in c(1:5)) {
+  fit <- get_full_res(paste0("tmin_ref", t - 1), all_obs, mt)
+  df_op_ref$t_ref[t] <- fit[1, 1]
+  fit <- get_full_res(paste0("amu_sdtminref", t - 1, "_op_MK"), all_obs, mt)
+  df_op_ref$amu_ref[t] <- fit[1, 1]
+  df_op_ref$damu_ref[t] <- fit[1, 2]
+}
+gg <- gg + geom_pointrange(aes(
+  x = df_op$t, y = df_op$amu, ymin = df_op$amu - df_op$damu,
+  ymax = df_op$amu + df_op$damu, color = "integer time TM"
+), size = 2)
+gg <- gg + geom_pointrange(aes(
+  x = df_op_ref$t_ref, y = df_op_ref$amu_ref, ymin = df_op_ref$amu_ref - df_op_ref$damu_ref,
+  ymax = df_op_ref$amu_ref + df_op_ref$damu_ref, color = "reference time TM"
+))
+##### SD with subtraction
+fit <- get_full_res(paste0("amu_{sd}_(eq,MK)"), all_obs, mt)
+amu <- fit[1, 1]
+damu <- fit[1, 2]
+gg <- gg + geom_pointrange(aes(
+  x = 0, y = !!amu, ymin = !!(amu - damu),
+  ymax = !!(amu + damu), color = "subtracted SD OS"
+),  shape=3,size=1.5)
+fit <- get_full_res(paste0("amu_{sd}_(op,MK)"), all_obs, mt)
+amu <- fit[1, 1]
+damu <- fit[1, 2]
+gg <- gg + geom_pointrange(aes(
+  x = 0, y = amu, ymin = amu - damu,
+  ymax = amu + damu, color = "subtracted SD TM"
+), shape=3,size=1.5)
+####
+fig <- myplotly(gg, e, "$t_{min}$", "$a_\\mu^{SD}(t_{min})$", to_print = TRUE, legend_position = c(0, 0))
+```
+
+
+
+
+```{r, results='asis',echo=FALSE}
+e <- "cE.44.112_mu.0.000440_output"
+dir <- "/home/garofalo/analysis/g-2_new_stat/out/"
+df <- NULL
+mt <- read_df(paste0(dir, e))
+all_obs <- Rose::get_all_corr(mt)
+
+df <- data.frame("t" = rep(0, 6), "amu" = rep(0, 6), "damu" = rep(0, 6))
+df_ref <- data.frame("t_ref" = rep(0, 5), "amu_ref" = rep(0, 5), "damu_ref" = rep(0, 5))
+fit <- get_full_res("a_fm", all_obs, mt)
+a_fm <- fit[1, 1]
+for (t in c(1:6)) {
+  fit <- get_full_res(paste0("amu_sdtmin", t - 1, "_eq_MK"), all_obs, mt)
+  df$t[t] <- (t - 1) * a_fm
+  df$amu[t] <- fit[1, 1]
+  df$damu[t] <- fit[1, 2]
+}
+for (t in c(1:5)) {
+  fit <- get_full_res(paste0("tmin_ref", t - 1), all_obs, mt)
+  df_ref$t_ref[t] <- fit[1, 1]
+  fit <- get_full_res(paste0("amu_sdtminref", t - 1, "_eq_MK"), all_obs, mt)
+  df_ref$amu_ref[t] <- fit[1, 1]
+  df_ref$damu_ref[t] <- fit[1, 2]
+}
+gg <- myggplot(fill = FALSE, shape = FALSE) + geom_pointrange(aes(
+  x = df$t, y = df$amu, ymin = df$amu - df$damu,
+  ymax = df$amu + df$damu, color = "integer time OS"
+), size = 2)
+gg <- gg + geom_pointrange(aes(
+  x = df_ref$t_ref, y = df_ref$amu_ref, ymin = df_ref$amu_ref - df_ref$damu_ref,
+  ymax = df_ref$amu_ref + df_ref$damu_ref, color = "reference time OS"
+))
+
+df_op <- data.frame("t" = rep(0, 6), "amu" = rep(0, 6), "damu" = rep(0, 6))
+df_op_ref <- data.frame("t_ref" = rep(0, 5), "amu_ref" = rep(0, 5), "damu_ref" = rep(0, 5))
+for (t in c(1:6)) {
+  fit <- get_full_res(paste0("amu_sdtmin", t - 1, "_op_MK"), all_obs, mt)
+  df_op$t[t] <- (t - 1) * a_fm
+  df_op$amu[t] <- fit[1, 1]
+  df_op$damu[t] <- fit[1, 2]
+}
+for (t in c(1:5)) {
+  fit <- get_full_res(paste0("tmin_ref", t - 1), all_obs, mt)
+  df_op_ref$t_ref[t] <- fit[1, 1]
+  fit <- get_full_res(paste0("amu_sdtminref", t - 1, "_op_MK"), all_obs, mt)
+  df_op_ref$amu_ref[t] <- fit[1, 1]
+  df_op_ref$damu_ref[t] <- fit[1, 2]
+}
+gg <- gg + geom_pointrange(aes(
+  x = df_op$t, y = df_op$amu, ymin = df_op$amu - df_op$damu,
+  ymax = df_op$amu + df_op$damu, color = "integer time TM"
+), size = 2)
+gg <- gg + geom_pointrange(aes(
+  x = df_op_ref$t_ref, y = df_op_ref$amu_ref, ymin = df_op_ref$amu_ref - df_op_ref$damu_ref,
+  ymax = df_op_ref$amu_ref + df_op_ref$damu_ref, color = "reference time TM"
+))
+##### SD with subtraction
+fit <- get_full_res(paste0("amu_{sd}_(eq,MK)"), all_obs, mt)
+amu <- fit[1, 1]
+damu <- fit[1, 2]
+gg <- gg + geom_pointrange(aes(
+  x = 0, y = !!amu, ymin = !!(amu - damu),
+  ymax = !!(amu + damu), color = "subtracted SD OS"
+),  shape=3,size=1.5)
+fit <- get_full_res(paste0("amu_{sd}_(op,MK)"), all_obs, mt)
+amu <- fit[1, 1]
+damu <- fit[1, 2]
+gg <- gg + geom_pointrange(aes(
+  x = 0, y = amu, ymin = amu - damu,
+  ymax = amu + damu, color = "subtracted SD TM"
+), shape=3,size=1.5)
+####
+fig <- myplotly(gg, e, "$t_{min}$", "$a_\\mu^{SD}(t_{min})$", to_print = TRUE, legend_position = c(0, 0),
+                height = 450, width = 550)
+```
+
+
+
+```{r, results='asis',echo=FALSE}
+eq_op <- function(x) {
+  if (x == 0) {
+    return("OS")
+  } # equal
+  else {
+    return("TM")
+  } # opposite
+}
+eq_op1 <- function(x) {
+  if (x == 0) {
+    return("OS-a(tau)")
+  } # equal
+  else {
+    return("TM-a(tau)")
+  } # opposite
+}
+AIC <- function(v, err, chi2dof, dof, npar, multiplicity = 1) {
+  l <- list()
+  Nmeas <- dof + npar
+  AIC <- exp(-0.5 * (chi2dof * dof + 2 * npar - Nmeas)) / multiplicity
+  N <- sum(AIC)
+  AIC <- AIC / N
+  l$AIC <- AIC
+  l$m <- sum(v * AIC)
+  stat <- sum(AIC * err^2)
+  syst <- sum(AIC * (v - l$m)^2)
+  l$dm <- sqrt(stat + syst)
+  l$stat <- sqrt(stat)
+  l$syst <- sqrt(syst)
+  return(l)
+}
+AIC2 <- function(v, err, chi2dof, dof, npar, multiplicity = 1) {
+  l <- list()
+  Nmeas <- dof + npar
+  AIC <- exp(-0.5 * (chi2dof * dof + 2 * npar - 2 * Nmeas)) / multiplicity
+  N <- sum(AIC)
+  AIC <- AIC / N
+  l$AIC <- AIC
+  l$m <- sum(v * AIC)
+  stat <- sum(AIC * err^2)
+  syst <- sum(AIC * (v - l$m)^2)
+  l$dm <- sqrt(stat + syst)
+  l$stat <- sqrt(stat)
+  l$syst <- sqrt(syst)
+  return(l)
+}
+plot_the_Ambaradam <- function(name) {
+  list_lat <- c(
+    "_3b", "_3b_BOS", "_3b_BTM", "_3b_BOS_BTM",
+    "_3b_noC", "_3b_noC_BOS", "_3b_noC_BTM",
+    "_3b_onlyOS", "_3b_onlyTM", "_4b_onlyOS", "_4b_onlyTM",
+    "_3b_noC_onlyOS", "_3b_noC_onlyTM"
+  )
+  list_a <- c(
+    "", "_a4OS", "_a4TM", "_a4OS_a4TM",
+    "_alogOS", "_alogTM", "_alogOS_alogTM",
+    "_alog2OS", "_alog2TM", "_alog2OS_alog2TM",
+    "_alog3OS", "_alog3TM", "_alog3OS_alog3TM",
+    "_a4",
+    "_alog", "_alog2", "_alog3"
+  )
+  source("/home/garofalo/programs/Rose/R/read_block.R")
+  dir <- "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/"
+  count <- 0
+  for (lat in list_lat) {
+    for (a2 in list_a) {
+      namefit <- paste0("amu_", name, lat, a2)
+      namefile <- paste0(dir, namefit)
+
+      file <- paste0(namefile, "_fit_P.dat")
+      if (file.exists(file)) {
+        count <- count + 1
+      }
+    }
+  }
+  df <- data.frame(
+    "fit" = rep("", count),
+    "res" = rep(0, count),
+    "err" = rep(0, count),
+    "chi2dof" = rep(0, count),
+    "dof" = rep(0, count),
+    "Npar" = rep(0, count),
+    "Ndat" = rep(0, count),
+    "mult" = rep(0, count)
+  )
+  count <- 1
+  for (lat in list_lat) {
+    # for (lat in c("_3b_BOS_BTM" )){
+    for (a2 in list_a) {
+      # for (a2 in c( "_a4OS_a4TM")) {
+      namefit <- paste0("amu_", name, lat, a2)
+      namefile <- paste0(dir, namefit)
+
+      file <- paste0(namefile, "_fit_P.dat")
+      if (file.exists(file)) {
+        fit <- read_fit_P_file(file)
+        mydata <- c("OS", "TM")
+        if (str_detect(namefit, "onlyOS")) mydata <- c("OS")
+        if (str_detect(namefit, "onlyTM")) mydata <- c("TM")
+        # if (fit$dof == 1) next
+        df[count, 1] <- namefit
+        df[count, c(2, 3)] <- fit$P[1, c(2, 3)]
+        df[count, 4] <- fit$chi2dof
+        df[count, 5] <- fit$dof
+        df[count, 6] <- fit$npar
+        df[count, 7] <- fit$ndata
+        if (str_detect(namefit, "log")) {
+          df[count, 8] <- 3
+        } else {
+          df[count, 8] <- 1
+        }
+
+        count <- count + 1
+      }
+    }
+  }
+  a <- which(df$fit == "")
+  if (length(a) > 0) df <- df[-a, ]
+  ave_AIC <- AIC(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity = df$mult)
+
+  df$AIC <- ave_AIC$AIC
+  return(ave_AIC)
+}
+
+AIC_res <- plot_the_Ambaradam("SD")
+
+df_sub <- data.frame("t_ref" = 0, "amu_ref" = AIC_res$m, "damu_ref" =AIC_res$dm)
+t<-1
+df_sub$t_ref[t] <- (t-1) * 0.07951
+df_sub$amu_ref[t] <- AIC_res$m
+df_sub$damu_ref[t] <- AIC_res$dm
+
+for (t in c(1:5)) {
+  AIC_res <- plot_the_Ambaradam(paste0("SDtmin", t - 1))
+  df_ref$t_ref[t] <- (t-1) * 0.07951/2 +0.07951
+  df_ref$amu_ref[t] <- AIC_res$m
+  df_ref$damu_ref[t] <- AIC_res$dm
+}
+df_pert<-read.table("/home/garofalo/analysis/gm2_analysis/gm2_book/amu_SD_s_pert.txt",header = TRUE)
+#print(df_ref)
+#print(df_pert)
+df_ref$amu_ref<- df_ref$amu_ref+df_pert$amu_.s._pert
+
+gg <- myggplot(fill = FALSE, shape = FALSE) + geom_pointrange(aes(
+  x = df_ref$t_ref, y = df_ref$amu_ref, ymin = df_ref$amu_ref - df_ref$damu_ref,
+  ymax = df_ref$amu_ref + df_ref$damu_ref, color = "reference time"
+))
+
+gg<- gg +  geom_pointrange(aes(
+  x = df_sub$t_ref, y = df_sub$amu_ref, ymin = df_sub$amu_ref - df_sub$damu_ref,
+  ymax = df_sub$amu_ref + df_sub$damu_ref, color = "SD "
+))
+fig <- myplotly(gg, "continuum", "$t_{min}$", "$a_\\mu^{SD}(t_{min})$", to_print = TRUE, legend_position = c(0, 0), height = 412, width = 600)
+```

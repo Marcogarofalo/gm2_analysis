@@ -29,23 +29,25 @@ ens <- c(
   # "cA.30.32_mu.0.003000",
   #  "cA.40.24_mu.0.004000",
   #  "cA.53.24_mu.0.005300",
-  "cB.72.64_mu.0.000720",
-  "cB.72.96_mu.0.000720",
-  "cC.06.80_mu.0.000600",
-  "cC.06.112_mu.0.000600",
-  "cD.54.96_mu.0.000540",
-  "cE.44.112_mu.0.000440"
+  "cB.72.64_K",
+  #"cB.72.96_mu.0.000720",
+  "cC.06.80_K",
+  #"cC.06.112_mu.0.000600",
+  "cD.54.96_K",
+  "cE.44.112_K"
 )
 source("/home/garofalo/programs/Rose/R/read_block.R")
 dir <- "/home/garofalo/analysis/g-2_new_stat/out/"
 df <- NULL
+dft<- data.frame("en"=ens, "ms"=ens)
+count<-1
 for (e in ens) {
   mt <- read_df(paste0(dir, e, "_output"))
   all_obs <- Rose::get_all_corr(mt)
-  df <- add_corr_to_df("M_{K1}^{op}", all_obs, mt, df,
+  df <- add_corr_to_df("M_{K0}", all_obs, mt, df,
     rename = paste0("MK1-", substr(e, start = 1, stop = 8))
   )
-  df <- add_corr_to_df("M_{K2}^{op}", all_obs, mt, df,
+  df <- add_corr_to_df("M_{K1}", all_obs, mt, df,
     rename = paste0("MK2-", substr(e, start = 1, stop = 8))
   )
   # df<-add_corr_to_df("M_{PS}^{op}",all_obs ,mt,df,
@@ -53,145 +55,16 @@ for (e in ens) {
   #
 
   fit <- get_full_res("ms(MK)", all_obs, mt)
-  cat("$m_s($", gsub("\\_mu.*", "", e), "$)$=", mean_print(fit[1, 1], fit[1, 2]), "\n\n")
+  dft$ms[count]<- mean_print(fit[1,1],fit[1,2])
+  count =count+1
+  #cat("$m_s($", gsub("\\_mu.*", "", e), "$)$=", mean_print(fit[1, 1], fit[1, 2]), "\n\n")
 }
 gg <- plot_df_corr_ggplot(df)
 fig <- myplotly(gg, to_print = TRUE)
+kable(dft)
 ```
 
 
-
-
-```{r, results='asis',echo=FALSE}
-ens <- c(
-  # "cA.30.32_mu.0.003000",
-  #  "cA.40.24_mu.0.004000",
-  #  "cA.53.24_mu.0.005300",
-  "cB.72.64_mu.0.000720",
-  "cB.72.96_mu.0.000720",
-  "cC.06.80_mu.0.000600",
-  "cC.06.112_mu.0.000600",
-  "cD.54.96_mu.0.000540",
-  "cE.44.112_mu.0.000440"
-)
-source("/home/garofalo/programs/Rose/R/read_block.R")
-dir <- "/home/garofalo/analysis/g-2_new_stat/out/"
-df <- data.frame(
-  "ms" = rep(0, length(ens)), "ms_err" = rep(0, length(ens)), "en" = gsub("_mu.*", "", ens)
-)
-GG <- c(
-  0.0182234,
-  0.0182106,
-  0.0160289,
-  0.016046,
-  0.0135329,
-  0.011785
-)
-GG_err <- c(
-  2.37774e-05,
-  1.91945e-05,
-  4.22565e-05,
-  4.23336e-05,
-  3.34711e-05,
-  3.58137e-05
-)
-GG_c <- c(
-  0.0182804,
-  0.0182676,
-  0.0160447,
-  0.0160619,
-  0.0135802,
-  0.0117949
-)
-GG_c_err <- c(
-  2.3291e-05,
-  1.85465e-05,
-  4.06968e-05,
-  4.06442e-05,
-  3.26742e-05,
-  3.48293e-05
-)
-
-
-count <- 1
-for (e in ens) {
-  mt <- read_df(paste0(dir, e, "_output"))
-  all_obs <- Rose::get_all_corr(mt)
-  # df<-add_corr_to_df("M_{K1}^{op}",all_obs ,mt,df,
-  #                    rename = paste0("MK1-",substr( e , start = 1 , stop = 8 )))
-  # df<-add_corr_to_df("M_{K2}^{op}",all_obs ,mt,df,
-  #                    rename = paste0("MK2-",substr( e , start = 1 , stop = 8 )))
-  #
-
-  fit <- get_full_res("ms(MK)", all_obs, mt)
-  df[count, c(1, 2)] <- fit[1, c(1, 2)]
-  # cat("$m_s($",gsub("\\_mu.*","",e),"$)$=", mean_print(fit[1,1],fit[1,2]), "\n\n")
-  count <- count + 1
-}
-diff_rel <- (GG - df[, 1]) / GG
-err <- (1 / GG) * df[, 2] + (df[, 1] / GG)^2 * GG_err
-
-diff_c_rel <- (GG_c - df[, 1]) / GG_c
-c_err <- (1 / GG_c) * df[, 2] + (df[, 1] / GG_c)^2 * GG_c_err
-
-
-gg <- myggplot()
-gg <- gg + geom_pointrange(aes(
-  x = df[, 3], y = diff_rel,
-  ymin = diff_rel - err,
-  ymax = diff_rel + err,
-))
-fig <- myplotly(gg, "", "Ensemble", "$(\\mu_s(\\tau) -\\mu_s)/\\mu_s(\\tau)$", to_print = TRUE)
-
-gg <- myggplot()
-gg <- gg + geom_pointrange(aes(
-  x = df[, 3], y = diff_c_rel,
-  ymin = diff_c_rel - c_err,
-  ymax = diff_c_rel + c_err,
-))
-fig <- myplotly(gg, "", "Ensemble", "$(\\mu_s(corr) -\\mu_s)/\\mu_s(corr)$", to_print = TRUE)
-
-```
-
-
-## ms
-
-
-```{r, results='asis',echo=FALSE}
-ens <- c(
-  # "cA.30.32_mu.0.003000",
-  #  "cA.40.24_mu.0.004000",
-  #  "cA.53.24_mu.0.005300",
-  "cB.72.64_K",
-  # "cB.72.96_K",
-  "cC.06.80_K"
-  # "cC.06.112_K",
-  # "cD.54.96_K",
-  #"cE.44.112_K"
-)
-dir <- "/home/garofalo/analysis/g-2_new_stat/out/"
-df <- NULL
-for (e in ens) {
-  mt <- read_df(paste0(dir, e, "_output"))
-  all_obs <- Rose::get_all_corr(mt)
-  df <- add_corr_to_df("M_{K1}", all_obs, mt, df,
-    rename = paste0("MK_s1l1-", substr(e, start = 1, stop = 8))
-  )
-  # df <- add_corr_to_df("M_{K}^{s1,l2}", all_obs, mt, df,
-  #   rename = paste0("MK_s1l2-", substr(e, start = 1, stop = 8))
-  # )
-  # df <- add_corr_to_df("M_{K}^{s2,l1}", all_obs, mt, df,
-  #   rename = paste0("MK_s2l1-", substr(e, start = 1, stop = 8))
-  # )
-  # df <- add_corr_to_df("M_{K}^{s2,l2}", all_obs, mt, df,
-  #   rename = paste0("MK_s2l2-", substr(e, start = 1, stop = 8))
-  # )
-  
- 
-}
-gg <- plot_df_corr_ggplot(df)
-fig <- myplotly(gg, to_print = TRUE)
-```
 
 
 
