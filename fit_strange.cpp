@@ -270,31 +270,87 @@ int main(int argc, char** argv) {
     std::string namefit;
 
 
-    for (int iW = 0;iW < 6;iW++) {
+    for (int iW = 0;iW < 11;iW++) {
         for (int ie = 0;ie < 14;ie++) {
 
             std::vector<int> fi_list;
             if (ie < 7)
-                fi_list = { 0,1,2,3,4,5,6 };
-            else if (ie > 7 && ie < 13)
-                fi_list = { 7,8,9 };
-            else if (ie > 12)
-                fi_list = { 0,1,2,3,4,5,6 };
+                fi_list = { 0,1,2,3,4,5,6,   10,11,12,13,14,15 };
+            else if (ie > 7 && ie < 13) // only one regularization
+                fi_list = { 7,8,9, 16,17 };
+            else if (ie > 12) // with FVE
+                fi_list = { 0,1,2,3,4,5,6,   10,11,12,13,14,15 };
 
 
             for (int fi : fi_list) {
 
                 namefit = "amu";
 
-                switch (iW) {
-                case 0: namefit = namefit + "_SD"; break;
-                case 1: namefit = namefit + "_W"; break;
-                case 2: namefit = namefit + "_LD"; break;
-                case 3: namefit = namefit + "_full"; break;
-                case 4: namefit = namefit + "_fulltree"; break;
-                case 5: namefit = namefit + "_SDpWpLD"; break;
+switch (iW) {
+                case 0:
+                    namefit = namefit + "_SD";
+                    fit_info.corr_id = { 167, 168 };
+                    break;
+                case 1:
+                    namefit = namefit + "_W";
+                    fit_info.corr_id = { 169, 170 };
+                    break;
+                case 2:
+                    namefit = namefit + "_LD";
+                    fit_info.corr_id = { 175, 176 };
+                    break;
+                case 3:
+                    namefit = namefit + "_full";
+                    fit_info.corr_id = { 146, 147 };
+                    break;
+                case 4:
+                    namefit = namefit + "_fulltree";
+                    fit_info.corr_id = { 181, 182 };
+                    break;
+                case 5:
+                    namefit = namefit + "_SDpWpLD";
+                    fit_info.corr_id = { 167, 168,169, 170, 175, 176 };
+                    break;
+                case 6:
+                    namefit = namefit + "_SDtmin0";
+                    fit_info.corr_id = { 211, 212 }; // SD tmin 0
+                    break;
+                case 7:
+                    namefit = namefit + "_SDtmin1";
+                    fit_info.corr_id = { 213, 214 }; // SD tmin 1
+                    break;
+                case 8:
+                    namefit = namefit + "_SDtmin2";
+                    fit_info.corr_id = { 215, 216 }; // SD tmin 2
+                    break;
+                case 9:
+                    namefit = namefit + "_SDtmin3";
+                    fit_info.corr_id = { 217, 218 }; // SD tmin 3
+                    break;
+                case 10:
+                    namefit = namefit + "_SDtmin4";
+                    fit_info.corr_id = { 219, 220 }; // SD tmin 4
+                    break;
                 default: break;
                 }
+
+                // if (ie == 7 || ie == 9 || ie == 11) {// it is already like this
+                //     for (int i = 0;i < fit_info.corr_id.size() / 2;i++)
+                //         fit_info.corr_id[i * 2] = fit_info.corr_id[i * 2];
+                // }
+                // if fititng only the TM we need to put the id only in the even slots so that 
+                // the function lhs_sum sum them when n=0
+                if (ie == 8 || ie == 10 || ie == 12) {
+                    for (int i = 0;i < fit_info.corr_id.size() / 2;i++)
+                        fit_info.corr_id[i * 2] = fit_info.corr_id[i * 2 + 1];
+                }
+
+
+                double (*lhs_fun)(int, int, int, data_all, struct fit_type);
+                if (iW >= 0 && iW < 5) lhs_fun = lhs_amu;
+                else if (iW==5 ) lhs_fun = lhs_sum;
+                else lhs_fun = lhs_amu;
+
 
                 switch (ie) {
                 case 0:
@@ -418,51 +474,51 @@ int main(int argc, char** argv) {
                     fit_info.Npar = 3;
                     fit_info.function = rhs_amu_alog_onlyOSTM;
                     break;
-
-
-
+                case 10:
+                    namefit = namefit + "_alog2OS";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_alog2OS_common;
+                    break;
+                case 11:
+                    namefit = namefit + "_alog2TM";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_alog2TM_common;
+                    break;
+                case 12:
+                    namefit = namefit + "_alog2OS_alog2TM";
+                    fit_info.Npar = 5;
+                    fit_info.function = rhs_amu_alog2OS_alog2TM_common;
+                    break;
+                case 13:
+                    namefit = namefit + "_alog3OS";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_alog3OS_common;
+                    break;
+                case 14:
+                    namefit = namefit + "_alog3TM";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_alog3TM_common;
+                    break;
+                case 15:
+                    namefit = namefit + "_alog3OS_alog3TM";
+                    fit_info.Npar = 5;
+                    fit_info.function = rhs_amu_alog3OS_alog3TM_common;
+                    break;
+                case 16:
+                    namefit = namefit + "_alog2";
+                    fit_info.Npar = 3;
+                    fit_info.function = rhs_amu_alog2_onlyOSTM;
+                    break;
+                case 17:
+                    namefit = namefit + "_alog3";
+                    fit_info.Npar = 3;
+                    fit_info.function = rhs_amu_alog3_onlyOSTM;
+                    break;
                 default:
                     break;
                 }
 
-                switch (iW) {
-                case 0:
-                    fit_info.corr_id = { 167, 168 };
-                    break;
-                case 1:
-                    fit_info.corr_id = { 169, 170 };
-                    break;
-                case 2:
-                    fit_info.corr_id = { 175, 176 };
-                    break;
-                case 3:
-                    fit_info.corr_id = { 146, 147 };
-                    break;
-                case 4:
-                    fit_info.corr_id = { 181, 182 };
-                    break;
-                case 5:
-                    fit_info.corr_id = { 167, 168,169, 170, 175, 176 };
-                    break;
-                default: break;
-                }
-
-                // if (ie == 7 || ie == 9 || ie == 11) {// it is already like this
-                //     for (int i = 0;i < fit_info.corr_id.size() / 2;i++)
-                //         fit_info.corr_id[i * 2] = fit_info.corr_id[i * 2];
-                // }
-                // if fititng only the TM we need to put the id only in the even slots so that 
-                // the function lhs_sum sum them when n=0
-                if (ie == 8 || ie == 10 || ie == 12) {
-                    for (int i = 0;i < fit_info.corr_id.size() / 2;i++)
-                        fit_info.corr_id[i * 2] = fit_info.corr_id[i * 2 + 1];
-                }
-
-
-                double (*lhs_fun)(int, int, int, data_all, struct fit_type);
-                if (iW >= 0 && iW < 5) lhs_fun = lhs_amu;
-                else lhs_fun = lhs_sum;
-
+                
 
 
                 fit_info.Nvar = 8;
