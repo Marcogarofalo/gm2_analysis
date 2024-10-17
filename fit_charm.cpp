@@ -250,6 +250,120 @@ int main(int argc, char** argv) {
     }
 
     double* jack_Mpi_MeV_exp = fake_sampling(argv[1], Mpi_MeV, Mpi_MeV_err, Njack, 1003);
+    //////////////////////////////////////////////////////////////
+    // new jackall
+    //////////////////////////////////////////////////////////////
+    data_all jackextra;
+    jackextra.resampling = jackall.resampling;
+    //jackall->en = (data_single*)malloc(sizeof(data_single) * files.size());
+    jackextra.en = new data_single[jackall.ens];
+    jackextra.ens = jackall.ens;
+    int count = 0;
+    for (std::string s : files) {
+        FILE* f = open_file(s.c_str(), "r");
+
+        // jackall.en[count] = read_single_dataj(f);
+        data_single dj;
+        dj.header = read_header(f);
+        dj.Nobs = jackall.en[count].Nobs + 1 + 20;
+        dj.Njack = dj.header.Njack;
+        dj.jack = double_malloc_2(dj.Nobs, dj.Njack);
+
+        //
+        size_t i = 0;
+        for (int obs = 0; obs < jackall.en[count].Nobs; obs++) {
+            // i += fread(dj.jack[obs], sizeof(double), dj.Njack, stream);
+            for (int j = 0;j < Njack;j++)
+                dj.jack[obs][j] = jackall.en[count].jack[obs][j];
+        }
+        dj.resampling = jackall.en[count].resampling;
+
+        jackextra.en[count] = dj;
+        count++;
+        fclose(f);
+    }
+
+    int obs = jackall.en[0].Nobs;
+    std::vector<int> id_SD = { 183, 184 };
+    std::vector<int> id_W = { 185, 186 };
+    std::vector<int> id_LD = { 207, 208 };
+    std::vector<int> id_full = { 209, 210 };
+    std::vector<int> id_fulltree = { -1, -1 };  //not implemented
+    std::vector<int> id_SDtmin0 = { 221, 222 };
+    std::vector<int> id_SDtmin1 = { 223, 224 };
+    std::vector<int> id_SDtmin2 = { 225, 226 };
+    std::vector<int> id_SDtmin3 = { 227, 228 };
+    std::vector<int> id_SDtmin4 = { 229, 230 };
+
+    std::vector<int> id_SD_cor = { obs + 1, obs + 2 };
+    std::vector<int> id_W_cor = { obs + 3, obs + 4 };
+    std::vector<int> id_LD_cor = { obs + 5, obs + 6 };
+    std::vector<int> id_full_cor = { obs + 7, obs + 8 };
+    std::vector<int> id_fulltree_cor = { obs + 9, obs + 10 };
+    std::vector<int> id_SDtmin0_cor = { obs + 11, obs + 12 };
+    std::vector<int> id_SDtmin1_cor = { obs + 13, obs + 14 };
+    std::vector<int> id_SDtmin2_cor = { obs + 15, obs + 16 };
+    std::vector<int> id_SDtmin3_cor = { obs + 17, obs + 18 };
+    std::vector<int> id_SDtmin4_cor = { obs + 19, obs + 20 };
+
+
+    std::vector<int> ensemble_to_correct = { B72_64, B72_96, C06, C112 ,D54, E112 };
+    std::vector<double*> damu_SD(files.size());
+    std::vector<double*> damu_W(files.size());
+    std::vector<double*> damu_LD(files.size());
+
+    double scale = 1e-10;
+    double put_a_number =0;
+    for (int e = 0; e < files.size(); e++) {
+        if (e == B72_64 || e == B72_96) {
+            damu_SD[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + B72_64);
+            damu_W[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + B72_64 + files.size());
+            damu_LD[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + B72_64 + 2 * files.size()); // FULl HVP and then subtract
+            myres->sub(damu_LD[e], damu_LD[e], damu_W[e]);
+            myres->sub(damu_LD[e], damu_LD[e], damu_SD[e]);
+        }
+        else if (e == C06 || e == C112) {
+            damu_SD[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + C06);
+            damu_W[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + C06 + files.size());
+            damu_LD[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + C06 + 2 * files.size()); // FULl HVP and then subtract
+            myres->sub(damu_LD[e], damu_LD[e], damu_W[e]);
+            myres->sub(damu_LD[e], damu_LD[e], damu_SD[e]);
+        }
+        else if (e == D54) {
+            damu_SD[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + D54);
+            damu_W[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + D54 + files.size());
+            damu_LD[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + D54 + 2 * files.size()); // FULl HVP and then subtract
+            myres->sub(damu_LD[e], damu_LD[e], damu_W[e]);
+            myres->sub(damu_LD[e], damu_LD[e], damu_SD[e]);
+        }
+        else if (e == E112) {
+            damu_SD[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + D54);
+            damu_W[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + D54 + files.size());
+            damu_LD[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + D54 + 2 * files.size()); // FULl HVP and then subtract
+            myres->sub(damu_LD[e], damu_LD[e], damu_W[e]);
+            myres->sub(damu_LD[e], damu_LD[e], damu_SD[e]);
+        }
+        else {
+            damu_SD[e] = myres->create_fake(0.0, 1e-16, 2000 + A30);
+            damu_W[e] = myres->create_fake(0.0, 1e-16, 2000 + A30 + files.size());
+            damu_LD[e] = myres->create_fake(0.0, 1e-16, 2000 + A30 + 2 * files.size()); // FULl HVP and then subtract
+            myres->sub(damu_LD[e], damu_LD[e], damu_W[e]);
+            myres->sub(damu_LD[e], damu_LD[e], damu_SD[e]);
+        }
+
+    }
+
+    for (int e : ensemble_to_correct) {
+        for (int j = 0;j < Njack;j++) {
+            for (int tm = 0;tm < 2;tm++) {
+                jackextra.en[e].jack[id_SD_cor[tm]][j] = jackextra.en[e].jack[id_SD[tm]][j] + damu_SD[e][j];
+                jackextra.en[e].jack[id_W_cor[tm]][j] = jackextra.en[e].jack[id_W[tm]][j] + damu_W[e][j];
+                jackextra.en[e].jack[id_LD_cor[tm]][j] = jackextra.en[e].jack[id_LD[tm]][j] + damu_LD[e][j];
+
+                // jackextra.en[e].jack[id_SDtmin0_cor[tm]][j] = jackextra.en[e].jack[id_SDtmin0[tm]][j] + damu_SD[e][j];
+            }
+        }
+    }
 
     std::vector<std::string>   interpolations;
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -263,35 +377,128 @@ int main(int argc, char** argv) {
     data_all  sum_amu_W;
     sum_amu_W.resampling = argv[1];
 
-    int count = 0;
+    count = 0;
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
     fit_info.restore_default();
     std::string namefit;
 
-    std::vector<int> iWs = { 0,1,2,3,5 };
-    for (int iW :iWs) {
-        for (int ie = 0;ie < 13;ie++) {
+    std::vector<int> iWs = { 0,1,2,3,5,6,7,8,9,10, 11, 12, 13, 14 }; // only 4 missing = fulltree
+    for (int iW : iWs) {
+        for (int ie = 0;ie < 14;ie++) {
 
             std::vector<int> fi_list;
             if (ie < 7)
-                fi_list = { 0,1,2,3,4,5,6 };
-            else
-                fi_list = { 7,8,9 };
+                fi_list = { 0,1,2,3,4,5,6,   10,11,12,13,14,15 };
+            else if (ie > 7 && ie < 13) // only one regularization
+                fi_list = { 7,8,9, 16,17 };
+            else if (ie > 12) // with FVE
+                fi_list = { 0,1,2,3,4,5,6,   10,11,12,13,14,15 };
+
 
             for (int fi : fi_list) {
 
                 namefit = "amu";
 
                 switch (iW) {
-                case 0: namefit = namefit + "_SD"; break;
-                case 1: namefit = namefit + "_W"; break;
-                case 2: namefit = namefit + "_LD"; break;
-                case 3: namefit = namefit + "_full"; break;
-                case 4: namefit = namefit + "_fulltree"; break;
-                case 5: namefit = namefit + "_SDpWpLD"; break;
-                default: break;
+                case 0:
+                    namefit = namefit + "_SD";
+                    fit_info.corr_id = { 183, 184 };
+                    break;
+                case 1:
+                    namefit = namefit + "_W";
+                    fit_info.corr_id = { 185, 186 };
+                    break;
+                case 2:
+                    namefit = namefit + "_LD";
+                    fit_info.corr_id = { 207, 208 };//LD
+                    break;
+                case 3:
+                    namefit = namefit + "_full";
+                    fit_info.corr_id = { 209, 210 }; //<- MDs, in you want  JPsi then { 156, 161 };  
+                    break;
+                case 4:
+                    namefit = namefit + "_fulltree";
+                    printf(" analysis not done in gm2_analysis.cpp"); exit(1);
+                    fit_info.corr_id = { 181, 182 };
+                    break;
+                case 5:
+                    namefit = namefit + "_SDpWpLD";
+                    fit_info.corr_id = { 183, 184, 185, 186,  207, 208 };
+                    break;
+                case 6:
+                    namefit = namefit + "_SDtmin0";
+                    fit_info.corr_id = { 221, 222 }; // SD tmin 0
+                    break;
+                case 7:
+                    namefit = namefit + "_SDtmin1";
+                    fit_info.corr_id = { 223, 224 }; // SD tmin 1
+                    break;
+                case 8:
+                    namefit = namefit + "_SDtmin2";
+                    fit_info.corr_id = { 225, 226 }; // SD tmin 2
+                    break;
+                case 9:
+                    namefit = namefit + "_SDtmin3";
+                    fit_info.corr_id = { 227, 228 }; // SD tmin 3
+                    break;
+                case 10:
+                    namefit = namefit + "_SDtmin4";
+                    fit_info.corr_id = { 229, 230 }; // SD tmin 4
+                    break;
+                    //////////////////  corrected
+                case 11:
+                    namefit = namefit + "_SDcor";
+                    fit_info.corr_id = { id_SD_cor[0], id_SD_cor[1] };
+                    break;
+                case 12:
+                    namefit = namefit + "_Wcor";
+                    fit_info.corr_id = { id_W_cor[0], id_W_cor[1] };
+                    break;
+                case 13:
+                    namefit = namefit + "_LDcor";
+                    fit_info.corr_id = { id_LD_cor[0], id_LD_cor[1] };
+                    break;
+                case 14:
+                    namefit = namefit + "_SDpWpLDcor";
+                    fit_info.corr_id = { id_SD_cor[0], id_SD_cor[1],id_W_cor[0], id_W_cor[1], id_LD_cor[0], id_LD_cor[1] };
+                    break;
+                    // case 15:
+                    //     namefit = namefit + "_SDtmin0cor";
+                    //     fit_info.corr_id = { id_SDtmin0_cor[0], id_SDtmin0_cor[1] }; // SD tmin 0
+                    //     break;
+                    // case 16:
+                    //     namefit = namefit + "_SDtmin1cor";
+                    //     fit_info.corr_id = { id_SDtmin1_cor[0], id_SDtmin1_cor[1] };
+                    //     break;
+                    // case 17:
+                    //     namefit = namefit + "_SDtmin2cor";
+                    //     fit_info.corr_id = { id_SDtmin2_cor[0], id_SDtmin2_cor[1] };
+                    //     break;
+                    // case 18:
+                    //     namefit = namefit + "_SDtmin3cor";
+                    //     fit_info.corr_id = { id_SDtmin3_cor[0], id_SDtmin3_cor[1] };
+                    //     break;
+                    // case 19:
+                    //     namefit = namefit + "_SDtmin4cor";
+                    //     fit_info.corr_id = { id_SDtmin4_cor[0], id_SDtmin4_cor[1] };
+                    //     break;
+                default:
+                    break;
                 }
+
+                // if fititng only the TM we need to put the id only in the even slots so that 
+                // the function lhs_sum sum them when n=0
+                if (ie == 8 || ie == 10 || ie == 12) {
+                    for (int i = 0;i < fit_info.corr_id.size() / 2;i++)
+                        fit_info.corr_id[i * 2] = fit_info.corr_id[i * 2 + 1];
+                }
+
+               double (*lhs_fun)(int, int, int, data_all, struct fit_type);
+                if (iW >= 0 && iW < 5) lhs_fun = lhs_amu;
+                else if (iW == 5 || iW == 14) lhs_fun = lhs_sum;
+                else lhs_fun = lhs_amu;
+
 
                 switch (ie) {
                 case 0:
@@ -353,6 +560,11 @@ int main(int argc, char** argv) {
                     namefit = namefit + "_3b_noC_onlyTM";
                     fit_info.Nxen = { {  B72_64 ,D54, E112} };
                     break;
+                case 13:
+                    namefit = namefit + "_3b_BOS_BTM_FVE";
+                    fit_info.Nxen = { { B72_64, B72_96, C06, C112 ,D54, E112},
+                                      { B72_64, B72_96, C06, C112, D54, E112} };
+                    break;
                 default:
                     break;
                 }
@@ -410,51 +622,50 @@ int main(int argc, char** argv) {
                     fit_info.Npar = 3;
                     fit_info.function = rhs_amu_alog_onlyOSTM;
                     break;
-
-
-
+                case 10:
+                    namefit = namefit + "_alog2OS";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_alog2OS_common;
+                    break;
+                case 11:
+                    namefit = namefit + "_alog2TM";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_alog2TM_common;
+                    break;
+                case 12:
+                    namefit = namefit + "_alog2OS_alog2TM";
+                    fit_info.Npar = 5;
+                    fit_info.function = rhs_amu_alog2OS_alog2TM_common;
+                    break;
+                case 13:
+                    namefit = namefit + "_alog3OS";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_alog3OS_common;
+                    break;
+                case 14:
+                    namefit = namefit + "_alog3TM";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_alog3TM_common;
+                    break;
+                case 15:
+                    namefit = namefit + "_alog3OS_alog3TM";
+                    fit_info.Npar = 5;
+                    fit_info.function = rhs_amu_alog3OS_alog3TM_common;
+                    break;
+                case 16:
+                    namefit = namefit + "_alog2";
+                    fit_info.Npar = 3;
+                    fit_info.function = rhs_amu_alog2_onlyOSTM;
+                    break;
+                case 17:
+                    namefit = namefit + "_alog3";
+                    fit_info.Npar = 3;
+                    fit_info.function = rhs_amu_alog3_onlyOSTM;
+                    break;
                 default:
                     break;
                 }
 
-                switch (iW) {
-                case 0:
-                    fit_info.corr_id = { 183, 184 };
-                    break;
-                case 1:
-                    fit_info.corr_id = { 185, 186 };
-                    break;
-                case 2:
-                    fit_info.corr_id = { 207, 208 };//LD
-                    break;
-                case 3:
-                    fit_info.corr_id = { 209, 210 }; //<- MDs, in you want  JPsi then { 156, 161 };  
-                    break;
-                case 4:
-                    printf(" analysis not done in gm2_analysis.cpp"); exit(1);
-                    fit_info.corr_id = { 181, 182 };
-                    break;
-                case 5:
-                    fit_info.corr_id = { 183, 184, 185, 186,  207, 208  };
-                    break;
-                default: break;
-                }
-
-                // if (ie == 7 || ie == 9 || ie == 11) {// it is already like this
-                //     for (int i = 0;i < fit_info.corr_id.size() / 2;i++)
-                //         fit_info.corr_id[i * 2] = fit_info.corr_id[i * 2];
-                // }
-                // if fititng only the TM we need to put the id only in the even slots so that 
-                // the function lhs_sum sum them when n=0
-                if (ie == 8 || ie == 10 || ie == 12) {
-                    for (int i = 0;i < fit_info.corr_id.size() / 2;i++)
-                        fit_info.corr_id[i * 2] = fit_info.corr_id[i * 2 + 1];
-                }
-
-
-                double (*lhs_fun)(int, int, int, data_all, struct fit_type);
-                if (iW >= 0 && iW < 5) lhs_fun = lhs_amu;
-                else lhs_fun = lhs_sum;
 
 
 
@@ -490,7 +701,7 @@ int main(int argc, char** argv) {
                 // fit_info.guess_per_jack=5;
                 // fit_info.repeat_start=5;
                 fit_info.verbosity = 0;
-                fit_info.compute_cov_fit(argv, jackall, lhs_fun);
+                fit_info.compute_cov_fit(argv, jackextra, lhs_fun);
                 int ide = 0, ide1 = 0;
                 for (int n = 0;n < fit_info.Nxen.size();n++) {
                     for (int e : fit_info.Nxen[n]) {
@@ -505,14 +716,14 @@ int main(int argc, char** argv) {
                     }
                 }
                 fit_info.compute_cov1_fit();
-                fit_result amu_SD_l_common_a4 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
+                fit_result amu_SD_l_common_a4 = fit_all_data(argv, jackextra, lhs_fun, fit_info, namefit.c_str());
                 fit_info.band_range = { 0,0.0081 };
                 std::vector<double> xcont = { 0, 0 /*Delta*/, 0, 0,/*l, a,m*/ fit_info.x[4][0][Njack - 1],
                      fit_info.x[5][0][Njack - 1] , fit_info.x[6][0][Njack - 1], fit_info.x[7][0][Njack - 1] };
 
 
                 //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
-                print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0002, xcont);
+                print_fit_band(argv, jackextra, fit_info, fit_info, namefit.c_str(), "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0002, xcont);
 
                 free_fit_result(fit_info, amu_SD_l_common_a4);
             }

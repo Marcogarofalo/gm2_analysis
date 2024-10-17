@@ -3092,8 +3092,8 @@ int main(int argc, char** argv) {
         //////////////////////////////////////////////////////////////
         // SD tmin s
         //////////////////////////////////////////////////////////////
-        char name_sd[NAMESIZE];
         int_scheme = integrate_simpson38;
+        char name_sd[NAMESIZE];
         mysprintf(name_sd, NAMESIZE, "amu_sdtmin%d_eq_s1", tmin);
         isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? var + 3 + 1 * 2 : -1;
         double* amu_sdeq_simp_s = compute_amu_sd(conf_jack, 2 + 6, Njack, ZVs.P[0], a, q2s, int_scheme, outfile, name_sd, resampling, isub, tmin);
@@ -3166,10 +3166,66 @@ int main(int argc, char** argv) {
         mysprintf(name_sd, NAMESIZE, "tmin_ref%d", tmin);
         fprintf(outfile, "\n\n #%s fit in [%d,%d] chi2=%.5g  %.5g\n", name_sd, 0, T / 2, 0.0, 0.0);
         fprintf(outfile, "   %.15g   %15.g\n", tmin_ref[tmin][Njack - 1], 0.0);
+    }
+
+    //////////////////////////////////////////////////////////////
+    // tmin SD charm
+    //////////////////////////////////////////////////////////////
+    double*** amu_eq_sdtmin_c = (double***)malloc(sizeof(double**) * 2);
+    amu_eq_sdtmin_c[0] = (double**)malloc(sizeof(double*) * ntmin);
+    amu_eq_sdtmin_c[1] = (double**)malloc(sizeof(double*) * ntmin);
+
+    for (int tmin = 0; tmin < ntmin;tmin++) {
+
+        for (int tm = 0; tm < name_eqop.size(); tm++) {// eq op
+            double* Z;
+            if (tm == 0) Z = ZV;
+            if (tm == 1) Z = ZA;
+            for (int intgr = 1; intgr < name_intgr.size(); intgr++) {// integrators
+                if (intgr == 0)      int_scheme = integrate_reinman;
+                else if (intgr == 1) int_scheme = integrate_simpson38;
+                else exit(-1);
+
+                double** asdc_vec = (double**)malloc(sizeof(double*) * Ncharm);
+                char name_sd[NAMESIZE];
+                for (int ic = 0;ic < Ncharm;ic++) {
+                    // mysprintf(name_corr, NAMESIZE, "amu_{sd,%s}(%s,c%d)", name_intgr[intgr].c_str(), name_eqop[tm].c_str(), ic);
+                    mysprintf(name_sd, NAMESIZE, "amu_sdtmin%d_%s_c%d", tmin, name_eqop[tm].c_str(), ic);
+                    isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? id_eqop[tm + ic * 2] : -1;
+                    asdc_vec[ic] = compute_amu_sd(conf_jack, 2 + 6 * (3 + ic) + 3 * tm, Njack, Z, a, q2c, int_scheme, outfile, name_sd, resampling, isub, tmin);
+                    
+                    // write_jack(asdc_vec[ic], Njack, jack_file);
+                    // check_correlatro_counter(73 + ic + intgr * (Ncharm + name_M.size()) + tm * (Ncharm + name_M.size()) * name_intgr.size());
+                    printf("%s = %g  %g\n", name_sd, asdc_vec[ic][Njack - 1], error_jackboot(resampling, Njack, asdc_vec[ic]));
+                }
+                mysprintf(name_sd, NAMESIZE, "amu_sdtmin%d_%s_MDs", tmin, name_eqop[tm].c_str() );
+                amu_eq_sdtmin_c[tm][tmin] = interpol_Z(Ncharm_inter, Njack, mc, asdc_vec, phys_mc, outfile, name_sd, resampling);
+
+
+               
+                free_2(Ncharm, asdc_vec);
+            }
+        }
+    }
+
+    for (int tmin = 0; tmin < tmin_max;tmin++) {
+        // tmin_ref[tmin] = myres->create_fake(dt + tmin * dt / 2, 1e-12, 1);
+        char name_sd[NAMESIZE];
+
+        mysprintf(name_sd, NAMESIZE, "amu_sdtminref%d_eq_MDs", tmin);
+        amu_eq_sdtmin_inter[tmin] = interpol_Z(ntmin, Njack, tmins, amu_eq_sdtmin_c[0], tmin_ref[tmin], outfile, name_sd, resampling);
+        printf("amu_sd(eq,MDs, tmin=%g)  = %g  %g\n", tmin_ref[tmin][Njack - 1], amu_eq_sdtmin_inter[tmin][Njack - 1], error_jackboot(resampling, Njack, amu_eq_sdtmin_inter[tmin]));
+        write_jack(amu_eq_sdtmin_inter[tmin], Njack, jack_file);
+        check_correlatro_counter(221 + tmin * 2);
+
+        mysprintf(name_sd, NAMESIZE, "amu_sdtminref%d_op_MDs", tmin);
+        amu_op_sdtmin_inter[tmin] = interpol_Z(ntmin, Njack, tmins, amu_eq_sdtmin_c[1], tmin_ref[tmin], outfile, name_sd, resampling);
+        printf("amu_sd(op,MDs, tmin=%g)  = %g  %g\n", tmin_ref[tmin][Njack - 1], amu_op_sdtmin_inter[tmin][Njack - 1], error_jackboot(resampling, Njack, amu_op_sdtmin_inter[tmin]));
+        write_jack(amu_op_sdtmin_inter[tmin], Njack, jack_file);
+        check_correlatro_counter(222 + tmin * 2);
 
 
     }
-
 
     fprintf(outfile, " \n\n");
     fprintf(outfile, "#\n");
