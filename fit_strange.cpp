@@ -386,16 +386,17 @@ int main(int argc, char** argv) {
     std::string namefit;
 
 
-    for (int iW = 0;iW < 15;iW++) {
+    for (int iW = 0;iW < 16;iW++) {
         for (int ie = 0;ie < 14;ie++) {
 
             std::vector<int> fi_list;
             if (ie < 7)
                 fi_list = { 0,1,2,3,4,5,6,   10,11,12,13,14,15 };
-            else if (ie > 7 && ie < 13) // only one regularization
+            else if (ie >= 7 && ie < 13) // only one regularization
                 fi_list = { 7,8,9, 16,17 };
             else if (ie > 12) // with FVE
                 fi_list = { 0,1,2,3,4,5,6,   10,11,12,13,14,15 };
+
 
 
             for (int fi : fi_list) {
@@ -463,6 +464,10 @@ int main(int argc, char** argv) {
                 case 14:
                     namefit = namefit + "_SDpWpLDcor";
                     fit_info.corr_id = { id_SD_cor[0], id_SD_cor[1],id_W_cor[0], id_W_cor[1], id_LD_cor[0], id_LD_cor[1] };
+                    break;
+                case 15:
+                    namefit = namefit + "_Wetas";
+                    fit_info.corr_id = { 48, 51 };
                     break;
                     // case 15:
                     //     namefit = namefit + "_SDtmin0cor";
@@ -700,12 +705,12 @@ int main(int argc, char** argv) {
                 }
 
                 fit_info.linear_fit = true;
-                fit_info.covariancey = true;
                 // fit_info.acc= 1e-6;
                 // fit_info.chi2_gap_jackboot=0.1;
                 // fit_info.guess_per_jack=5;
                 // fit_info.repeat_start=5;
                 fit_info.verbosity = 0;
+                fit_info.covariancey = true;
                 fit_info.compute_cov_fit(argv, jackextra, lhs_fun);
                 int ide = 0, ide1 = 0;
                 for (int n = 0;n < fit_info.Nxen.size();n++) {
@@ -714,9 +719,11 @@ int main(int argc, char** argv) {
                         for (int n1 = 0;n1 < fit_info.Nxen.size();n1++) {
                             for (int e1 : fit_info.Nxen[n1]) {
                                 if (e != e1)   fit_info.cov[ide][ide1] = 0;
+                                // printf("%-12.5g ", fit_info.cov[ide][ide1]);
                                 ide1++;
                             }
                         }
+                        // printf("\n");
                         ide++;
                     }
                 }
@@ -731,6 +738,7 @@ int main(int argc, char** argv) {
                 print_fit_band(argv, jackextra, fit_info, fit_info, namefit.c_str(), "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0002, xcont);
 
                 free_fit_result(fit_info, amu_SD_l_common_a4);
+                // if (namefit.compare())
             }
         }
     }
