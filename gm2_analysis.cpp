@@ -581,6 +581,14 @@ void check_confs_correlated(std::vector<configuration_class> in_confs, std::vect
 
     }
 }
+
+double *resample_value_and_free(double *a, int seed){
+    double *tmp;
+    a = myres->create_fake(tmp[myres->Njack - 1], myres->comp_error(tmp), seed);
+    free(tmp);
+    return(a);
+}
+
 int main(int argc, char** argv) {
     int size;
     int i, j, t;
@@ -1228,7 +1236,6 @@ int main(int argc, char** argv) {
     double* phys_mc = (double*)malloc(sizeof(double) * Njack);// allocate memory 
 
     std::string latt;
-
     if (strcmp("cA.53.24", argv[4]) == 0 || strcmp("cA.40.24", argv[4]) == 0 || strcmp("cA.30.32", argv[4]) == 0) {
         myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_A.txt");
         myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_A.txt");
@@ -1270,10 +1277,19 @@ int main(int argc, char** argv) {
         latt = "E";
     }
     double** ms = (double**)malloc(sizeof(double*) * 2);
-    ms[0] = fake_sampling(resampling, header.mus[1], 1e-10, Njack, 1);
-    ms[1] = fake_sampling(resampling, header.mus[2], 1e-10, Njack, 1);
+    ms[0] = fake_sampling(resampling, header.mus[1], 1e-20, Njack, 1);
+    ms[1] = fake_sampling(resampling, header.mus[2], 1e-20, Njack, 1);
     printf("reading a   =  %g  %g fm\n", a[Njack - 1], myres->comp_error(a));
 
+
+    // resampling everithing 
+    // read the seed
+    // line_read_param(option, "a", mean, err, seed, namefile_plateaux);
+    // a = resample_value_and_free(a, seed);
+    // phys_ml = resample_value_and_free(phys_ml, seed+10);
+    // phys_ms = resample_value_and_free(phys_ms, seed+20);
+    // phys_mc = resample_value_and_free(phys_mc, seed+30);
+    
     // line_read_param(option, "a", mean, err, seed, namefile_plateaux);
     // a = fake_sampling(resampling, mean, err, Njack, seed);
 
@@ -2080,9 +2096,9 @@ int main(int argc, char** argv) {
 
 
     double** mc = (double**)malloc(sizeof(double*) * 3);
-    mc[0] = fake_sampling(resampling, header.mus[3], 1e-10, Njack, 1);
-    mc[1] = fake_sampling(resampling, header.mus[4], 1e-10, Njack, 1);
-    mc[2] = fake_sampling(resampling, header.mus[5], 1e-10, Njack, 1);
+    mc[0] = fake_sampling(resampling, header.mus[3], 1e-20, Njack, 1);
+    mc[1] = fake_sampling(resampling, header.mus[4], 1e-20, Njack, 1);
+    mc[2] = fake_sampling(resampling, header.mus[5], 1e-20, Njack, 1);
 
 
     double* mc_etac = interpol_Z(Ncharm_inter, Njack, Metac_vec, mc, jack_aMetac_MeV_exp, outfile, "mc(etac)", resampling);
@@ -2547,8 +2563,8 @@ int main(int argc, char** argv) {
 
     //////////////////// fit at the MK
     double** vec_ms = (double**)malloc(sizeof(double*) * Nstrange);
-    vec_ms[0] = myres->create_fake(mus1, 1e-10, 1);
-    vec_ms[1] = myres->create_fake(mus2, 1e-10, 1);
+    vec_ms[0] = myres->create_fake(mus1, 1e-20, 1);
+    vec_ms[1] = myres->create_fake(mus2, 1e-20, 1);
 
     afull_vec[0] = amu_fulleq_simp_s;
     afull_vec[1] = amu_fulleq_simp_s1;
@@ -2805,9 +2821,20 @@ int main(int argc, char** argv) {
 
     asd_vec[0] = amu_Weq_simp_s;
     asd_vec[1] = amu_Weq_simp_s1;
-
     amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{W}_(eq,MK)", resampling);
     write_jack(amu_sd_sphys, Njack, jack_file);
+    printf("interpolation Ndata:%d\n", Nstrange);
+    printf("%g    %12g    %12g\n", vec_ms[0][Njack - 1], asd_vec[0][Njack - 1], myres->comp_error(asd_vec[0]));
+    printf("%g    %12g    %12g\n", vec_ms[1][Njack - 1], asd_vec[1][Njack - 1], myres->comp_error(asd_vec[1]));
+    printf("interpolating to %g  \n", phys_ms[Njack - 1]);
+    double** cov_s = myres->comp_cov(Nstrange, asd_vec);
+    for (int i = 0;i < Nstrange;i++) {
+        for (int k = 0;k < Nstrange;k++) {
+            printf("%-12.5g ", cov_s[i][k] / sqrt(cov_s[i][i] * cov_s[k][k]));
+        }
+        printf("\n");
+    }
+
     printf("amu_{W}_(eq,MK) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
     check_correlatro_counter(169);
@@ -2815,9 +2842,9 @@ int main(int argc, char** argv) {
     asd_vec[0] = amu_Wop_simp_s;
     asd_vec[1] = amu_Wop_simp_s1;
 
-    amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{W}_(eq,MK)", resampling);
+    amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{W}_(op,MK)", resampling);
     write_jack(amu_sd_sphys, Njack, jack_file);
-    printf("amu_{W}_(eq,MK) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
+    printf("amu_{W}_(op,MK) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
     check_correlatro_counter(170);
 
@@ -3193,16 +3220,16 @@ int main(int argc, char** argv) {
                     mysprintf(name_sd, NAMESIZE, "amu_sdtmin%d_%s_c%d", tmin, name_eqop[tm].c_str(), ic);
                     isub = (strcmp(argv[argc - 1], "three_corr") == 0) ? id_eqop[tm + ic * 2] : -1;
                     asdc_vec[ic] = compute_amu_sd(conf_jack, 2 + 6 * (3 + ic) + 3 * tm, Njack, Z, a, q2c, int_scheme, outfile, name_sd, resampling, isub, tmin);
-                    
+
                     // write_jack(asdc_vec[ic], Njack, jack_file);
                     // check_correlatro_counter(73 + ic + intgr * (Ncharm + name_M.size()) + tm * (Ncharm + name_M.size()) * name_intgr.size());
                     printf("%s = %g  %g\n", name_sd, asdc_vec[ic][Njack - 1], error_jackboot(resampling, Njack, asdc_vec[ic]));
                 }
-                mysprintf(name_sd, NAMESIZE, "amu_sdtmin%d_%s_MDs", tmin, name_eqop[tm].c_str() );
+                mysprintf(name_sd, NAMESIZE, "amu_sdtmin%d_%s_MDs", tmin, name_eqop[tm].c_str());
                 amu_eq_sdtmin_c[tm][tmin] = interpol_Z(Ncharm_inter, Njack, mc, asdc_vec, phys_mc, outfile, name_sd, resampling);
 
 
-               
+
                 free_2(Ncharm, asdc_vec);
             }
         }
