@@ -265,7 +265,7 @@ int main(int argc, char** argv) {
         // jackall.en[count] = read_single_dataj(f);
         data_single dj;
         dj.header = read_header(f);
-        dj.Nobs = jackall.en[count].Nobs + 1 + 20;
+        dj.Nobs = jackall.en[count].Nobs + 1 + 50;
         dj.Njack = dj.header.Njack;
         dj.jack = double_malloc_2(dj.Nobs, dj.Njack);
 
@@ -296,6 +296,11 @@ int main(int argc, char** argv) {
     std::vector<int> id_SDtmin2 = { 215, 216 };
     std::vector<int> id_SDtmin3 = { 217, 218 };
     std::vector<int> id_SDtmin4 = { 219, 220 };
+    std::vector<int> id_SDeta = { 37, 40 };
+    std::vector<int> id_Weta = { 54, 57 };
+    std::vector<int> id_LDeta = { 232, 233 };
+
+
 
     std::vector<int> id_SD_cor = { obs + 1, obs + 2 };
     std::vector<int> id_W_cor = { obs + 3, obs + 4 };
@@ -307,6 +312,9 @@ int main(int argc, char** argv) {
     std::vector<int> id_SDtmin2_cor = { obs + 15, obs + 16 };
     std::vector<int> id_SDtmin3_cor = { obs + 17, obs + 18 };
     std::vector<int> id_SDtmin4_cor = { obs + 19, obs + 20 };
+    std::vector<int> id_SDeta_cor = { obs + 21, obs + 22 };
+    std::vector<int> id_Weta_cor = { obs + 23, obs + 24 };
+    std::vector<int> id_LDeta_cor = { obs + 25, obs + 26 };
 
 
     std::vector<int> ensemble_to_correct = { B72_64, B72_96, C06, C112 ,D54, E112 };
@@ -361,6 +369,10 @@ int main(int argc, char** argv) {
                 jackextra.en[e].jack[id_W_cor[tm]][j] = jackextra.en[e].jack[id_W[tm]][j] + damu_W[e][j];
                 jackextra.en[e].jack[id_LD_cor[tm]][j] = jackextra.en[e].jack[id_LD[tm]][j] + damu_LD[e][j];
 
+                jackextra.en[e].jack[id_SDeta_cor[tm]][j] = jackextra.en[e].jack[id_SDeta[tm]][j] + damu_SD[e][j];
+                jackextra.en[e].jack[id_Weta_cor[tm]][j] = jackextra.en[e].jack[id_Weta[tm]][j] + damu_W[e][j];
+                jackextra.en[e].jack[id_LDeta_cor[tm]][j] = jackextra.en[e].jack[id_LDeta[tm]][j] + damu_LD[e][j];
+
                 // jackextra.en[e].jack[id_SDtmin0_cor[tm]][j] = jackextra.en[e].jack[id_SDtmin0[tm]][j] + damu_SD[e][j];
             }
         }
@@ -386,7 +398,7 @@ int main(int argc, char** argv) {
     std::string namefit;
 
 
-    for (int iW = 0;iW < 16;iW++) {
+    for (int iW = 0;iW < 19;iW++) {
         for (int ie = 0;ie < 14;ie++) {
 
             std::vector<int> fi_list;
@@ -466,8 +478,20 @@ int main(int argc, char** argv) {
                     fit_info.corr_id = { id_SD_cor[0], id_SD_cor[1],id_W_cor[0], id_W_cor[1], id_LD_cor[0], id_LD_cor[1] };
                     break;
                 case 15:
+                    namefit = namefit + "_SDetas";
+                    fit_info.corr_id = { id_SDeta_cor[0], id_SDeta_cor[1] };
+                    break;
+                case 16:
                     namefit = namefit + "_Wetas";
-                    fit_info.corr_id = { 48, 51 };
+                    fit_info.corr_id = { id_Weta_cor[0], id_Weta_cor[1] };
+                    break;
+                case 17:
+                    namefit = namefit + "_LDetas";
+                    fit_info.corr_id = { id_LDeta_cor[0], id_LDeta_cor[1] };
+                    break;
+                case 18:
+                    namefit = namefit + "_SDpWpLDetas";
+                    fit_info.corr_id = { id_SDeta_cor[0], id_SDeta_cor[1],id_Weta_cor[0], id_Weta_cor[1], id_LDeta_cor[0], id_LDeta_cor[1] };
                     break;
                     // case 15:
                     //     namefit = namefit + "_SDtmin0cor";
@@ -492,10 +516,7 @@ int main(int argc, char** argv) {
                 default: break;
                 }
 
-                // if (ie == 7 || ie == 9 || ie == 11) {// it is already like this
-                //     for (int i = 0;i < fit_info.corr_id.size() / 2;i++)
-                //         fit_info.corr_id[i * 2] = fit_info.corr_id[i * 2];
-                // }
+                
                 // if fititng only the TM we need to put the id only in the even slots so that 
                 // the function lhs_sum sum them when n=0
                 if (ie == 8 || ie == 10 || ie == 12) {
@@ -503,10 +524,9 @@ int main(int argc, char** argv) {
                         fit_info.corr_id[i * 2] = fit_info.corr_id[i * 2 + 1];
                 }
 
-
+                // if fitting the sum SD+W+LD we need to select lhs function to sum
                 double (*lhs_fun)(int, int, int, data_all, struct fit_type);
-                if (iW >= 0 && iW < 5) lhs_fun = lhs_amu;
-                else if (iW == 5 || iW == 14) lhs_fun = lhs_sum;
+                if (iW == 5 || iW == 14 || iW == 18) lhs_fun = lhs_sum;
                 else lhs_fun = lhs_amu;
 
 

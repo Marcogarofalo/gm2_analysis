@@ -38,9 +38,13 @@
 
 // equal=OS
 // opposite=TM
+// BMW
+// constexpr double Metas_MeV = 689.89;
+// constexpr double Metas_MeV_err = 0.49;
+// ETMC
+constexpr double Metas_MeV = 689.5;
+constexpr double Metas_MeV_err = 1.1;
 
-constexpr double Metas_MeV = 689.89;
-constexpr double Metas_MeV_err = 0.49;
 
 constexpr double Mphi_MeV = 1019.461;
 constexpr double Mphi_MeV_err = 0.016;
@@ -582,8 +586,8 @@ void check_confs_correlated(std::vector<configuration_class> in_confs, std::vect
     }
 }
 
-double *resample_value_and_free(double *a, int seed){
-    double *tmp;
+double* resample_value_and_free(double* a, int seed) {
+    double* tmp;
     a = myres->create_fake(tmp[myres->Njack - 1], myres->comp_error(tmp), seed);
     free(tmp);
     return(a);
@@ -1289,7 +1293,7 @@ int main(int argc, char** argv) {
     // phys_ml = resample_value_and_free(phys_ml, seed+10);
     // phys_ms = resample_value_and_free(phys_ms, seed+20);
     // phys_mc = resample_value_and_free(phys_mc, seed+30);
-    
+
     // line_read_param(option, "a", mean, err, seed, namefile_plateaux);
     // a = fake_sampling(resampling, mean, err, Njack, seed);
 
@@ -3276,6 +3280,31 @@ int main(int argc, char** argv) {
     fprintf(outfile, "\n\n #dt fit in [%d,%d] chi2=%.5g  %.5g\n", 0, T / 2, 0.0, 0.0);
     fprintf(outfile, "   %.15g   %15.g\n", dt, 0.0);
 
+    double* Meta_phys = interpol_Z(Nstrange, Njack, vec_ms, Meta, phys_ms, outfile, "Meta_phys_TM", resampling);
+    write_jack(Meta_phys, Njack, jack_file);
+    check_correlatro_counter(231);
+
+    //////////////////////////////////////////////////////////////
+    // interpol LDeta s
+    //////////////////////////////////////////////////////////////
+
+    asd_vec[0] = amu_LDeq_simp_s;
+    asd_vec[1] = amu_LDeq_simp_s1;
+
+    amu_sd_sphys = interpol_Z(Nstrange, Njack, Meta, asd_vec, jack_aMetas_MeV_exp, outfile, "amu_{LD}_(eq,Meta)", resampling);
+    write_jack(amu_sd_sphys, Njack, jack_file);
+    printf("amu_{LD}_(eq,MK) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
+    free(amu_sd_sphys);
+    check_correlatro_counter(232);
+
+    asd_vec[0] = amu_LDop_simp_s;
+    asd_vec[1] = amu_LDop_simp_s1;
+
+    amu_sd_sphys = interpol_Z(Nstrange, Njack, Meta, asd_vec, jack_aMetas_MeV_exp, outfile, "amu_{LD}_(eq,Meta)", resampling);
+    write_jack(amu_sd_sphys, Njack, jack_file);
+    printf("amu_{LD}_(eq,MK) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
+    free(amu_sd_sphys);
+    check_correlatro_counter(233);
 
 
 
