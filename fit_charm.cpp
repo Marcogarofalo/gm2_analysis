@@ -337,9 +337,9 @@ int main(int argc, char** argv) {
             myres->sub(damu_LD[e], damu_LD[e], damu_SD[e]);
         }
         else if (e == E112) {
-            damu_SD[e] = myres->create_fake(0.00670547 * scale, 0.00604982 * scale, 2000 + D54);
-            damu_W[e] = myres->create_fake(0.00501327 * scale, 0.00338483 * scale, 2000 + D54 + files.size());
-            damu_LD[e] = myres->create_fake(0.0117678 * scale, 0.00938253 * scale, 2000 + D54 + 2 * files.size()); // FULl HVP and then subtract
+            damu_SD[e] = myres->create_fake(0.00670547 * scale, 0.00604982 * scale, 2000 + E112);
+            damu_W[e] = myres->create_fake(0.00501327 * scale, 0.00338483 * scale, 2000 + E112 + files.size());
+            damu_LD[e] = myres->create_fake(0.0117678 * scale, 0.00938253 * scale, 2000 + E112 + 2 * files.size()); // FULl HVP and then subtract
             myres->sub(damu_LD[e], damu_LD[e], damu_W[e]);
             myres->sub(damu_LD[e], damu_LD[e], damu_SD[e]);
         }
