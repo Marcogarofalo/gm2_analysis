@@ -390,7 +390,7 @@ int main(int argc, char** argv) {
             std::vector<int> fi_list;
             if (ie < 7)
                 fi_list = { 0,1,2,3,4,5,6,   10,11,12,13,14,15 };
-            else if (ie > 7 && ie < 13) // only one regularization
+            else if (ie >= 7 && ie < 13) // only one regularization
                 fi_list = { 7,8,9, 16,17 };
             else if (ie > 12) // with FVE
                 fi_list = { 0,1,2,3,4,5,6,   10,11,12,13,14,15 };
