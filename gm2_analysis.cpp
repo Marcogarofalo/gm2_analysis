@@ -1240,46 +1240,48 @@ int main(int argc, char** argv) {
     double* phys_mc = (double*)malloc(sizeof(double) * Njack);// allocate memory 
 
     std::string latt;
-    if (strcmp("cA.53.24", argv[4]) == 0 || strcmp("cA.40.24", argv[4]) == 0 || strcmp("cA.30.32", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_A.txt");
-        myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_A.txt");
-        // myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_A.txt");
-        double* tmp = myres->create_fake(0.020, 0.005, 123456789); // this is a fake value
-        myres->copy(phys_ms, tmp);
-        free(tmp);
-        tmp = myres->create_fake(0.20, 0.005, 123456789); // this is a fake value
-        myres->copy(phys_mc, tmp);
-        free(tmp);
-        latt = "A";
-    }
-    else if (strcmp("cB.72.64", argv[4]) == 0 || strcmp("cB.72.96", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_B.txt");
-        myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_B.txt");
-        myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_B.txt");
-        myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_B.txt");
-        latt = "B";
-    }
-    else if (strcmp("cC.06.80", argv[4]) == 0 || strcmp("cC.06.112", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_C.txt");
-        myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_C.txt");
-        myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_C.txt");
-        myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_C.txt");
-        latt = "C";
-    }
-    else if (strcmp("cD.54.96", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_D.txt");
-        myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_D.txt");
-        myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_D.txt");
-        myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_D.txt");
-        latt = "D";
-    }
-    else if (strcmp("cE.44.112", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_E.txt");
-        myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_E.txt");
-        myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_E.txt");
-        myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_E.txt");
-        latt = "E";
-    }
+    set_a_ml_ms_mc(argv[4], a, phys_ml, phys_ms, phys_mc, latt);
+
+    // if (strcmp("cA.53.24", argv[4]) == 0 || strcmp("cA.40.24", argv[4]) == 0 || strcmp("cA.30.32", argv[4]) == 0) {
+    //     myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_A.txt");
+    //     myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_A.txt");
+    //     // myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_A.txt");
+    //     double* tmp = myres->create_fake(0.020, 0.005, 123456789); // this is a fake value
+    //     myres->copy(phys_ms, tmp);
+    //     free(tmp);
+    //     tmp = myres->create_fake(0.20, 0.005, 123456789); // this is a fake value
+    //     myres->copy(phys_mc, tmp);
+    //     free(tmp);
+    //     latt = "A";
+    // }
+    // else if (strcmp("cB.72.64", argv[4]) == 0 || strcmp("cB.72.96", argv[4]) == 0) {
+    //     myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_B.txt");
+    //     myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_B.txt");
+    //     myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_B.txt");
+    //     myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_B.txt");
+    //     latt = "B";
+    // }
+    // else if (strcmp("cC.06.80", argv[4]) == 0 || strcmp("cC.06.112", argv[4]) == 0) {
+    //     myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_C.txt");
+    //     myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_C.txt");
+    //     myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_C.txt");
+    //     myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_C.txt");
+    //     latt = "C";
+    // }
+    // else if (strcmp("cD.54.96", argv[4]) == 0) {
+    //     myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_D.txt");
+    //     myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_D.txt");
+    //     myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_D.txt");
+    //     myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_D.txt");
+    //     latt = "D";
+    // }
+    // else if (strcmp("cE.44.112", argv[4]) == 0) {
+    //     myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_E.txt");
+    //     myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_E.txt");
+    //     myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_E.txt");
+    //     myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_E.txt");
+    //     latt = "E";
+    // }
     double** ms = (double**)malloc(sizeof(double*) * 2);
     ms[0] = fake_sampling(resampling, header.mus[1], 1e-20, Njack, 1);
     ms[1] = fake_sampling(resampling, header.mus[2], 1e-20, Njack, 1);

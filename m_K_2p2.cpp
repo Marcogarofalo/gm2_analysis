@@ -832,33 +832,10 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     double* a = (double*)malloc(sizeof(double) * Njack);// allocate memory 
     double* ml = (double*)malloc(sizeof(double) * Njack);// allocate memory 
+    double* phys_ms = (double*)malloc(sizeof(double) * Njack);// allocate memory 
+    double* phys_mc = (double*)malloc(sizeof(double) * Njack);// allocate memory 
     std::string latt;
-
-    if (strcmp("cA.53.24", argv[4]) == 0 || strcmp("cA.40.24", argv[4]) == 0 || strcmp("cA.30.32", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_A.txt");
-        myres->read_jack_from_file(ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_A.txt");
-        latt = "A";
-    }
-    else if (strcmp("cB.72.64", argv[4]) == 0 || strcmp("cB.72.96", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_B.txt");
-        myres->read_jack_from_file(ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_B.txt");
-        latt = "B";
-    }
-    else if (strcmp("cC.06.80", argv[4]) == 0 || strcmp("cC.06.112", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_C.txt");
-        myres->read_jack_from_file(ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_C.txt");
-        latt = "C";
-    }
-    else if (strcmp("cD.54.96", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_D.txt");
-        myres->read_jack_from_file(ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_D.txt");
-        latt = "D";
-    }
-    else if (strcmp("cE.44.112", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_E.txt");
-        myres->read_jack_from_file(ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_E.txt");
-        latt = "E";
-    }
+    set_a_ml_ms_mc(argv[4], a, ml, phys_ms, phys_mc, latt);
     corr_counter = -1;
     write_jack(a, Njack, jack_file);
 

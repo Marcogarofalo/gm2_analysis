@@ -808,29 +808,17 @@ int main(int argc, char** argv) {
     // read lattice spacing
     //////////////////////////////////////////////////////////////
     double* a = (double*)malloc(sizeof(double) * Njack);// allocate memory 
-
-    if (strcmp("cA.53.24", argv[4]) == 0 || strcmp("cA.40.24", argv[4]) == 0 || strcmp("cA.30.32", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_A.txt");
-
-    }
-    else if (strcmp("cB.72.64", argv[4]) == 0 || strcmp("cB.72.96", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_B.txt");
-    }
-    else if (strcmp("cC.06.80", argv[4]) == 0 || strcmp("cC.06.112", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_C.txt");
-    }
-    else if (strcmp("cD.54.96", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_D.txt");
-    }
-    else if (strcmp("cE.44.112", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_E.txt");
-    }
+    double* ml = (double*)malloc(sizeof(double) * Njack);// allocate memory 
+    double* phys_ms = (double*)malloc(sizeof(double) * Njack);// allocate memory 
+    double* phys_mc = (double*)malloc(sizeof(double) * Njack);// allocate memory 
+    std::string latt;
+    set_a_ml_ms_mc(argv[4], a, ml, phys_ms, phys_mc, latt);
     corr_counter = -1;
     write_jack(a, Njack, jack_file);
 
     double* ms = (double*)malloc(sizeof(double) * Njack);// allocate memory 
     char namefile_ms[NAMESIZE];
-    mysprintf(namefile_ms, NAMESIZE, "/home/garofalo/analysis/g-2_new_stat/out/%s_ms",  argv[4]);
+    mysprintf(namefile_ms, NAMESIZE, "/home/garofalo/analysis/g-2_new_stat/out/%s_ms", argv[4]);
     myres->read_jack_from_file(ms, namefile_ms);
 
     check_correlatro_counter(0);
@@ -889,7 +877,7 @@ int main(int argc, char** argv) {
     write_jack(mc_MDs, Njack, jack_file);
     check_correlatro_counter(7);
 
-    
+
 
 
     //////////////////////

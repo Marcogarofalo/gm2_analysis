@@ -2908,7 +2908,7 @@ double rhs_amu_alog3OS_alog3TM_common(int n, int Nvar, double* x, int Npar, doub
 }
 
 
-void set_a_ml_ms_mc(char *argv_i, double *a, double *phys_ml, double *phys_ms, double *phys_mc){
+void set_a_ml_ms_mc(char *argv_i, double *a, double *phys_ml, double *phys_ms, double *phys_mc, std::string &latt){
     if (strcmp("cA.53.24", argv_i) == 0 || strcmp("cA.40.24", argv_i) == 0 || strcmp("cA.30.32", argv_i) == 0) {
         myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_A.txt");
         myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_A.txt");

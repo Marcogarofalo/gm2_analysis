@@ -804,26 +804,16 @@ int main(int argc, char** argv) {
 
     // ////////////////// symmetrization/////////////////////////////////////////////
     for (int i = 0;i < ncorr_new;i++) { symmetrise_jackboot(Njack, i, file_head.l0, conf_jack); }
-    corr_counter =-1;
+    corr_counter = -1;
     //////////////////////////////////////////////////////////////
     // read lattice spacing
     //////////////////////////////////////////////////////////////
     double* a = (double*)malloc(sizeof(double) * Njack);// allocate memory 
-    if (strcmp("cA.53.24", argv[4]) == 0 || strcmp("cA.40.24", argv[4]) == 0 || strcmp("cA.30.32", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_A.txt");
-    }
-    else if (strcmp("cB.72.64", argv[4]) == 0 || strcmp("cB.72.96", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_B.txt");
-    }
-    else if (strcmp("cC.06.80", argv[4]) == 0 || strcmp("cC.06.112", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_C.txt");
-    }
-    else if (strcmp("cD.54.96", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_D.txt");
-    }
-    else if (strcmp("cE.44.112", argv[4]) == 0) {
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_E.txt");
-    }
+    double* ml = (double*)malloc(sizeof(double) * Njack);// allocate memory 
+    double* phys_ms = (double*)malloc(sizeof(double) * Njack);// allocate memory 
+    double* phys_mc = (double*)malloc(sizeof(double) * Njack);// allocate memory 
+    std::string latt;
+    set_a_ml_ms_mc(argv[4], a, ml, phys_ms, phys_mc, latt);
 
 
     corr_counter = -1;
@@ -857,7 +847,7 @@ int main(int argc, char** argv) {
 
     double* jack_MDs_Mev = myres->create_fake(MDs_MeV, MDs_MeV_err, 1);
     double* jack_aMDs_exp = myres->create_copy(jack_MDs_Mev);
-    myres->mult(jack_aMDs_exp, jack_aMDs_exp, a );
+    myres->mult(jack_aMDs_exp, jack_aMDs_exp, a);
     myres->div(jack_aMDs_exp, jack_aMDs_exp, hbarc);
 
     double* mc_MDs = interpol_Z(string_muc.size(), Njack, MDs, mc, jack_aMDs_exp, outfile, "mc(MDs)", resampling);
