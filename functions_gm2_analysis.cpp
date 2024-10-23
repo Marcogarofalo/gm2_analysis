@@ -2500,6 +2500,41 @@ double lhs_afpi_max_twist(int n, int e, int j, data_all gjack, struct fit_type f
     return r;
 }
 
+double lhs_afpi_max_twist_remove_FVE(int n, int e, int j, data_all gjack, struct fit_type fit_info, struct fit_result fit_out) {
+    double r;
+    r = gjack.en[e].jack[fit_info.corr_id[n]][j];
+    int count = 0;
+    for (int in = 0;in < n;in++) {
+        for (int ie : fit_info.Nxen[in]) {
+            count++;
+        }
+    }
+    for (int ee : fit_info.Nxen[n]) {
+        if (ee == e) {
+            break;
+        }
+        count++;
+    }
+
+    double mu = fit_info.x[0][count][j];
+    double Mpi = fit_info.x[1][count][j];
+    double fpi = fit_info.x[2][count][j];
+    double L = fit_info.x[3][count][j];
+    double xi = fit_info.x[4][count][j];
+    double mpcac_mu = fit_info.x[8][count][j];
+    double ZA = fit_info.x[9][count][j];
+
+    double mr = ZA * mpcac_mu;
+    double cl = sqrt(1 + mr * mr);
+    Mpi /= sqrt(cl);
+    fpi *= cl;
+    xi /= cl * cl * cl;
+    double delta_FVE = FVE_GL_Mpi(L, xi, fpi);
+    r = fpi / (1 + delta_FVE);
+    r /= 1 + fit_out.P[7][j] * xi * exp(-Mpi * L) / pow(Mpi * L, 3.0 / 2.0);
+    return r;
+}
+
 double lhs_Mpi2_over_afpi2_max_twist(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
     double r;
     r = gjack.en[e].jack[fit_info.corr_id[n]][j];
@@ -2870,4 +2905,48 @@ double rhs_amu_alog3OS_alog3TM_common(int n, int Nvar, double* x, int Npar, doub
     if (n == 0)      r = P[0] + a * P[1] + P[3] * a / pow(log(a), 3);
     else if (n == 1) r = P[0] + a * P[2] + P[4] * a / pow(log(a), 3);
     return r;
+}
+
+
+void set_a_ml_ms_mc(char *argv_i, double *a, double *phys_ml, double *phys_ms, double *phys_mc){
+    if (strcmp("cA.53.24", argv_i) == 0 || strcmp("cA.40.24", argv_i) == 0 || strcmp("cA.30.32", argv_i) == 0) {
+        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_A.txt");
+        myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_A.txt");
+        // myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_A.txt");
+        double* tmp = myres->create_fake(0.020, 0.005, 123456789); // this is a fake value
+        myres->copy(phys_ms, tmp);
+        free(tmp);
+        tmp = myres->create_fake(0.20, 0.005, 123456789); // this is a fake value
+        myres->copy(phys_mc, tmp);
+        free(tmp);
+        latt = "A";
+    }
+    else if (strcmp("cB.72.64", argv_i) == 0 || strcmp("cB.72.96", argv_i) == 0) {
+        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_B.txt");
+        myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_B.txt");
+        myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_B.txt");
+        myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_B.txt");
+        latt = "B";
+    }
+    else if (strcmp("cC.06.80", argv_i) == 0 || strcmp("cC.06.112", argv_i) == 0) {
+        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_C.txt");
+        myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_C.txt");
+        myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_C.txt");
+        myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_C.txt");
+        latt = "C";
+    }
+    else if (strcmp("cD.54.96", argv_i) == 0) {
+        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_D.txt");
+        myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_D.txt");
+        myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_D.txt");
+        myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_D.txt");
+        latt = "D";
+    }
+    else if (strcmp("cE.44.112", argv_i) == 0) {
+        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_E.txt");
+        myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_a2_A_cov_amul_jack_E.txt");
+        myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_E.txt");
+        myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_E.txt");
+        latt = "E";
+    }
 }
