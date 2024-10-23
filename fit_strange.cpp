@@ -137,8 +137,12 @@ data_all read_all_the_files(std::vector<std::string> files, const char* resampli
 
 double lhs_sum(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
     double r;
-    if (n == 0)        r = gjack.en[e].jack[fit_info.corr_id[0]][j] + gjack.en[e].jack[fit_info.corr_id[2]][j] + gjack.en[e].jack[fit_info.corr_id[4]][j];
-    else if (n == 1)   r = gjack.en[e].jack[fit_info.corr_id[1]][j] + gjack.en[e].jack[fit_info.corr_id[3]][j] + gjack.en[e].jack[fit_info.corr_id[5]][j];
+    // if (n == 0)        r = gjack.en[e].jack[fit_info.corr_id[0]][j] + gjack.en[e].jack[fit_info.corr_id[2]][j] + gjack.en[e].jack[fit_info.corr_id[4]][j];
+    // else if (n == 1)   r = gjack.en[e].jack[fit_info.corr_id[1]][j] + gjack.en[e].jack[fit_info.corr_id[3]][j] + gjack.en[e].jack[fit_info.corr_id[5]][j];
+    r = gjack.en[e].jack[fit_info.corr_id[0 + n]][j] + gjack.en[e].jack[fit_info.corr_id[2 + n]][j] + gjack.en[e].jack[fit_info.corr_id[4 + n]][j];
+    r = 0;
+    for (int i = 0;i < fit_info.corr_id.size();i += 2)
+        r += gjack.en[e].jack[fit_info.corr_id[i + n]][j];
     return r;
 }
 
@@ -365,13 +369,13 @@ int main(int argc, char** argv) {
     for (int e : ensemble_to_correct) {
         for (int j = 0;j < Njack;j++) {
             for (int tm = 0;tm < 2;tm++) {
-                jackextra.en[e].jack[id_SD_cor[tm]][j] = jackextra.en[e].jack[id_SD[tm]][j] + damu_SD[e][j];
-                jackextra.en[e].jack[id_W_cor[tm]][j] = jackextra.en[e].jack[id_W[tm]][j] + damu_W[e][j];
-                jackextra.en[e].jack[id_LD_cor[tm]][j] = jackextra.en[e].jack[id_LD[tm]][j] + damu_LD[e][j];
-
-                jackextra.en[e].jack[id_SDeta_cor[tm]][j] = jackextra.en[e].jack[id_SDeta[tm]][j] + damu_SD[e][j];
-                jackextra.en[e].jack[id_Weta_cor[tm]][j] = jackextra.en[e].jack[id_Weta[tm]][j] + damu_W[e][j];
-                jackextra.en[e].jack[id_LDeta_cor[tm]][j] = jackextra.en[e].jack[id_LDeta[tm]][j] + damu_LD[e][j];
+                jackextra.en[e].jack[id_SD_cor[tm]][j] = damu_SD[e][j];
+                jackextra.en[e].jack[id_W_cor[tm]][j] = damu_W[e][j];
+                jackextra.en[e].jack[id_LD_cor[tm]][j] = damu_LD[e][j];
+                jackextra.en[e].jack[id_full_cor[tm]][j] = damu_LD[e][j] + damu_W[e][j] + damu_SD[e][j];
+                // jackextra.en[e].jack[id_SDeta_cor[tm]][j] = jackextra.en[e].jack[id_SDeta[tm]][j] + damu_SD[e][j];
+                // jackextra.en[e].jack[id_Weta_cor[tm]][j] = jackextra.en[e].jack[id_Weta[tm]][j] + damu_W[e][j];
+                // jackextra.en[e].jack[id_LDeta_cor[tm]][j] = jackextra.en[e].jack[id_LDeta[tm]][j] + damu_LD[e][j];
 
                 // jackextra.en[e].jack[id_SDtmin0_cor[tm]][j] = jackextra.en[e].jack[id_SDtmin0[tm]][j] + damu_SD[e][j];
             }
@@ -463,35 +467,38 @@ int main(int argc, char** argv) {
                     //////////////////  corrected
                 case 11:
                     namefit = namefit + "_SDcor";
-                    fit_info.corr_id = { id_SD_cor[0], id_SD_cor[1] };
+                    fit_info.corr_id = { id_SD[0], id_SD[1],id_SD_cor[0], id_SD_cor[1] };
                     break;
                 case 12:
                     namefit = namefit + "_Wcor";
-                    fit_info.corr_id = { id_W_cor[0], id_W_cor[1] };
+                    fit_info.corr_id = { id_W[0], id_W[1], id_W_cor[0], id_W_cor[1] };
                     break;
                 case 13:
                     namefit = namefit + "_LDcor";
-                    fit_info.corr_id = { id_LD_cor[0], id_LD_cor[1] };
+                    fit_info.corr_id = { id_LD[0], id_LD[1], id_LD_cor[0], id_LD_cor[1] };
                     break;
                 case 14:
                     namefit = namefit + "_SDpWpLDcor";
-                    fit_info.corr_id = { id_SD_cor[0], id_SD_cor[1],id_W_cor[0], id_W_cor[1], id_LD_cor[0], id_LD_cor[1] };
+                    fit_info.corr_id = { id_SD[0], id_SD[1],id_W[0], id_W[1], id_LD[0], id_LD[1], id_full_cor[0], id_full_cor[1] };
+                    // fit_info.corr_id = { id_SD[0], id_SD[1], id_SD_cor[0], id_SD_cor[1],id_W[0], id_W[1], id_W_cor[0], id_W_cor[1], id_LD[0], id_LD[1], id_LD_cor[0], id_LD_cor[1] };
+                    // fit_info.corr_id = {id_LD_cor[0], id_LD_cor[1]      , id_LD[0], id_LD[1], id_LD[0], id_LD[1], id_W_cor[0], id_W_cor[1], id_SD_cor[1],id_W[0], id_W[1],
+                    //  id_SD[0], id_SD[1], id_SD_cor[0]  };
                     break;
                 case 15:
                     namefit = namefit + "_SDetas";
-                    fit_info.corr_id = { id_SDeta_cor[0], id_SDeta_cor[1] };
+                    fit_info.corr_id = { id_SDeta[0], id_SDeta[1], id_SD_cor[0], id_SD_cor[1] };
                     break;
                 case 16:
                     namefit = namefit + "_Wetas";
-                    fit_info.corr_id = { id_Weta_cor[0], id_Weta_cor[1] };
+                    fit_info.corr_id = { id_Weta[0], id_Weta[1], id_W_cor[0], id_W_cor[1] };
                     break;
                 case 17:
                     namefit = namefit + "_LDetas";
-                    fit_info.corr_id = { id_LDeta_cor[0], id_LDeta_cor[1] };
+                    fit_info.corr_id = { id_LDeta[0], id_LDeta[1], id_LD_cor[0], id_LD_cor[1] };
                     break;
                 case 18:
                     namefit = namefit + "_SDpWpLDetas";
-                    fit_info.corr_id = { id_SDeta_cor[0], id_SDeta_cor[1],id_Weta_cor[0], id_Weta_cor[1], id_LDeta_cor[0], id_LDeta_cor[1] };
+                    fit_info.corr_id = { id_SDeta[0], id_SDeta[1],id_Weta[0], id_Weta[1], id_LDeta[0], id_LDeta[1] ,id_full_cor[0], id_full_cor[1] };
                     break;
                     // case 15:
                     //     namefit = namefit + "_SDtmin0cor";
@@ -516,7 +523,7 @@ int main(int argc, char** argv) {
                 default: break;
                 }
 
-                
+
                 // if fititng only the TM we need to put the id only in the even slots so that 
                 // the function lhs_sum sum them when n=0
                 if (ie == 8 || ie == 10 || ie == 12) {
@@ -525,9 +532,9 @@ int main(int argc, char** argv) {
                 }
 
                 // if fitting the sum SD+W+LD we need to select lhs function to sum
-                double (*lhs_fun)(int, int, int, data_all, struct fit_type);
-                if (iW == 5 || iW == 14 || iW == 18) lhs_fun = lhs_sum;
-                else lhs_fun = lhs_amu;
+                double (*lhs_fun)(int, int, int, data_all, struct fit_type)=lhs_sum;
+                // if (iW == 5 || iW == 14 || iW == 18) lhs_fun = lhs_sum;
+                // else lhs_fun = lhs_amu;
 
 
                 switch (ie) {
