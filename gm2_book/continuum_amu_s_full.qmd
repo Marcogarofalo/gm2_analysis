@@ -167,17 +167,24 @@ plot_the_Ambaradam <- function(name) {
         if (str_detect(namefit, "_3b_BOS_BTM")) {
           namelegend <- paste0(namelegend, "-4beta")
         }
-
-        gg <- plot_fit(
-          basename = namefile,
-          var = "afm",
-          id_x = 1,
-          data_type = mydata,
-          width = 1e-4,
-          gg = gg,
-          single_name_for_fit = namelegend,
-          noribbon = TRUE
-        )
+        if (
+          (lat == "_3b_BOS_BTM" & a2 == "_a4OS_a4TM") |
+            (lat == "_3b" & a2 == "") |
+            (lat == "_3b" & a2 == "_a4OS_a4TM")|
+            (lat == "_3b_BOS_BTM" & a2 == "_alogOS_alogTM") | 
+            (lat == "_3b_onlyTM" & a2=="")
+        ) {
+          gg <- plot_fit(
+            basename = namefile,
+            var = "afm",
+            id_x = 1,
+            data_type = mydata,
+            width = 1e-4,
+            gg = gg,
+            single_name_for_fit = namelegend,
+            noribbon = TRUE
+          )
+        }
         count <- count + 1
       }
     }
@@ -189,8 +196,10 @@ plot_the_Ambaradam <- function(name) {
     df <- df[-a, ]
   }
   ave_AIC <- AIC(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity = df$mult)
-  cat("AIC (chi2 + 2Npar - Ndat)/2 = ", mean_print(ave_AIC$m, ave_AIC$dm),
-      "(", ave_AIC$stat, ")", "[", ave_AIC$syst, "]", "\n\n")
+  cat(
+    "AIC (chi2 + 2Npar - Ndat)/2 = ", mean_print(ave_AIC$m, ave_AIC$dm),
+    "(", ave_AIC$stat, ")", "[", ave_AIC$syst, "]", "\n\n"
+  )
   a <- which(df$dof == 1)
   if (length(a) > 0) {
     df1 <- df[-a, ]
@@ -198,49 +207,75 @@ plot_the_Ambaradam <- function(name) {
     df1 <- df
   }
   ave_AIC1 <- AIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
-  cat("AIC (chi2 + 2Npar - Ndat)/2 (no dof =1) = ", mean_print(ave_AIC1$m, ave_AIC1$dm),
-        "(", ave_AIC1$stat, ")", "[", ave_AIC1$syst, "]", "\n\n")
+  cat(
+    "AIC (chi2 + 2Npar - Ndat)/2 (no dof =1) = ", mean_print(ave_AIC1$m, ave_AIC1$dm),
+    "(", ave_AIC1$stat, ")", "[", ave_AIC1$syst, "]", "\n\n"
+  )
 
   ave_AIC2 <- AIC2(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity = df$mult)
-  cat("AIC (chi2 + 2Npar -2 Ndat)/2 = ", mean_print(ave_AIC2$m, ave_AIC2$dm),
-        "(", ave_AIC2$stat, ")", "[", ave_AIC2$syst, "]", "\n\n")
+  cat(
+    "AIC (chi2 + 2Npar -2 Ndat)/2 = ", mean_print(ave_AIC2$m, ave_AIC2$dm),
+    "(", ave_AIC2$stat, ")", "[", ave_AIC2$syst, "]", "\n\n"
+  )
 
   a <- which(str_detect(df$fit, "only"))
   df1 <- df[-a, ]
   ave_AIC11 <- AIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
-  cat("AIC (chi2 + 2Npar - Ndat)/2 (only TM/OS combined) = ", mean_print(ave_AIC11$m, ave_AIC11$dm),
-        "(", ave_AIC11$stat, ")", "[", ave_AIC11$syst, "]", "\n\n")
+  cat(
+    "AIC (chi2 + 2Npar - Ndat)/2 (only TM/OS combined) = ", mean_print(ave_AIC11$m, ave_AIC11$dm),
+    "(", ave_AIC11$stat, ")", "[", ave_AIC11$syst, "]", "\n\n"
+  )
   ave_AIC11 <- AIC2(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
-  cat("AIC (chi2 + 2Npar -2 Ndat)/2 (only TM/OS combined) = ", mean_print(ave_AIC11$m, ave_AIC11$dm),
-      "(", ave_AIC11$stat, ")", "[", ave_AIC11$syst, "]", "\n\n")
+  cat(
+    "AIC (chi2 + 2Npar -2 Ndat)/2 (only TM/OS combined) = ", mean_print(ave_AIC11$m, ave_AIC11$dm),
+    "(", ave_AIC11$stat, ")", "[", ave_AIC11$syst, "]", "\n\n"
+  )
 
   a <- which(str_detect(df$fit, "alog"))
   df1 <- df[-a, ]
   ave_AIC11 <- AIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
-  cat("AIC (chi2 + 2Npar - Ndat)/2 (no log ) = ", mean_print(ave_AIC11$m, ave_AIC11$dm),
-      "(", ave_AIC11$stat, ")", "[", ave_AIC11$syst, "]", "\n\n")
+  cat(
+    "AIC (chi2 + 2Npar - Ndat)/2 (no log ) = ", mean_print(ave_AIC11$m, ave_AIC11$dm),
+    "(", ave_AIC11$stat, ")", "[", ave_AIC11$syst, "]", "\n\n"
+  )
   ave_AIC11 <- AIC2(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
-  cat("AIC (chi2 + 2Npar -2 Ndat)/2 (no log ) = ", mean_print(ave_AIC11$m, ave_AIC11$dm),
-      "(", ave_AIC11$stat, ")", "[", ave_AIC11$syst, "]", "\n\n")
+  cat(
+    "AIC (chi2 + 2Npar -2 Ndat)/2 (no log ) = ", mean_print(ave_AIC11$m, ave_AIC11$dm),
+    "(", ave_AIC11$stat, ")", "[", ave_AIC11$syst, "]", "\n\n"
+  )
 
   a <- which(str_detect(df$fit, "_3b_BOS_BTM"))
   df1 <- df[a, ]
   ave_AIC11 <- AIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
-  cat("AIC (chi2 + 2Npar - Ndat)/2 (always 4 latt) = ", mean_print(ave_AIC11$m, ave_AIC11$dm),
-      "(", ave_AIC11$stat, ")", "[", ave_AIC11$syst, "]", "\n\n")
+  cat(
+    "AIC (chi2 + 2Npar - Ndat)/2 (always 4 latt) = ", mean_print(ave_AIC11$m, ave_AIC11$dm),
+    "(", ave_AIC11$stat, ")", "[", ave_AIC11$syst, "]", "\n\n"
+  )
 
   a <- which(str_detect(df$fit, "_3b_BOS_BTM"))
   a <- c(a, which(str_detect(df$fit, "_3b$")))
   df1 <- df[a, ]
   ave_AIC11 <- AIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
-  cat("AIC (chi2 + 2Npar - Ndat)/2 (4 latt + 3 linear ) = ", mean_print(ave_AIC11$m, ave_AIC11$dm),
-      "(", ave_AIC11$stat, ")", "[", ave_AIC11$syst, "]", "\n\n")
+  cat(
+    "AIC (chi2 + 2Npar - Ndat)/2 (4 latt + 3 linear ) = ", mean_print(ave_AIC11$m, ave_AIC11$dm),
+    "(", ave_AIC11$stat, ")", "[", ave_AIC11$syst, "]", "\n\n"
+  )
+  
+  a <- which(str_detect(df$fit, "noC"))
+  df1 <- df[-a, ]
+  ave_AIC11 <- AIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+  cat(
+    "AIC (chi2 + 2Npar - Ndat)/2 (always C ) = ", mean_print(ave_AIC11$m, ave_AIC11$dm),
+    "(", ave_AIC11$stat, ")", "[", ave_AIC11$syst, "]", "\n\n"
+  )
 
   a <- c(which(str_detect(df$fit, "alog2")), which(str_detect(df$fit, "alog3")))
   df1 <- df[-a, ]
   ave_AIC11 <- AIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = 1)
-  cat("AIC (chi2 + 2Npar - Ndat)/2 (no a/log^2(3) a) = ", mean_print(ave_AIC11$m, ave_AIC11$dm),
-      "(", ave_AIC11$stat, ")", "[", ave_AIC11$syst, "]", "\n\n")
+  cat(
+    "AIC (chi2 + 2Npar - Ndat)/2 (no a/log^2(3) a) = ", mean_print(ave_AIC11$m, ave_AIC11$dm),
+    "(", ave_AIC11$stat, ")", "[", ave_AIC11$syst, "]", "\n\n"
+  )
 
   gg <- gg + geom_pointrange(aes(
     x = 0, y = ave_AIC$m, ymin = ave_AIC$m - ave_AIC$dm,
@@ -319,12 +354,13 @@ kable(dft, col.names = c(
 
 
 
-## SD window
+### SD window
 
 window paper value: 9.074(64)e-10
 
 ```{r, echo=FALSE, results='asis',  warning=FALSE}
 df <- plot_the_Ambaradam("SD")
+write.table(df, file = "SD_strange", row.names = FALSE)
 ```
 
 <!-- ```{r, echo=FALSE, results='asis',  warning=FALSE} -->
@@ -335,61 +371,32 @@ here there are some bad fits for example the linear with 4 beta
 
 
 
-## W window
+### W window
 
 window paper value: 27.28(20)e-10
 
 ```{r, echo=FALSE, results='asis',  warning=FALSE}
 df <- plot_the_Ambaradam("W")
-```
-
-### W etas
-
-```{r, echo=FALSE, results='asis',  warning=FALSE}
-df <- plot_the_Ambaradam("Wetas")
+write.table(df, file = "W_strange", row.names = FALSE)
 ```
 
 
-```{r, echo=FALSE, results='asis',  warning=FALSE}
-gg <- plot_fit(
-  basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_W_3b_BOS_BTM_a4OS_a4TM",
-  var = "afm",
-  id_x = 1,
-  data_type = c("K", "K"),
-  width = 1e-4,
-  gg = NULL,
-  single_name_for_fit = "fit",
-  noline = TRUE
-)
-gg <- plot_fit(
-  basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_Wetas_3b_BOS_BTM_a4OS_a4TM",
-  var = "afm",
-  id_x = 1,
-  # data_type = c("OS-eta", "TM-eta"),
-  data_type = c("etas", "etas"),
-  width = 1e-4,
-  gg = gg,
-  single_name_for_fit = "fit-eta",
-  noline = TRUE
-)
-
-fig <- myplotly(gg, "", "$a^2$", "$a_{\\mu}(s)$", to_print = TRUE, output = "HTML", legend_position = c(0, 0))
-```
-
-## LD
+### LD
 
 
 ```{r, echo=FALSE, results='asis',  warning=FALSE}
 df <- plot_the_Ambaradam("LD")
+write.table(df, file = "LD_strange", row.names = FALSE)
 ```
 
 
 
-## SUM
+### SUM
 
 
 ```{r, echo=FALSE, results='asis',  warning=FALSE}
 df <- plot_the_Ambaradam("SDpWpLD")
+write.table(df, file = "SDpWpLD_strange", row.names = FALSE)
 ```
 
 
@@ -533,117 +540,107 @@ fig <- myplotly(gg, "", "$a^2$", "$a_{\\mu}(s)$", to_print = TRUE, output = "HTM
 ## misstuning corrected data
 
 
-## SD window
+### SD window
 
 window paper value: 9.074(64)e-10
 
 ```{r, echo=FALSE, results='asis',  warning=FALSE}
 df <- plot_the_Ambaradam("SDcor")
+write.table(df, file = "SDcor_strange", row.names = FALSE)
 ```
 
 
 
-## W window
+### W window
 
 window paper value: 27.28(20)e-10
 
 ```{r, echo=FALSE, results='asis',  warning=FALSE}
 df <- plot_the_Ambaradam("Wcor")
+write.table(df, file = "Wcor_strange", row.names = FALSE)
 ```
 
 
-## LD
+
+### LD
 
 
 ```{r, echo=FALSE, results='asis',  warning=FALSE}
 df <- plot_the_Ambaradam("LDcor")
+write.table(df, file = "LDcor_strange", row.names = FALSE)
 ```
 
 
 
-## SUM
+### SUM
 
 
 ```{r, echo=FALSE, results='asis',  warning=FALSE}
 df <- plot_the_Ambaradam("SDpWpLDcor")
+write.table(df, file = "SDpWpLDcor_strange", row.names = FALSE)
 ```
 
 
+## eta
 
-<!-- ```{r, echo=FALSE, results='asis',  warning=FALSE} -->
-<!-- df <- Rose::read_fit_P_file("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_a4_MK_cov_fit_P.dat") -->
-<!-- Rose::make_table_fit_result(df) -->
-<!-- # df1<-data.frame("P"=df$P[,1], "value"=mapply(mean_print, df$P[,2],df$P[,3] ) ) -->
-<!-- # cat("$\\chi^2/dof=$ ",df$chi2,"\n\n") -->
-<!-- # kable(df1) -->
-<!-- ``` -->
 
-<!-- #  Lattice spacing change -->
+### SD etas
 
-<!-- ```{r, echo=FALSE, results='asis', dev='tikz', warning=FALSE} -->
-<!-- file=sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_a4_MK_cov_fit_data.txt") -->
-<!-- df<- read.table(file, header=FALSE, fill=TRUE) -->
-<!-- iy<-length(df[1,])-2 -->
-<!-- # -->
-<!-- # -->
-<!-- # gg<- myggplot(fill=FALSE) -->
-<!-- # gg<-gg+  geom_point(data=df, mapping=aes(x=df[,1] , y=df[,iy], -->
-<!-- #                     color=as.factor(df[,iy+2]), shape=as.factor(df[,iy+2])) -->
-<!-- #                     ,width=1e-4)  +labs(color = "", shape="") -->
-<!-- # gg<-gg + geom_errorbar(data=df, mapping=aes(x=df[,1] , ymin=df[,iy]-df[,iy+1], -->
-<!-- #                ymax=df[,iy]+df[,iy+1],color=as.factor(df[,iy+2]), -->
-<!-- #                shape=as.factor(df[,iy+2]) ) -->
-<!-- #                ,width=1e-4) -->
-<!-- # #####################à -->
-<!-- # file1=sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all_a_from_tau//amu_full_a2_a4_MK_cov_fit_data.txt") -->
-<!-- # df1<- read.table(file1, header=FALSE, fill=TRUE) -->
-<!-- # -->
-<!-- # gg<-gg+  geom_point(data=df1, mapping=aes(x=df1[,1]+0.0001 , y=df1[,iy], -->
-<!-- #                     color=as.factor(df1[,iy+2]), shape=as.factor(df1[,iy+2])) -->
-<!-- #                     ,width=1e-4)  +labs(color = "", shape="") -->
-<!-- # gg<-gg + geom_errorbar(data=df1, mapping=aes(x=df1[,1]+0.0001 , ymin=df1[,iy]-df1[,iy+1], -->
-<!-- #                ymax=df1[,iy]+df1[,iy+1],color=as.factor(df1[,iy+2]), -->
-<!-- #                shape=as.factor(df1[,iy+2]) ) -->
-<!-- #                ,width=1e-4) -->
-<!-- # ################################################ -->
-<!-- # df[,iy+2]<-plyr::laply(df[,iy+2],eq_op) -->
-<!-- # df1[,iy+2]<-plyr::laply(df1[,iy+2],eq_op1) -->
-<!-- # #kable(df) -->
-<!-- # datalist = list() -->
-<!-- # for (n in c(1:2)){ -->
-<!-- # -->
-<!-- # file=sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all/amu_full_a2_a4_MK_cov_fit_out_n%d_afm.txt",n-1) -->
-<!-- # datalist[[n]]<- read.table(file, header=FALSE, fill=TRUE, -->
-<!-- #                  col.names=c(paste0("x",n),paste0("fit",n),paste0("fiterr",n))) -->
-<!-- # -->
-<!-- # gg<-gg + geom_ribbon(data=datalist[[n]], mapping=aes_string(x=datalist[[n]][,1] , ymin=datalist[[n]][,2]-datalist[[n]][,3], ymax=datalist[[n]][,2]+datalist[[n]][,3]),alpha=0.3, fill="red") -->
-<!-- # # gg<-gg + geom_line(data=datalist[[n]], mapping=aes_string(x=datalist[[n]][,1] , y=datalist[[n]][,2]  ),color="red" ) -->
-<!-- # -->
-<!-- # -->
-<!-- # -->
-<!-- # } -->
-<!-- gg <- myggplot() -->
-<!-- gg <- plot_fit( -->
-<!--   basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_fulltree_3b_BOS_BTM_a4OS_a4TM", var = "afm", data_type = c("TM", "OS"), width = 1e-4, gg = gg, -->
-<!--   id_color = iy + 2, id_shape = iy + 2, -->
-<!--   # , labelfit = "zap" -->
-<!--   , single_name_for_fit = "fit" -->
-<!--   # , nolabel_for_fit = TRUE -->
-<!--   , noline = TRUE -->
-<!-- ) -->
-<!-- gg <- plot_fit( -->
-<!--   basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_a_from_tau/amu_full_a2_a4_MK_cov", var = "afm", data_type = c("TM-a(tau)", "OS-a(tau)"), width = 1e-4, gg = gg, -->
-<!--   id_color = iy + 2, id_shape = iy + 2, -->
-<!--   # , labelfit = "zap" -->
-<!--   , single_name_for_fit = "fit-a(tau)" -->
-<!--   # , nolabel_for_fit = TRUE -->
-<!--   , noline = TRUE -->
-<!-- ) -->
+window paper value: 9.074(64)e-10
 
-<!-- fig <- myplotly(gg, "", "$a^2(\\mbox{fm})$", "$a_{\\mu}(s)$", -->
-<!--   to_print = TRUE, -->
-<!--   legend_position = c(0, 0) -->
-<!-- ) -->
-<!-- # fig<- myplotly(gg,"","$L$", "$E_2- E_{free}^{lat}+E_{free}^{cont}/m$", output = "HTML" ,to_print = FALSE) -->
-<!-- # htmlwidgets::saveWidget(fig, "two_energy_fit.html", selfcontained = T) -->
-<!-- ``` -->
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- plot_the_Ambaradam("SDetas")
+write.table(df, file = "SDeta_cor_strange", row.names = FALSE)
+```
+
+### W etas
+
+window paper value: 27.28(20)e-10
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- plot_the_Ambaradam("Wetas")
+write.table(df, file = "Weta_cor_strange", row.names = FALSE)
+```
+
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_Wcor_3b_BOS_BTM_a4OS_a4TM",
+  var = "afm",
+  id_x = 1,
+  data_type = c("K", "K"),
+  width = 1e-4,
+  gg = NULL,
+  single_name_for_fit = "fit",
+  noline = TRUE
+)
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_Wetas_3b_BOS_BTM_a4OS_a4TM",
+  var = "afm",
+  id_x = 1,
+  # data_type = c("OS-eta", "TM-eta"),
+  data_type = c("etas", "etas"),
+  width = 1e-4,
+  gg = gg,
+  single_name_for_fit = "fit-eta",
+  noline = TRUE
+)
+
+fig <- myplotly(gg, "", "$a^2$", "$a_{\\mu}(s)$", to_print = TRUE, output = "HTML", legend_position = c(0, 0))
+```
+
+
+### LD etas
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- plot_the_Ambaradam("LDetas")
+write.table(df, file = "LDeta_cor_strange", row.names = FALSE)
+```
+
+### SUM
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- plot_the_Ambaradam("SDpWpLDetas")
+write.table(df, file = "SDpWpLDetas_cor_strange", row.names = FALSE)
+
+```

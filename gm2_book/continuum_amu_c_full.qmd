@@ -150,16 +150,24 @@ plot_the_Ambaradam <- function(name) {
         if (str_detect(namefit, "_3b_BOS_BTM"))
           namelegend<-paste0(namelegend,"-4beta")
         
-        gg <- plot_fit(
-          basename = namefile,
-          var = "afm",
-          id_x = 1,
-          data_type = mydata,
-          width = 1e-4,
-          gg = gg,
-          single_name_for_fit = namelegend,
-          noribbon = TRUE
-        )
+        if (
+          (lat == "_3b_BOS_BTM" & a2 == "_a4OS_a4TM") |
+            (lat == "_3b" & a2 == "") |
+            (lat == "_3b" & a2 == "_a4OS_a4TM")|
+            (lat == "_3b_BOS_BTM" & a2 == "_alogOS_alogTM") | 
+            (lat == "_3b_onlyTM" & a2=="")
+        ) {
+          gg <- plot_fit(
+            basename = namefile,
+            var = "afm",
+            id_x = 1,
+            data_type = mydata,
+            width = 1e-4,
+            gg = gg,
+            single_name_for_fit = namelegend,
+            noribbon = TRUE
+          )
+        }
         count <- count + 1
       }
     }
@@ -268,7 +276,7 @@ kable(dft, col.names = c("$a^2(\\text{fm})$", "$a_{\\mu}^{SD}(c)$",
                          "$a_{\\mu}^{SD+W+LD}(c)$","En"))
 ```
 
-## SD
+### SD
 
 window paper value: 11.61(27)e-10
 
@@ -276,7 +284,7 @@ window paper value: 11.61(27)e-10
 df <- plot_the_Ambaradam("SD")
 ```
 
-## W
+### W
 
 window paper value: 2.90(12)e-10
 
@@ -284,12 +292,13 @@ window paper value: 2.90(12)e-10
 df <- plot_the_Ambaradam("W")
 ```
 
-## LD
+### LD
+
 ```{r, echo=FALSE, results='asis',  warning=FALSE}
 df <- plot_the_Ambaradam("LD")
 ```
 
-## SUM
+### SUM
 
 ```{r, echo=FALSE, results='asis',  warning=FALSE}
 df <- plot_the_Ambaradam("SDpWpLD")
@@ -329,4 +338,35 @@ gg <- plot_fit(
   noribbon = TRUE
 )
 fig <- myplotly(gg, "", "$a^2$", "$a_{\\mu}(c)$", to_print = TRUE, output = "HTML", legend_position = c(0, 0))
+```
+
+
+## Adding misstuning corrections
+
+
+### SD
+
+window paper value: 11.61(27)e-10
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- plot_the_Ambaradam("SDcor")
+```
+
+### W
+
+window paper value: 2.90(12)e-10
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- plot_the_Ambaradam("Wcor")
+```
+
+### LD
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- plot_the_Ambaradam("LDcor")
+```
+
+### SUM
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- plot_the_Ambaradam("SDpWpLDcor")
 ```

@@ -30,17 +30,17 @@ ens <- c(
   #  "cA.40.24_mu.0.004000",
   #  "cA.53.24_mu.0.005300",
   "cB.72.64_K",
-  #"cB.72.96_mu.0.000720",
+  # "cB.72.96_mu.0.000720",
   "cC.06.80_K",
-  #"cC.06.112_mu.0.000600",
+  # "cC.06.112_mu.0.000600",
   "cD.54.96_K",
   "cE.44.112_K"
 )
 source("/home/garofalo/programs/Rose/R/read_block.R")
 dir <- "/home/garofalo/analysis/g-2_new_stat/out/"
 df <- NULL
-dft<- data.frame("en"=ens, "ms"=ens)
-count<-1
+dft <- data.frame("en" = ens, "ms" = ens)
+count <- 1
 for (e in ens) {
   mt <- read_df(paste0(dir, e, "_output"))
   all_obs <- Rose::get_all_corr(mt)
@@ -55,9 +55,9 @@ for (e in ens) {
   #
 
   fit <- get_full_res("ms(MK)", all_obs, mt)
-  dft$ms[count]<- mean_print(fit[1,1],fit[1,2])
-  count =count+1
-  #cat("$m_s($", gsub("\\_mu.*", "", e), "$)$=", mean_print(fit[1, 1], fit[1, 2]), "\n\n")
+  dft$ms[count] <- mean_print(fit[1, 1], fit[1, 2])
+  count <- count + 1
+  # cat("$m_s($", gsub("\\_mu.*", "", e), "$)$=", mean_print(fit[1, 1], fit[1, 2]), "\n\n")
 }
 gg <- plot_df_corr_ggplot(df)
 fig <- myplotly(gg, to_print = TRUE)
@@ -74,9 +74,9 @@ ens <- c(
   #  "cA.40.24_mu.0.004000",
   #  "cA.53.24_mu.0.005300",
   "cB.72.64_K",
-  #"cB.72.96_mu.0.000720",
+  # "cB.72.96_mu.0.000720",
   "cC.06.80_K",
-  #"cC.06.112_mu.0.000600",
+  # "cC.06.112_mu.0.000600",
   "cD.54.96_K",
   "cE.44.112_K"
 )
@@ -89,7 +89,7 @@ GG <- c(
   0.0182782,
   0.0160434,
   0.013576,
-  0.0117933 
+  0.0117933
 )
 GG_err <- c(
   2.3907e-05,
@@ -117,9 +117,9 @@ for (e in ens) {
 }
 diff_rel <- (GG - df[, 1]) / GG
 err <- (1 / GG) * df[, 2] + (df[, 1] / GG)^2 * GG_err
-sting_mus<-mapply(mean_print, df[,1],df[,2])
-dft<-data.frame("Ens"=ens, "amus"=sting_mus,"amus_GG"=mapply(mean_print, GG,GG_err) )
-kable(dft, col.names = c("Ens.","$a\\mu_s$","$a\\mu_s(GG)$"))
+sting_mus <- mapply(mean_print, df[, 1], df[, 2])
+dft <- data.frame("Ens" = ens, "amus" = sting_mus, "amus_GG" = mapply(mean_print, GG, GG_err))
+kable(dft, col.names = c("Ens.", "$a\\mu_s(K)$", "$a\\mu_s(GG)$"))
 
 gg <- myggplot()
 gg <- gg + geom_pointrange(aes(
@@ -127,12 +127,11 @@ gg <- gg + geom_pointrange(aes(
   ymin = diff_rel - err,
   ymax = diff_rel + err,
 ))
-gg<- gg+ geom_hline(yintercept = 0)
+gg <- gg + geom_hline(yintercept = 0)
 fig <- myplotly(gg, "", "Ensemble", "$(\\mu_s(GG) -\\mu_s)/\\mu_s(GG)$", to_print = TRUE)
-
 ```
 
-## $\eta_s$ and Jpsi
+## $\eta_s$ and phi
 
 ```{r, results='asis',echo=FALSE}
 ens <- c(
@@ -162,6 +161,194 @@ for (e in ens) {
 }
 gg <- plot_df_corr_ggplot(df)
 fig <- myplotly(gg, to_print = TRUE)
+```
+
+## Continuum $\eta_s$
+
+
+```{r, echo=FALSE, results='asis'}
+library("gridExtra")
+library("ggpubr")
+library(stringr)
+
+eq_op <- function(x) {
+  if (x == 0) {
+    return("OS")
+  } # equal
+  else {
+    return("TM")
+  } # opposite
+}
+eq_op1 <- function(x) {
+  if (x == 0) {
+    return("OS-a(tau)")
+  } # equal
+  else {
+    return("TM-a(tau)")
+  } # opposite
+}
+AIC <- function(v, err, chi2dof, dof, npar, multiplicity = 1) {
+  l <- list()
+  Nmeas <- dof + npar
+  AIC <- exp(-0.5 * (chi2dof * dof + 2 * npar - Nmeas)) / multiplicity
+  N <- sum(AIC)
+  AIC <- AIC / N
+  l$AIC <- AIC
+  l$m <- sum(v * AIC)
+  stat <- sum(AIC * err^2)
+  syst <- sum(AIC * (v - l$m)^2)
+  l$dm <- sqrt(stat + syst)
+  l$stat <- sqrt(stat)
+  l$syst <- sqrt(syst)
+  return(l)
+}
+AIC2 <- function(v, err, chi2dof, dof, npar, multiplicity = 1) {
+  l <- list()
+  Nmeas <- dof + npar
+  AIC <- exp(-0.5 * (chi2dof * dof + 2 * npar - 2 * Nmeas)) / multiplicity
+  N <- sum(AIC)
+  AIC <- AIC / N
+  l$AIC <- AIC
+  l$m <- sum(v * AIC)
+  stat <- sum(AIC * err^2)
+  syst <- sum(AIC * (v - l$m)^2)
+  l$dm <- sqrt(stat + syst)
+  l$stat <- sqrt(stat)
+  l$syst <- sqrt(syst)
+  return(l)
+}
+plot_the_Ambaradam <- function(name) {
+  list_lat <- c(
+    "_3b", "_4b"
+  )
+  list_a <- c(
+    "_a2", "_a4"
+  )
+  source("/home/garofalo/programs/Rose/R/read_block.R")
+  dir <- "/home/garofalo/analysis/g-2_new_stat/fit_all_Metas/"
+  count <- 0
+  for (lat in list_lat) {
+    for (a2 in list_a) {
+      namefit <- paste0("Metas_", name, lat, a2)
+      namefile <- paste0(dir, namefit)
+
+      file <- paste0(namefile, "_fit_P.dat")
+      if (file.exists(file)) {
+        count <- count + 1
+        print(file)
+      }
+    }
+  }
+  df <- data.frame(
+    "fit" = rep("", count),
+    "res" = rep(0, count),
+    "err" = rep(0, count),
+    "chi2dof" = rep(0, count),
+    "dof" = rep(0, count),
+    "Npar" = rep(0, count),
+    "Ndat" = rep(0, count),
+    "mult" = rep(0, count)
+  )
+  gg <- myggplot(repeat_color = 1)
+  count <- 1
+  for (lat in list_lat) {
+    # for (lat in c("_3b_BOS_BTM" )){
+    for (a2 in list_a) {
+      # for (a2 in c( "_a4OS_a4TM")) {
+      namefit <- paste0("Metas_", name, lat, a2)
+      namefile <- paste0(dir, namefit)
+
+      file <- paste0(namefile, "_fit_P.dat")
+      if (file.exists(file)) {
+        fit <- read_fit_P_file(file)
+        mydata <- c("TM")
+
+        # if (fit$dof == 1) next
+        df[count, 1] <- namefit
+        df[count, c(2, 3)] <- fit$P[1, c(2, 3)]
+        df[count, 4] <- fit$chi2dof
+        df[count, 5] <- fit$dof
+        df[count, 6] <- fit$npar
+        df[count, 7] <- fit$ndata
+        df[count, 8] <- 1
+        namelegend <- "fit"
+        
+        gg <- plot_fit(
+          basename = namefile,
+          var = "afm",
+          id_x = 1,
+          data_type = mydata,
+          width = 1e-4,
+          gg = gg,
+          single_name_for_fit = namelegend,
+          noribbon = TRUE
+        )
+        count <- count + 1
+      }
+    }
+  }
+  a <- which(df$fit == "")
+  if (length(a) > 0) {
+    print("eliminating:")
+    print(df$fit[a])
+    df <- df[-a, ]
+  }
+  ave_AIC <- AIC(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity = df$mult)
+  cat(
+    "AIC (chi2 + 2Npar - Ndat)/2 = ", mean_print(ave_AIC$m, ave_AIC$dm),
+    "(", ave_AIC$stat, ")", "[", ave_AIC$syst, "]", "\n\n"
+  )
+  a <- which(df$dof == 1)
+  if (length(a) > 0) {
+    df1 <- df[-a, ]
+  } else {
+    df1 <- df
+  }
+  ave_AIC1 <- AIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+  cat(
+    "AIC (chi2 + 2Npar - Ndat)/2 (no dof =1) = ", mean_print(ave_AIC1$m, ave_AIC1$dm),
+    "(", ave_AIC1$stat, ")", "[", ave_AIC1$syst, "]", "\n\n"
+  )
+
+  ave_AIC2 <- AIC2(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity = df$mult)
+  cat(
+    "AIC (chi2 + 2Npar -2 Ndat)/2 = ", mean_print(ave_AIC2$m, ave_AIC2$dm),
+    "(", ave_AIC2$stat, ")", "[", ave_AIC2$syst, "]", "\n\n"
+  )
+
+
+  gg <- gg + geom_pointrange(aes(
+    x = 0, y = ave_AIC$m, ymin = ave_AIC$m - ave_AIC$dm,
+    ymax = ave_AIC$m + ave_AIC$dm, color = "AIC", shape = "AIC", fill = "AIC"
+  ))
+  fig <- myplotly(gg, "", "$a^2$", "$M_{\\eta_s}$", to_print = TRUE, output = "HTML", legend_position = c(0, 0))
+  # fig <- fig + ylim(5.1e-9, 5.43e-9) +xlim(0,0.008)+ theme(axis.title.y=element_blank(),
+  #         axis.text.y=element_blank(),
+  #         axis.ticks.y=element_blank())+theme(plot.margin = margin(0,0,0,0, "cm"))
+  gg <- ggplot() +
+    geom_histogram(aes(y = df$res, weight = ave_AIC$AIC)) +
+    theme_bw()
+
+  gg <- gg +
+    # ylim(5.1e-9, 5.43e-9) +
+    ylab("$M_{\\eta_s}$") + theme(plot.margin = margin(0, 0, 0, 0, "cm")) + theme(
+      axis.title.x = element_blank(),
+      axis.text.x = element_text(angle = 45, vjust = 0.5, hjust = 0.5)
+    )
+  print(gg)
+  # ggarrange(gg, fig,
+  #   align = "h",
+  #   # heights = c(2, 0.7),
+  #   widths = c(1, 3.5),
+  #   ncol = 2, nrow = 1
+  # )
+  df$AIC <- ave_AIC$AIC
+  return(df)
+}
+```
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- plot_the_Ambaradam("TM")
 ```
 
 ## Z

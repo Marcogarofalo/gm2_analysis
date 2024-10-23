@@ -383,3 +383,175 @@ gg <- gg + geom_pointrange(aes(
 
 fig <- myplotly(gg, "no C48", "$a^2$", "$a(\\tau)-a(MG)$", to_print = TRUE, xrange = c(0, 0.0085))
 ```
+
+
+
+## max twist corrections with A12
+
+```{r, echo=FALSE, results='asis', dev='tikz', warning=FALSE}
+
+
+dir <- "/home/garofalo/analysis/g-2_new_stat/fit_all/"
+namefit <- paste0(dir, "afpi_max_twist_A12_cov")
+file <- paste0(namefit, "_fit_P.dat")
+fit <- read_fit_P_file(file)
+cat("\n\n")
+dt <- make_table_fit_result(fit)
+#dt <- make_table_fit_result(fit)
+# dt<- data.frame("par"=fit$P[,1] )
+# dt$value<- mapply(mean_print, fit$P[,2], fit$P[,3])
+# dt$no_max_twist<- mapply(mean_print, fit_no_max_twist$P[,2], fit_no_max_twist$P[,3])
+#print(dt)
+kable(dt)
+gg <- myggplot(repeat_color = 1)
+gg <- plot_fit(
+  basename = namefit,
+  var = "xi",
+  id_x = 5,
+  data_type = c("A", "B", "C", "D", "E", "B", "C", "D"),
+  width = 1e-4,
+  gg = gg, 
+  labelfit = "",
+  # , single_name_for_fit = "fit"
+  # , nolabel_for_fit = TRUE
+  noline = TRUE
+)
+# filed <- paste0(namefit, "_fit_data.txt")
+# df <- read.table(filed, header = FALSE, fill = TRUE)
+# idy <- ncol(df) - 2
+# kable(df[, c(1,2,3,4,idy,idy+1)],col.names =c("mu","aMpi","afpi","L","afpi-inf","err") )
+gg <- gg + geom_vline(xintercept = 0.00678723)
+fig <- myplotly(gg, "", "$\\xi$", "$af_\\pi$", to_print = TRUE)
+
+############## scaling with tau         ########################################
+a_tau <- c(0.0908026, 0.07951, 0.06816, 0.05688, 0.04891)
+da_tau <- c(0.000535517, 0.00004, 0.00008, 0.00006, 0.00006)
+gg <- myggplot()
+
+diff <- (a_tau - fit$P[c(1:5), 2])
+gg <- gg + geom_pointrange(aes(
+  x = a_tau^2, y = diff,
+  ymin = diff - da_tau,
+  ymax = diff + da_tau,
+  color = "tau-MG",
+  shape = "tau-MG",
+  fill = "tau-MG"
+))
+
+
+fig <- myplotly(gg, "no C48", "$a^2$", "$a(\\tau)-a(MG)$", to_print = TRUE, xrange = c(0, 0.0085))
+```
+
+
+## max twist corrections with A12 and extra FVE
+
+```{r, echo=FALSE, results='asis', dev='tikz', warning=FALSE}
+
+
+dir <- "/home/garofalo/analysis/g-2_new_stat/fit_all/"
+namefit <- paste0(dir, "afpi_max_twist_A12_resFVE_corr_cov")
+file <- paste0(namefit, "_fit_P.dat")
+fit <- read_fit_P_file(file)
+cat("\n\n")
+dt <- make_table_fit_result(fit)
+# dt<- data.frame("par"=fit$P[,1] )
+# dt$value<- mapply(mean_print, fit$P[,2], fit$P[,3])
+# dt$no_max_twist<- mapply(mean_print, fit_no_max_twist$P[,2], fit_no_max_twist$P[,3])
+#print(dt)
+kable(dt)
+gg <- myggplot(repeat_color = 1)
+gg <- plot_fit(
+  basename = namefit,
+  var = "xi",
+  id_x = 5,
+  data_type = c("A", "B", "C", "D", "E", "B", "C", "D"),
+  width = 1e-4,
+  gg = gg, 
+  labelfit = "",
+  # , single_name_for_fit = "fit"
+  # , nolabel_for_fit = TRUE
+  noline = TRUE
+)
+# filed <- paste0(namefit, "_fit_data.txt")
+# df <- read.table(filed, header = FALSE, fill = TRUE)
+# idy <- ncol(df) - 2
+# kable(df[, c(1,2,3,4,idy,idy+1)],col.names =c("mu","aMpi","afpi","L","afpi-inf","err") )
+gg <- gg + geom_vline(xintercept = 0.00678723)
+fig <- myplotly(gg, "", "$\\xi$", "$af_\\pi$", to_print = TRUE)
+
+############## scaling with tau         ########################################
+a_tau <- c(0.0908026, 0.07951, 0.06816, 0.05688, 0.04891)
+da_tau <- c(0.000535517, 0.00004, 0.00008, 0.00006, 0.00006)
+gg <- myggplot()
+
+diff <- (a_tau - fit$P[c(1:5), 2])
+gg <- gg + geom_pointrange(aes(
+  x = a_tau^2, y = diff,
+  ymin = diff - da_tau,
+  ymax = diff + da_tau,
+  color = "tau-MG",
+  shape = "tau-MG",
+  fill = "tau-MG"
+))
+
+
+fig <- myplotly(gg, "no C48", "$a^2$", "$a(\\tau)-a(MG)$", to_print = TRUE, xrange = c(0, 0.0085))
+```
+
+
+
+## max twist corrections with A12 no C20
+
+```{r, echo=FALSE, results='asis', dev='tikz', warning=FALSE}
+
+
+dir <- "/home/garofalo/analysis/g-2_new_stat/fit_all/"
+namefit <- paste0(dir, "afpi_max_twist_A12_noC20_cov")
+file <- paste0(namefit, "_fit_P.dat")
+fit <- read_fit_P_file(file)
+cat("\n\n")
+dt <- make_table_fit_result(fit)
+#dt <- make_table_fit_result(fit)
+# dt<- data.frame("par"=fit$P[,1] )
+# dt$value<- mapply(mean_print, fit$P[,2], fit$P[,3])
+# dt$no_max_twist<- mapply(mean_print, fit_no_max_twist$P[,2], fit_no_max_twist$P[,3])
+#print(dt)
+kable(dt)
+gg <- myggplot(repeat_color = 1)
+gg <- plot_fit(
+  basename = namefit,
+  var = "xi",
+  id_x = 5,
+  data_type = c("A", "B", "C", "D", "E", "B", "C", "D"),
+  width = 1e-4,
+  gg = gg, 
+  labelfit = "",
+  # , single_name_for_fit = "fit"
+  # , nolabel_for_fit = TRUE
+  noline = TRUE
+)
+# filed <- paste0(namefit, "_fit_data.txt")
+# df <- read.table(filed, header = FALSE, fill = TRUE)
+# idy <- ncol(df) - 2
+# kable(df[, c(1,2,3,4,idy,idy+1)],col.names =c("mu","aMpi","afpi","L","afpi-inf","err") )
+gg <- gg + geom_vline(xintercept = 0.00678723)
+fig <- myplotly(gg, "", "$\\xi$", "$af_\\pi$", to_print = TRUE)
+
+############## scaling with tau         ########################################
+a_tau <- c(0.0908026, 0.07951, 0.06816, 0.05688, 0.04891)
+da_tau <- c(0.000535517, 0.00004, 0.00008, 0.00006, 0.00006)
+gg <- myggplot()
+
+diff <- (a_tau - fit$P[c(1:5), 2])
+gg <- gg + geom_pointrange(aes(
+  x = a_tau^2, y = diff,
+  ymin = diff - da_tau,
+  ymax = diff + da_tau,
+  color = "tau-MG",
+  shape = "tau-MG",
+  fill = "tau-MG"
+))
+
+
+fig <- myplotly(gg, "no C48", "$a^2$", "$a(\\tau)-a(MG)$", to_print = TRUE, xrange = c(0, 0.0085))
+```
