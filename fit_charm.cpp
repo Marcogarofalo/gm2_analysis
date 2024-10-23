@@ -316,30 +316,30 @@ int main(int argc, char** argv) {
     double put_a_number =0;
     for (int e = 0; e < files.size(); e++) {
         if (e == B72_64 || e == B72_96) {
-            damu_SD[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + B72_64);
-            damu_W[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + B72_64 + files.size());
-            damu_LD[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + B72_64 + 2 * files.size()); // FULl HVP and then subtract
+            damu_SD[e] = myres->create_fake(-0.00263127  * scale, 0.00159453 * scale, 2000 + B72_64);
+            damu_W[e] = myres->create_fake(-0.00144267 * scale, 0.000824161 * scale, 2000 + B72_64 + files.size());
+            damu_LD[e] = myres->create_fake(-0.00408932 * scale, 0.00241131 * scale, 2000 + B72_64 + 2 * files.size()); // FULl HVP and then subtract
             myres->sub(damu_LD[e], damu_LD[e], damu_W[e]);
             myres->sub(damu_LD[e], damu_LD[e], damu_SD[e]);
         }
         else if (e == C06 || e == C112) {
-            damu_SD[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + C06);
-            damu_W[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + C06 + files.size());
-            damu_LD[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + C06 + 2 * files.size()); // FULl HVP and then subtract
+            damu_SD[e] = myres->create_fake(-0.00658523 * scale, 0.00321247 * scale, 2000 + C06);
+            damu_W[e] = myres->create_fake(-0.0038205 * scale, 0.00204857 * scale, 2000 + C06 + files.size());
+            damu_LD[e] = myres->create_fake(-0.010442 * scale, 0.00520567 * scale, 2000 + C06 + 2 * files.size()); // FULl HVP and then subtract
             myres->sub(damu_LD[e], damu_LD[e], damu_W[e]);
             myres->sub(damu_LD[e], damu_LD[e], damu_SD[e]);
         }
         else if (e == D54) {
-            damu_SD[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + D54);
-            damu_W[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + D54 + files.size());
-            damu_LD[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + D54 + 2 * files.size()); // FULl HVP and then subtract
+            damu_SD[e] = myres->create_fake(0.000394258 * scale, 0.000814973 * scale, 2000 + D54);
+            damu_W[e] = myres->create_fake(0.00023767 * scale, 0.000448224 * scale, 2000 + D54 + files.size());
+            damu_LD[e] = myres->create_fake(0.000634983 * scale, 0.00126249 * scale, 2000 + D54 + 2 * files.size()); // FULl HVP and then subtract
             myres->sub(damu_LD[e], damu_LD[e], damu_W[e]);
             myres->sub(damu_LD[e], damu_LD[e], damu_SD[e]);
         }
         else if (e == E112) {
-            damu_SD[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + D54);
-            damu_W[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + D54 + files.size());
-            damu_LD[e] = myres->create_fake(put_a_number * scale, put_a_number * scale, 2000 + D54 + 2 * files.size()); // FULl HVP and then subtract
+            damu_SD[e] = myres->create_fake(0.00670547 * scale, 0.00604982 * scale, 2000 + D54);
+            damu_W[e] = myres->create_fake(0.00501327 * scale, 0.00338483 * scale, 2000 + D54 + files.size());
+            damu_LD[e] = myres->create_fake(0.0117678 * scale, 0.00938253 * scale, 2000 + D54 + 2 * files.size()); // FULl HVP and then subtract
             myres->sub(damu_LD[e], damu_LD[e], damu_W[e]);
             myres->sub(damu_LD[e], damu_LD[e], damu_SD[e]);
         }
