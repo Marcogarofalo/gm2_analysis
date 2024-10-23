@@ -838,7 +838,7 @@ int main(int argc, char** argv) {
 
     check_correlatro_counter(0);
     printf("reading a   =  %g  %g fm\n", a[Njack - 1], myres->comp_error(a));
-    printf("reading amul^phys=  %g  %g\n", phys_ml[Njack - 1], myres->comp_error(phys_ml));
+    printf("reading amul^phys=  %g  %g\n", ml[Njack - 1], myres->comp_error(ml));
     printf("reading amus^phys=  %g  %g\n", phys_ms[Njack - 1], myres->comp_error(phys_ms));
     ////////////////////////////////////////////////
     printf("################### fitting  the correlaators #################\n");
