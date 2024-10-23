@@ -676,7 +676,7 @@ int main(int argc, char** argv) {
 
     header.thetas = {};
 
-    mysprintf(namefile, NAMESIZE, "%s_mu.%f", argv[4], mu);
+    mysprintf(namefile, NAMESIZE, "%s_mu.%f_mpcac", argv[4], mu);
 
 
     mysprintf(option[6], NAMESIZE, namefile); // basename
@@ -724,22 +724,15 @@ int main(int argc, char** argv) {
     std::vector<std::string>  correlators;
 
     std::string str_mu(argv[11]);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5A0.txt", argv[3], argv[4], str_mu.c_str());//0
+
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5P5.txt", argv[3], argv[4], str_mu.c_str());//0
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_P5P5.txt", argv[3], argv[4], str_mu.c_str());//1
-    correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_VKVK.txt", argv[3], argv[4], str_mu.c_str());//2
-    correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_V0P5.txt", argv[3], argv[4], str_mu.c_str());//3
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.opposite_mu.%s_V0P5.txt", argv[3], argv[4], str_mu.c_str());//1
     correlators.emplace_back(namefile);
 
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5A0.txt", argv[3], argv[4], str_mu.c_str());//4
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5P5.txt", argv[3], argv[4], str_mu.c_str());//2
     correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_P5P5.txt", argv[3], argv[4], str_mu.c_str());//5
-    correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_VKVK.txt", argv[3], argv[4], str_mu.c_str());//6
-    correlators.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_V0P5.txt", argv[3], argv[4], str_mu.c_str());//7
+    mysprintf(namefile, NAMESIZE, "%s/%s_r.equal_mu.%s_V0P5.txt", argv[3], argv[4], str_mu.c_str());//3
     correlators.emplace_back(namefile);
 
     std::vector<configuration_class> myconfs;
@@ -799,10 +792,11 @@ int main(int argc, char** argv) {
 
     // ////////////////// symmetrization/////////////////////////////////////////////
     // for (int i = 0;i < 7;i++) { symmetrise_jackboot(Njack, i, file_head.l0, conf_jack); }
-    symmetrise_jackboot(Njack, 1, header.T, conf_jack);
-    symmetrise_jackboot(Njack, 3, header.T, conf_jack);
-    symmetrise_jackboot(Njack, 5, header.T, conf_jack);
-    symmetrise_jackboot(Njack, 7, header.T, conf_jack);
+    // file for gm2 are already symm
+    // symmetrise_jackboot(Njack, 0, header.T, conf_jack);
+    // symmetrise_jackboot(Njack, 1, header.T, conf_jack,-1);
+    // symmetrise_jackboot(Njack, 2, header.T, conf_jack);
+    // symmetrise_jackboot(Njack, 3, header.T, conf_jack,-1);
     ////////////////////////////////////////////////
     double* zeros = (double*)calloc(Njack, sizeof(double));
     corr_counter = -1;
@@ -818,8 +812,9 @@ int main(int argc, char** argv) {
     // }
 
     //////////////////////////////////////////////////////////////
-    // f_pi 
     //////////////////////////////////////////////////////////////
+// ZA*mpcac /mu    0.735*(-2.44897959184e-4)/0.0012
+
     fit_type fit_info;
 
     fit_info.restore_default();
@@ -828,23 +823,27 @@ int main(int argc, char** argv) {
     fit_info.N = 1;
     fit_info.Njack = Njack;
     fit_info.T = header.T;
-    fit_info.corr_id = { 3, 1 };
+    fit_info.corr_id = { 1, 0 };
     fit_info.n_ext_P = 0;
     // fit_info.ext_P = (double**)malloc(sizeof(double*) * 0);
     fit_info.function = constant_fit;
     fit_info.linear_fit = true;
 
-    //c++ 1 || r 2
-    fit_result fit_out = fit_fun_to_fun_of_corr(option, kinematic_2pt, (char*)"P5P5", conf_jack, namefile_plateaux, outfile, mpcac, "mpcac_TM", fit_info, jack_file);
-    free_fit_result(fit_info, fit_out);
+    double* M_PS_op = plateau_correlator_function(option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack, namefile_plateaux, outfile, 0, "M_{PS}^{op}", M_eff_T, jack_file);
     check_correlatro_counter(0);
 
 
-    fit_info.corr_id = { 7, 5 };
+    //c++ 1 || r 2
+    fit_result fit_out = fit_fun_to_fun_of_corr(option, kinematic_2pt, (char*)"P5P5", conf_jack, namefile_plateaux, outfile, mpcac, "mpcac_TM", fit_info, jack_file);
+    free_fit_result(fit_info, fit_out);
+    check_correlatro_counter(1);
+
+
+    fit_info.corr_id = { 3, 2 };
     fit_out = fit_fun_to_fun_of_corr(option, kinematic_2pt, (char*)"P5P5", conf_jack, namefile_plateaux, outfile, mpcac, "mpcac_OS", fit_info, jack_file);
     free_fit_result(fit_info, fit_out);
     fit_info.restore_default();
-    check_correlatro_counter(1);
+    check_correlatro_counter(2);
 
 
     //////////////////////
