@@ -108,6 +108,11 @@ add_executable(fit_strange fit_strange.cpp)
 target_link_libraries(fit_strange PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
 target_link_libraries(fit_strange PUBLIC functions_gm2_analysis)
 
+add_executable(fit_etas fit_etas.cpp)
+target_link_libraries(fit_etas PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(fit_etas PUBLIC functions_gm2_analysis)
+
+
 add_executable(fit_charm fit_charm.cpp)
 target_link_libraries(fit_charm PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
 target_link_libraries(fit_charm PUBLIC functions_gm2_analysis)
