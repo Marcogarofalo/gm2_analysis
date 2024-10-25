@@ -311,44 +311,42 @@ int main(int argc, char** argv) {
     std::vector<double*> damu_SD(files.size());
     std::vector<double*> damu_W(files.size());
     std::vector<double*> damu_LD(files.size());
+    std::vector<double*> damu_full(files.size());
+
 
     double scale = 1e-10;
-    double put_a_number =0;
+    double put_a_number = 0;
     for (int e = 0; e < files.size(); e++) {
         if (e == B72_64 || e == B72_96) {
-            damu_SD[e] = myres->create_fake(-0.00263127  * scale, 0.00159453 * scale, 2000 + B72_64);
-            damu_W[e] = myres->create_fake(-0.00144267 * scale, 0.000824161 * scale, 2000 + B72_64 + files.size());
-            damu_LD[e] = myres->create_fake(-0.00408932 * scale, 0.00241131 * scale, 2000 + B72_64 + 2 * files.size()); // FULl HVP and then subtract
-            myres->sub(damu_LD[e], damu_LD[e], damu_W[e]);
-            myres->sub(damu_LD[e], damu_LD[e], damu_SD[e]);
+            damu_SD[e] = myres->create_fake(-0.00263127 * scale, 0.00226673 * scale, 2000 + B72_64);
+            damu_W[e] = myres->create_fake(-0.00144267 * scale, 0.00116569 * scale, 2000 + B72_64 + files.size());
+            damu_full[e] = myres->create_fake(-0.00408932 * scale, 0.00341044 * scale, 2000 + B72_64 + 2 * files.size());
+            damu_LD[e] = myres->create_fake(-1.53837e-05 * scale, 1.03892e-05 * scale, 2000 + B72_64 + 3 * files.size());
+
         }
         else if (e == C06 || e == C112) {
-            damu_SD[e] = myres->create_fake(-0.00658523 * scale, 0.00321247 * scale, 2000 + C06);
-            damu_W[e] = myres->create_fake(-0.0038205 * scale, 0.00204857 * scale, 2000 + C06 + files.size());
-            damu_LD[e] = myres->create_fake(-0.010442 * scale, 0.00520567 * scale, 2000 + C06 + 2 * files.size()); // FULl HVP and then subtract
-            myres->sub(damu_LD[e], damu_LD[e], damu_W[e]);
-            myres->sub(damu_LD[e], damu_LD[e], damu_SD[e]);
+            damu_SD[e] = myres->create_fake(-0.00658523 * scale, 0.00261089 * scale, 2000 + C06);
+            damu_W[e] = myres->create_fake(-0.0038205 * scale, 0.00160086 * scale, 2000 + C06 + files.size());
+            damu_full[e] = myres->create_fake(-0.010442 * scale, 0.00418127 * scale, 2000 + C06 + 2 * files.size());
+            damu_LD[e] = myres->create_fake(-3.63001e-05 * scale, 1.66105e-05 * scale, 2000 + C06 + 3 * files.size());
         }
         else if (e == D54) {
-            damu_SD[e] = myres->create_fake(0.000394258 * scale, 0.000814973 * scale, 2000 + D54);
-            damu_W[e] = myres->create_fake(0.00023767 * scale, 0.000448224 * scale, 2000 + D54 + files.size());
-            damu_LD[e] = myres->create_fake(0.000634983 * scale, 0.00126249 * scale, 2000 + D54 + 2 * files.size()); // FULl HVP and then subtract
-            myres->sub(damu_LD[e], damu_LD[e], damu_W[e]);
-            myres->sub(damu_LD[e], damu_LD[e], damu_SD[e]);
+            damu_SD[e] = myres->create_fake(0.000394258  * scale, 0.0026415 * scale, 2000 + D54);
+            damu_W[e] = myres->create_fake(0.00023767 * scale, 0.00139557 * scale, 2000 + D54 + files.size());
+            damu_full[e] = myres->create_fake(0.000634983 * scale, 0.00398003 * scale, 2000 + D54 + 2 * files.size()); // FULl HVP and then subtract
+            damu_LD[e] = myres->create_fake(3.05414e-06  * scale, 1.84107e-05 * scale, 2000 + D54 + 3 * files.size());
         }
         else if (e == E112) {
-            damu_SD[e] = myres->create_fake(0.00670547 * scale, 0.00604982 * scale, 2000 + E112);
-            damu_W[e] = myres->create_fake(0.00501327 * scale, 0.00338483 * scale, 2000 + E112 + files.size());
-            damu_LD[e] = myres->create_fake(0.0117678 * scale, 0.00938253 * scale, 2000 + E112 + 2 * files.size()); // FULl HVP and then subtract
-            myres->sub(damu_LD[e], damu_LD[e], damu_W[e]);
-            myres->sub(damu_LD[e], damu_LD[e], damu_SD[e]);
+            damu_SD[e] = myres->create_fake(0.00670547 * scale, 0.00619627 * scale, 2000 + E112);
+            damu_W[e] = myres->create_fake(0.00501327 * scale, 0.00345889 * scale, 2000 + E112 + files.size());
+            damu_full[e] = myres->create_fake(0.0117678 * scale, 0.00960423 * scale, 2000 + E112 + 2 * files.size());
+            damu_LD[e] = myres->create_fake(4.90842e-05 * scale, 2.88217e-05 * scale, 2000 + E112 + 3 * files.size());
         }
         else {
             damu_SD[e] = myres->create_fake(0.0, 1e-16, 2000 + A30);
             damu_W[e] = myres->create_fake(0.0, 1e-16, 2000 + A30 + files.size());
+            damu_full[e] = myres->create_fake(0.0, 1e-16, 2000 + A30 + files.size());
             damu_LD[e] = myres->create_fake(0.0, 1e-16, 2000 + A30 + 2 * files.size()); // FULl HVP and then subtract
-            myres->sub(damu_LD[e], damu_LD[e], damu_W[e]);
-            myres->sub(damu_LD[e], damu_LD[e], damu_SD[e]);
         }
 
     }
@@ -356,9 +354,13 @@ int main(int argc, char** argv) {
     for (int e : ensemble_to_correct) {
         for (int j = 0;j < Njack;j++) {
             for (int tm = 0;tm < 2;tm++) {
-                jackextra.en[e].jack[id_SD_cor[tm]][j] = jackextra.en[e].jack[id_SD[tm]][j] + damu_SD[e][j];
-                jackextra.en[e].jack[id_W_cor[tm]][j] = jackextra.en[e].jack[id_W[tm]][j] + damu_W[e][j];
-                jackextra.en[e].jack[id_LD_cor[tm]][j] = jackextra.en[e].jack[id_LD[tm]][j] + damu_LD[e][j];
+                jackextra.en[e].jack[id_SD_cor[tm]][j] = damu_SD[e][j];
+                jackextra.en[e].jack[id_W_cor[tm]][j] = damu_W[e][j];
+                jackextra.en[e].jack[id_LD_cor[tm]][j] = damu_LD[e][j];
+                jackextra.en[e].jack[id_full_cor[tm]][j] = damu_full[e][j];
+                // jackextra.en[e].jack[id_SDeta_cor[tm]][j] = jackextra.en[e].jack[id_SDeta[tm]][j] + damu_SD[e][j];
+                // jackextra.en[e].jack[id_Weta_cor[tm]][j] = jackextra.en[e].jack[id_Weta[tm]][j] + damu_W[e][j];
+                // jackextra.en[e].jack[id_LDeta_cor[tm]][j] = jackextra.en[e].jack[id_LDeta[tm]][j] + damu_LD[e][j];
 
                 // jackextra.en[e].jack[id_SDtmin0_cor[tm]][j] = jackextra.en[e].jack[id_SDtmin0[tm]][j] + damu_SD[e][j];
             }
@@ -449,19 +451,19 @@ int main(int argc, char** argv) {
                     //////////////////  corrected
                 case 11:
                     namefit = namefit + "_SDcor";
-                    fit_info.corr_id = { id_SD_cor[0], id_SD_cor[1] };
+                    fit_info.corr_id = { id_SD[0], id_SD[1],id_SD_cor[0], id_SD_cor[1] };
                     break;
                 case 12:
                     namefit = namefit + "_Wcor";
-                    fit_info.corr_id = { id_W_cor[0], id_W_cor[1] };
+                    fit_info.corr_id = { id_W[0], id_W[1], id_W_cor[0], id_W_cor[1] };
                     break;
                 case 13:
                     namefit = namefit + "_LDcor";
-                    fit_info.corr_id = { id_LD_cor[0], id_LD_cor[1] };
+                    fit_info.corr_id = { id_LD[0], id_LD[1], id_LD_cor[0], id_LD_cor[1] };
                     break;
                 case 14:
                     namefit = namefit + "_SDpWpLDcor";
-                    fit_info.corr_id = { id_SD_cor[0], id_SD_cor[1],id_W_cor[0], id_W_cor[1], id_LD_cor[0], id_LD_cor[1] };
+                    fit_info.corr_id = { id_SD[0], id_SD[1],id_W[0], id_W[1], id_LD[0], id_LD[1], id_full_cor[0], id_full_cor[1] };
                     break;
                     // case 15:
                     //     namefit = namefit + "_SDtmin0cor";
@@ -494,10 +496,10 @@ int main(int argc, char** argv) {
                         fit_info.corr_id[i * 2] = fit_info.corr_id[i * 2 + 1];
                 }
 
-               double (*lhs_fun)(int, int, int, data_all, struct fit_type);
-                if (iW >= 0 && iW < 5) lhs_fun = lhs_amu;
-                else if (iW == 5 || iW == 14) lhs_fun = lhs_sum;
-                else lhs_fun = lhs_amu;
+                double (*lhs_fun)(int, int, int, data_all, struct fit_type) = lhs_sum;
+                // if (iW >= 0 && iW < 5) lhs_fun = lhs_amu;
+                // else if (iW == 5 || iW == 14) lhs_fun = lhs_sum;
+                // else lhs_fun = lhs_amu;
 
 
                 switch (ie) {
