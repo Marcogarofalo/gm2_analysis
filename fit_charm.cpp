@@ -331,10 +331,10 @@ int main(int argc, char** argv) {
             damu_LD[e] = myres->create_fake(-3.63001e-05 * scale, 1.66105e-05 * scale, 2000 + C06 + 3 * files.size());
         }
         else if (e == D54) {
-            damu_SD[e] = myres->create_fake(0.000394258  * scale, 0.0026415 * scale, 2000 + D54);
+            damu_SD[e] = myres->create_fake(0.000394258 * scale, 0.0026415 * scale, 2000 + D54);
             damu_W[e] = myres->create_fake(0.00023767 * scale, 0.00139557 * scale, 2000 + D54 + files.size());
             damu_full[e] = myres->create_fake(0.000634983 * scale, 0.00398003 * scale, 2000 + D54 + 2 * files.size()); // FULl HVP and then subtract
-            damu_LD[e] = myres->create_fake(3.05414e-06  * scale, 1.84107e-05 * scale, 2000 + D54 + 3 * files.size());
+            damu_LD[e] = myres->create_fake(3.05414e-06 * scale, 1.84107e-05 * scale, 2000 + D54 + 3 * files.size());
         }
         else if (e == E112) {
             damu_SD[e] = myres->create_fake(0.00670547 * scale, 0.00619627 * scale, 2000 + E112);
