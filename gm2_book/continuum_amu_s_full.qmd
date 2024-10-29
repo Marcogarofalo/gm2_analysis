@@ -109,6 +109,7 @@ plot_the_Ambaradam <- function(name) {
     "_alog", "_alog2", "_alog3"
   )
   source("/home/garofalo/programs/Rose/R/read_block.R")
+  source("/home/garofalo/programs/Rose/R/plot_routines.R")
   dir <- "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/"
   count <- 0
   for (lat in list_lat) {
@@ -170,20 +171,21 @@ plot_the_Ambaradam <- function(name) {
         if (
           (lat == "_3b_BOS_BTM" & a2 == "_a4OS_a4TM") |
             (lat == "_3b" & a2 == "") |
-            (lat == "_3b" & a2 == "_a4OS_a4TM")|
-            (lat == "_3b_BOS_BTM" & a2 == "_alogOS_alogTM") | 
-            (lat == "_3b_onlyTM" & a2=="")
+            (lat == "_3b" & a2 == "_a4OS_a4TM") |
+            (lat == "_3b_BOS_BTM" & a2 == "_alogOS_alogTM") |
+            (lat == "_3b_onlyTM" & a2 == "")
         ) {
-          gg <- plot_fit(
-            basename = namefile,
-            var = "afm",
-            id_x = 1,
-            data_type = mydata,
-            width = 1e-4,
-            gg = gg,
-            single_name_for_fit = namelegend,
-            noribbon = TRUE
-          )
+          # if(fit$chi2dof<0.5 | (lat == "_3b_BOS_BTM" & a2 == "_a4OS_a4TM")){
+          # gg <- plot_fit(
+          #   basename = namefile,
+          #   var = "afm",
+          #   id_x = 1,
+          #   data_type = mydata,
+          #   width = 1e-4,
+          #   gg = gg,
+          #   single_name_for_fit = namelegend,
+          #   noribbon = TRUE
+          # )
         }
         count <- count + 1
       }
@@ -200,6 +202,33 @@ plot_the_Ambaradam <- function(name) {
     "AIC (chi2 + 2Npar - Ndat)/2 = ", mean_print(ave_AIC$m, ave_AIC$dm),
     "(", ave_AIC$stat, ")", "[", ave_AIC$syst, "]", "\n\n"
   )
+  df$AIC <- ave_AIC$AIC
+  l <- order(df$AIC, decreasing = TRUE)
+  sumAIC=0
+  for (i in l) {
+    namefile <- paste0(dir, df$fit[i ])
+    mydata <- c(" OS", " TM")
+    if (str_detect(df$fit[i ], "onlyOS")) mydata <- c(" OS")
+    if (str_detect(df$fit[i ], "onlyTM")) mydata <- c(" TM")
+    namelegend <- "fit"
+    gg <- plot_fit(
+      basename = namefile,
+      var = "afm",
+      id_x = 1,
+      data_type = mydata,
+      width = 1e-4,
+      gg = gg,
+      single_name_for_fit = paste0("AIC=",df$AIC[i]),
+      noribbon = TRUE, alpha_line=0.2
+    )
+    sumAIC =sumAIC +df$AIC[i]
+    if (sumAIC>0.3){
+      break
+    }
+  }
+
+  ###########################
+
   a <- which(df$dof == 1)
   if (length(a) > 0) {
     df1 <- df[-a, ]
@@ -260,7 +289,7 @@ plot_the_Ambaradam <- function(name) {
     "AIC (chi2 + 2Npar - Ndat)/2 (4 latt + 3 linear ) = ", mean_print(ave_AIC11$m, ave_AIC11$dm),
     "(", ave_AIC11$stat, ")", "[", ave_AIC11$syst, "]", "\n\n"
   )
-  
+
   a <- which(str_detect(df$fit, "noC"))
   df1 <- df[-a, ]
   ave_AIC11 <- AIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
@@ -287,6 +316,7 @@ plot_the_Ambaradam <- function(name) {
   #         axis.ticks.y=element_blank())+theme(plot.margin = margin(0,0,0,0, "cm"))
   gg <- ggplot() +
     geom_histogram(aes(y = df$res, weight = ave_AIC$AIC)) +
+    # geom_density(aes(y = df$res, weight = ave_AIC$AIC)) +
     theme_bw()
 
   gg <- gg +
@@ -302,7 +332,6 @@ plot_the_Ambaradam <- function(name) {
   #   widths = c(1, 3.5),
   #   ncol = 2, nrow = 1
   # )
-  df$AIC <- ave_AIC$AIC
   return(df)
 }
 
@@ -361,6 +390,18 @@ window paper value: 9.074(64)e-10
 ```{r, echo=FALSE, results='asis',  warning=FALSE}
 df <- plot_the_Ambaradam("SD")
 write.table(df, file = "SD_strange", row.names = FALSE)
+# gg <- ggplot() +
+#     # geom_histogram(aes(y = df$res, weight = df$AIC)) +
+#     geom_density(aes(y = df$res, weight = df$AIC)) +
+#     theme_bw()
+# gg
+
+# gghistogram(df,
+#    x = "res", y = "..density..",
+#    weight = "AIC",
+#    rug = TRUE,
+#   add_density = TRUE
+#   )
 ```
 
 <!-- ```{r, echo=FALSE, results='asis',  warning=FALSE} -->
@@ -642,5 +683,37 @@ write.table(df, file = "LDeta_cor_strange", row.names = FALSE)
 ```{r, echo=FALSE, results='asis',  warning=FALSE}
 df <- plot_the_Ambaradam("SDpWpLDetas")
 write.table(df, file = "SDpWpLDetas_cor_strange", row.names = FALSE)
+```
 
+## Eta + FVE
+
+
+### SD etas
+
+window paper value: 9.074(64)e-10
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- plot_the_Ambaradam("SDetasFVE")
+```
+
+### W
+
+window paper value: 27.28(20)e-10
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- plot_the_Ambaradam("WetasFVE")
+```
+
+
+
+### LD 
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- plot_the_Ambaradam("LDetasFVE")
+```
+
+### SUM
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- plot_the_Ambaradam("SDpWpLDetasFVE")
 ```

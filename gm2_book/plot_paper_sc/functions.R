@@ -139,7 +139,7 @@ plot_all_fits<- function(name,  window,quark){
           width = 1e-4,
           gg = gg,
           single_name_for_fit = namelegend,
-          noribbon = TRUE
+          noribbon = TRUE, alpha_line = 0.1,size=1.5
         )
         # }
         count <- count + 1

@@ -150,32 +150,66 @@ plot_the_Ambaradam <- function(name) {
         if (str_detect(namefit, "_3b_BOS_BTM"))
           namelegend<-paste0(namelegend,"-4beta")
         
-        if (
-          (lat == "_3b_BOS_BTM" & a2 == "_a4OS_a4TM") |
-            (lat == "_3b" & a2 == "") |
-            (lat == "_3b" & a2 == "_a4OS_a4TM")|
-            (lat == "_3b_BOS_BTM" & a2 == "_alogOS_alogTM") | 
-            (lat == "_3b_onlyTM" & a2=="")
-        ) {
-          gg <- plot_fit(
-            basename = namefile,
-            var = "afm",
-            id_x = 1,
-            data_type = mydata,
-            width = 1e-4,
-            gg = gg,
-            single_name_for_fit = namelegend,
-            noribbon = TRUE
-          )
-        }
+        # if (
+        #   (lat == "_3b_BOS_BTM" & a2 == "_a4OS_a4TM") |
+        #     (lat == "_3b" & a2 == "") |
+        #     (lat == "_3b" & a2 == "_a4OS_a4TM")|
+        #     (lat == "_3b_BOS_BTM" & a2 == "_alogOS_alogTM") | 
+        #     (lat == "_3b_onlyTM" & a2=="")
+        # ) {
+        #   gg <- plot_fit(
+        #     basename = namefile,
+        #     var = "afm",
+        #     id_x = 1,
+        #     data_type = mydata,
+        #     width = 1e-4,
+        #     gg = gg,
+        #     single_name_for_fit = namelegend,
+        #     noribbon = TRUE
+        #   )
+        # }
         count <- count + 1
       }
     }
   }
-  a <- which(df$fit == "")
-  if (length(a) > 0) df <- df[-a, ]
-  ave_AIC <- AIC(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity =  df$mult)
-  cat("AIC (chi2 + 2Npar - Ndat)/2 = ", mean_print(ave_AIC$m, ave_AIC$dm), "\n\n")
+   a <- which(df$fit == "")
+  if (length(a) > 0) {
+    print("eliminating:")
+    print(df$fit[a])
+    df <- df[-a, ]
+  }
+  ave_AIC <- AIC(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity = df$mult)
+  cat(
+    "AIC (chi2 + 2Npar - Ndat)/2 = ", mean_print(ave_AIC$m, ave_AIC$dm),
+    "(", ave_AIC$stat, ")", "[", ave_AIC$syst, "]", "\n\n"
+  )
+  df$AIC <- ave_AIC$AIC
+  l <- order(df$AIC, decreasing = TRUE)
+  sumAIC=0
+  for (i in l) {
+    namefile <- paste0(dir, df$fit[i ])
+    mydata <- c(" OS", " TM")
+    if (str_detect(df$fit[i ], "onlyOS")) mydata <- c(" OS")
+    if (str_detect(df$fit[i ], "onlyTM")) mydata <- c(" TM")
+    namelegend <- "fit"
+    gg <- plot_fit(
+      basename = namefile,
+      var = "afm",
+      id_x = 1,
+      data_type = mydata,
+      width = 1e-4,
+      gg = gg,
+      single_name_for_fit = paste0("AIC=",df$AIC[i]),
+      noribbon = TRUE
+    )
+    sumAIC =sumAIC +df$AIC[i]
+    if (sumAIC>0.3){
+      break
+    }
+  }
+
+  ###########################
+  
   a <- which(df$dof == 1)
   if (length(a) > 0) df1 <- df[-a, ]
   else df1<-df
@@ -350,6 +384,37 @@ window paper value: 11.61(27)e-10
 
 ```{r, echo=FALSE, results='asis',  warning=FALSE}
 df <- plot_the_Ambaradam("SDcor")
+```
+
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+name<-  "/home/garofalo/analysis/g-2_new_stat/fit_all_charm//amu_SDcor_3b_BOS_BTM"
+file <- paste0(name, "_fit_P.dat")
+df<-Rose::read_fit_P_file(file)
+print(make_table_fit_result(df))
+gg <- plot_fit(
+  basename =name,
+  var = "afm",
+  id_x = 1,
+  data_type = c("K", "K"),
+  width = 1e-4,
+  gg = NULL,
+  single_name_for_fit = "fit",
+  noline = TRUE
+)
+# gg <- plot_fit(
+#   basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_charm//amu_SDetas_3b_BOS_BTM_a4OS_a4TM",
+#   var = "afm",
+#   id_x = 1,
+#   # data_type = c("OS-eta", "TM-eta"),
+#   data_type = c("etas", "etas"),
+#   width = 1e-4,
+#   gg = gg,
+#   single_name_for_fit = "fit-eta",
+#   noline = TRUE
+# )
+
+fig <- myplotly(gg, "", "$a^2$", "$a_{\\mu}(s)$", to_print = TRUE, output = "HTML", legend_position = c(0, 0))
 ```
 
 ### W
