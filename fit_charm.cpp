@@ -135,10 +135,15 @@ data_all read_all_the_files(std::vector<std::string> files, const char* resampli
 
 }
 
+
 double lhs_sum(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
     double r;
-    if (n == 0)        r = gjack.en[e].jack[fit_info.corr_id[0]][j] + gjack.en[e].jack[fit_info.corr_id[2]][j] + gjack.en[e].jack[fit_info.corr_id[4]][j];
-    else if (n == 1)   r = gjack.en[e].jack[fit_info.corr_id[1]][j] + gjack.en[e].jack[fit_info.corr_id[3]][j] + gjack.en[e].jack[fit_info.corr_id[5]][j];
+    // if (n == 0)        r = gjack.en[e].jack[fit_info.corr_id[0]][j] + gjack.en[e].jack[fit_info.corr_id[2]][j] + gjack.en[e].jack[fit_info.corr_id[4]][j];
+    // else if (n == 1)   r = gjack.en[e].jack[fit_info.corr_id[1]][j] + gjack.en[e].jack[fit_info.corr_id[3]][j] + gjack.en[e].jack[fit_info.corr_id[5]][j];
+    r = gjack.en[e].jack[fit_info.corr_id[0 + n]][j] + gjack.en[e].jack[fit_info.corr_id[2 + n]][j] + gjack.en[e].jack[fit_info.corr_id[4 + n]][j];
+    r = 0;
+    for (int i = 0;i < fit_info.corr_id.size();i += 2)
+        r += gjack.en[e].jack[fit_info.corr_id[i + n]][j];
     return r;
 }
 
