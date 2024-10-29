@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
+#include <cmath>     /* erf */ 
+#include <ranges>
 
 #include "global.hpp"
 #include "resampling.hpp"
@@ -188,6 +190,20 @@ void sum_lsc(data_all in, const char* outpath, const char* filename) {
 
 }
 
+double comp_pool_variable(double* j1, double* j2) {
+    double err1 = myres->comp_error(j1);
+    double err2 = myres->comp_error(j2);
+    int  Nj = myres->Njack;
+    return (j1[Nj - 1] - j2[Nj - 1]) / sqrt(err1 * err1 + err2 * err2);
+}
+double comp_error_pool(double* j1, double* j2) {
+
+    int  Nj = myres->Njack;
+    double P = comp_pool_variable(j1, j2);
+
+    return fabs(j1[Nj - 1] - j2[Nj - 1]) * erf(fabs(P) / sqrt(2.0));
+}
+
 
 
 int main(int argc, char** argv) {
@@ -259,16 +275,13 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     data_all jackextra;
     jackextra.resampling = jackall.resampling;
-    //jackall->en = (data_single*)malloc(sizeof(data_single) * files.size());
+    
     jackextra.en = new data_single[jackall.ens];
     jackextra.ens = jackall.ens;
-    int count = 0;
-    for (std::string s : files) {
-        FILE* f = open_file(s.c_str(), "r");
-
-        // jackall.en[count] = read_single_dataj(f);
+    for (int count = 0; count < jackextra.ens; count++) {
+      
         data_single dj;
-        dj.header = read_header(f);
+        dj.header = jackall.en[count].header;
         dj.Nobs = jackall.en[count].Nobs + 1 + 50;
         dj.Njack = dj.header.Njack;
         dj.jack = double_malloc_2(dj.Nobs, dj.Njack);
@@ -276,15 +289,14 @@ int main(int argc, char** argv) {
         //
         size_t i = 0;
         for (int obs = 0; obs < jackall.en[count].Nobs; obs++) {
-            // i += fread(dj.jack[obs], sizeof(double), dj.Njack, stream);
+    
             for (int j = 0;j < Njack;j++)
                 dj.jack[obs][j] = jackall.en[count].jack[obs][j];
         }
         dj.resampling = jackall.en[count].resampling;
 
         jackextra.en[count] = dj;
-        count++;
-        fclose(f);
+    
     }
 
 
@@ -310,16 +322,11 @@ int main(int argc, char** argv) {
     std::vector<int> id_W_cor = { obs + 3, obs + 4 };
     std::vector<int> id_LD_cor = { obs + 5, obs + 6 };
     std::vector<int> id_full_cor = { obs + 7, obs + 8 };
-    std::vector<int> id_fulltree_cor = { obs + 9, obs + 10 };
-    std::vector<int> id_SDtmin0_cor = { obs + 11, obs + 12 };
-    std::vector<int> id_SDtmin1_cor = { obs + 13, obs + 14 };
-    std::vector<int> id_SDtmin2_cor = { obs + 15, obs + 16 };
-    std::vector<int> id_SDtmin3_cor = { obs + 17, obs + 18 };
-    std::vector<int> id_SDtmin4_cor = { obs + 19, obs + 20 };
-    std::vector<int> id_SDeta_cor = { obs + 21, obs + 22 };
-    std::vector<int> id_Weta_cor = { obs + 23, obs + 24 };
-    std::vector<int> id_LDeta_cor = { obs + 25, obs + 26 };
 
+    std::vector<int> id_SD_FVE = { obs + 9, obs + 10 };
+    std::vector<int> id_W_FVE = { obs + 11, obs + 12 };
+    std::vector<int> id_LD_FVE = { obs + 13, obs + 14 };
+    std::vector<int> id_full_FVE = { obs + 15, obs + 16 };
 
     std::vector<int> ensemble_to_correct = { B72_64, B72_96, C06, C112 ,D54, E112 };
     std::vector<double*> damu_SD(files.size());
@@ -345,7 +352,7 @@ int main(int argc, char** argv) {
             damu_SD[e] = myres->create_fake(0.000635405 * scale, 0.000967111 * scale, 2000 + D54);
             damu_W[e] = myres->create_fake(0.0104084 * scale, 0.0315747 * scale, 2000 + D54 + files.size());
             damu_full[e] = myres->create_fake(0.0321713 * scale, 0.13259 * scale, 2000 + D54 + 2 * files.size()); // FULl HVP and then subtract
-            damu_LD[e] = myres->create_fake(0.0211275*scale, 0.101898 *scale, 1);
+            damu_LD[e] = myres->create_fake(0.0211275 * scale, 0.101898 * scale, 1);
         }
         else if (e == E112) {
             damu_SD[e] = myres->create_fake(0.00230056 * scale, 0.00218935 * scale, 2000 + E112);
@@ -370,14 +377,47 @@ int main(int argc, char** argv) {
                 jackextra.en[e].jack[id_W_cor[tm]][j] = damu_W[e][j];
                 jackextra.en[e].jack[id_LD_cor[tm]][j] = damu_LD[e][j];
                 jackextra.en[e].jack[id_full_cor[tm]][j] = damu_full[e][j];
-                // jackextra.en[e].jack[id_SDeta_cor[tm]][j] = jackextra.en[e].jack[id_SDeta[tm]][j] + damu_SD[e][j];
-                // jackextra.en[e].jack[id_Weta_cor[tm]][j] = jackextra.en[e].jack[id_Weta[tm]][j] + damu_W[e][j];
-                // jackextra.en[e].jack[id_LDeta_cor[tm]][j] = jackextra.en[e].jack[id_LDeta[tm]][j] + damu_LD[e][j];
 
-                // jackextra.en[e].jack[id_SDtmin0_cor[tm]][j] = jackextra.en[e].jack[id_SDtmin0[tm]][j] + damu_SD[e][j];
+
+                jackextra.en[e].jack[id_SD_FVE[tm]][j] = jackall.en[e].jack[id_SDeta[tm]][j];
+                jackextra.en[e].jack[id_W_FVE[tm]][j] = jackall.en[e].jack[id_Weta[tm]][j];
+                jackextra.en[e].jack[id_LD_FVE[tm]][j] = jackall.en[e].jack[id_LDeta[tm]][j];
+                // jackextra.en[e].jack[id_full_FVE[tm]][j] = jackall.en[e].jack[id_fulleta[tm]][j];
+
             }
         }
     }
+    {
+        int e = B72_64;
+        int eadd = B72_96;
+        for (int j = 0;j < Njack;j++) {
+            for (int tm = 0;tm < 2;tm++) {
+                jackextra.en[e].jack[id_SD_FVE[tm]][j] += jackextra.en[eadd].jack[id_SD_FVE[tm]][j];
+                jackextra.en[e].jack[id_W_FVE[tm]][j] += jackextra.en[eadd].jack[id_W_FVE[tm]][j];
+                jackextra.en[e].jack[id_LD_FVE[tm]][j] += jackextra.en[eadd].jack[id_LD_FVE[tm]][j];
+                // jackextra.en[e].jack[id_full_FVE[tm]][j] += jackextra.en[eadd].jack[id_full_FVE[tm]][j];
+                jackextra.en[e].jack[id_SD_FVE[tm]][j] /= 2.0;
+                jackextra.en[e].jack[id_W_FVE[tm]][j] /= 2.0;
+                jackextra.en[e].jack[id_LD_FVE[tm]][j] /= 2.0;
+                // jackextra.en[e].jack[id_full_FVE[tm]][j] /= 2.0;
+            }
+        }
+        e = C06;
+        eadd = C112;
+        for (int j = 0;j < Njack;j++) {
+            for (int tm = 0;tm < 2;tm++) {
+                jackextra.en[e].jack[id_SD_FVE[tm]][j] += jackextra.en[eadd].jack[id_SD_FVE[tm]][j];
+                jackextra.en[e].jack[id_W_FVE[tm]][j] += jackextra.en[eadd].jack[id_W_FVE[tm]][j];
+                jackextra.en[e].jack[id_LD_FVE[tm]][j] += jackextra.en[eadd].jack[id_LD_FVE[tm]][j];
+                // jackextra.en[e].jack[id_full_FVE[tm]][j] += jackextra.en[eadd].jack[id_full_FVE[tm]][j];
+                jackextra.en[e].jack[id_SD_FVE[tm]][j] /= 2.0;
+                jackextra.en[e].jack[id_W_FVE[tm]][j] /= 2.0;
+                jackextra.en[e].jack[id_LD_FVE[tm]][j] /= 2.0;
+                // jackextra.en[e].jack[id_full_FVE[tm]][j] /= 2.0;
+            }
+        }
+    }
+
 
 
     std::vector<std::string>   interpolations;
@@ -392,14 +432,14 @@ int main(int argc, char** argv) {
     data_all  sum_amu_W;
     sum_amu_W.resampling = argv[1];
 
-    count = 0;
+    int count = 0;
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
     fit_info.restore_default();
     std::string namefit;
 
 
-    for (int iW = 0;iW < 19;iW++) {
+    for (int iW = 0;iW < 23;iW++) {
         for (int ie = 0;ie < 14;ie++) {
 
             std::vector<int> fi_list;
@@ -496,6 +536,22 @@ int main(int argc, char** argv) {
                 case 18:
                     namefit = namefit + "_SDpWpLDetas";
                     fit_info.corr_id = { id_SDeta[0], id_SDeta[1],id_Weta[0], id_Weta[1], id_LDeta[0], id_LDeta[1] ,id_full_cor[0], id_full_cor[1] };
+                    break;
+                case 19:
+                    namefit = namefit + "_SDetasFVE";
+                    fit_info.corr_id = { id_SD_FVE[0], id_SD_FVE[1], id_SD_cor[0], id_SD_cor[1] };
+                    break;
+                case 20:
+                    namefit = namefit + "_WetasFVE";
+                    fit_info.corr_id = { id_W_FVE[0], id_W_FVE[1], id_W_cor[0], id_W_cor[1] };
+                    break;
+                case 21:
+                    namefit = namefit + "_LDetasFVE";
+                    fit_info.corr_id = { id_LD_FVE[0], id_LD_FVE[1], id_LD_cor[0], id_LD_cor[1] };
+                    break;
+                case 22:
+                    namefit = namefit + "_SDpWpLDetasFVE";
+                    fit_info.corr_id = { id_SD_FVE[0], id_SD_FVE[1],id_W_FVE[0], id_W_FVE[1], id_LD_FVE[0], id_LD_FVE[1] ,id_full_cor[0], id_full_cor[1] };
                     break;
                     // case 15:
                     //     namefit = namefit + "_SDtmin0cor";
@@ -770,4 +826,41 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // all ens
     //////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////
+    // volume pool variable
+    //////////////////////////////////////////////////////////////
+    {
+        std::vector<double> P(4);
+        std::vector<int> id;
+        id = id_SD;
+        P[0] = comp_error_pool(jackextra.en[B72_64].jack[id[0]], jackextra.en[B72_96].jack[id[0]]);
+        P[1] = comp_error_pool(jackextra.en[B72_64].jack[id[1]], jackextra.en[B72_96].jack[id[1]]);
+        P[2] = comp_error_pool(jackextra.en[C06].jack[id[0]], jackextra.en[C112].jack[id[0]]);
+        P[3] = comp_error_pool(jackextra.en[C06].jack[id[1]], jackextra.en[C112].jack[id[1]]);
+        auto delta = std::ranges::max_element(P.begin(), P.end());
+        printf("SD volume error FVE to add Delta=%g\n", *delta);
+        id = id_W;
+        P[0] = comp_error_pool(jackextra.en[B72_64].jack[id[0]], jackextra.en[B72_96].jack[id[0]]);
+        P[1] = comp_error_pool(jackextra.en[B72_64].jack[id[1]], jackextra.en[B72_96].jack[id[1]]);
+        P[2] = comp_error_pool(jackextra.en[C06].jack[id[0]], jackextra.en[C112].jack[id[0]]);
+        P[3] = comp_error_pool(jackextra.en[C06].jack[id[1]], jackextra.en[C112].jack[id[1]]);
+        delta = std::ranges::max_element(P.begin(), P.end());
+        printf("W volume error FVE to add Delta=%g\n", *delta);
+        id = id_LD;
+        P[0] = comp_error_pool(jackextra.en[B72_64].jack[id[0]], jackextra.en[B72_96].jack[id[0]]);
+        P[1] = comp_error_pool(jackextra.en[B72_64].jack[id[1]], jackextra.en[B72_96].jack[id[1]]);
+        P[2] = comp_error_pool(jackextra.en[C06].jack[id[0]], jackextra.en[C112].jack[id[0]]);
+        P[3] = comp_error_pool(jackextra.en[C06].jack[id[1]], jackextra.en[C112].jack[id[1]]);
+        // for (int i = 0;i < P.size();i++) printf("Pi=%g\n", P[i]);
+        delta = std::ranges::max_element(P.begin(), P.end());
+        printf("LD volume error FVE to add Delta=%g\n", *delta);
+        // id = id_full;
+        // P[0] = comp_error_pool(jackextra.en[B72_64].jack[id[0]], jackextra.en[B72_96].jack[id[0]]);
+        // P[1] = comp_error_pool(jackextra.en[B72_64].jack[id[1]], jackextra.en[B72_96].jack[id[1]]);
+        // P[2] = comp_error_pool(jackextra.en[C06].jack[id[0]], jackextra.en[C112].jack[id[0]]);
+        // P[3] = comp_error_pool(jackextra.en[C06].jack[id[1]], jackextra.en[C112].jack[id[1]]);
+        // delta = std::ranges::max_element(P.begin(), P.end());
+        // printf("SDpWpLD volume error FVE to add Delta=%g\n", *delta);
+    }
 }
