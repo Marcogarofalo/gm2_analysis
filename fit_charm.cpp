@@ -732,7 +732,7 @@ int main(int argc, char** argv) {
                 //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
                 print_fit_band(argv, jackextra, fit_info, fit_info, namefit.c_str(), "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0002, xcont);
 
-                free_fit_result(fit_info, amu_SD_l_common_a4);
+                free_fit_result(fit_info, amu_SD_l_common_a4);  
             }
         }
     }
