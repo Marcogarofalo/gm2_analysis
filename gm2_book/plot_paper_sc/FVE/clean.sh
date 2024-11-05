@@ -1,0 +1,1 @@
+rm *.tex *.log *.aux

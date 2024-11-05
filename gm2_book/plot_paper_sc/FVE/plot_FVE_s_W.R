@@ -9,10 +9,10 @@ library("gridExtra")
 library("ggpubr")
 library(stringr)
 
-source("functions.R")
+#source("functions.R")
 mydata <- c("OS", "TM")
 # gg <- plot_fit(
-basename <- "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_SDetas_3b_BOS_BTM_FVE_a4OS_a4TM"
+basename <- "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_Wetas_3b_BOS_BTM_FVE_a4OS_a4TM"
 var <- "afm"
 id_x <- 1
 data_type <- mydata
@@ -32,16 +32,17 @@ df<- df1[c(1:4,7:10),]
 mydata<-rep(c("$L\\sim 5.1$", "$L\\sim 7.6$", "$L\\sim 5.4$", "$L\\sim 7.6$"),2)
 idy <- ncol(df) - 2
 
+
 ############ relative precision
 smallV<- df[c(1,3,5,7),]
 bigV<- df[c(2,4,6,8),]
-myen<- c("C","C ","B","B ")
-reg<- c("OS","TM","OS","TM")
+myen<- c("B","C","B ","C ")
+reg<- c("OS","OS","TM","TM")
 nudge<- rep(c(0.00002,0,0.00002,0),2)
 ratio<-smallV[, idy]/bigV[,idy]
+error<- (smallV[, idy+1]/bigV[,idy]) +(smallV[, idy]/bigV[,idy]^2)*bigV[,idy+1]
 pool<- (smallV[,idy]-bigV[,idy])/sqrt(smallV[,idy+1]^2+bigV[,idy+1]^2)
 pool <- abs(smallV[,idy]-bigV[,idy])*erf(abs(pool)/sqrt(2))
-error<- (smallV[, idy+1]/bigV[,idy]) +(smallV[, idy]/bigV[,idy]^2)*bigV[,idy+1]
 gg <- myggplot()
 gg<- gg + geom_hline(yintercept = 1, color="black")
 gg <- gg + geom_point(
@@ -64,8 +65,8 @@ gg <- gg + geom_errorbar(
   ),
   width = 0.1, size = size
 )
-ylab <- paste0("$a_{\\mu}^{\\rm HVP, SD}(s,L)/a_{\\mu}^{\\rm HVP, SD}(s,L')$")
-nameout <- paste0("amu_FVE_s_SD_ratio")
+ylab <- paste0("$a_{\\mu}^{\\rm HVP, W}(s,L)/a_{\\mu}^{\\rm HVP, W}(s,L')$")
+nameout <- paste0("amu_FVE_s_W_ratio")
 # scientific_10 <- function(x) {
 #   paste0(as.character(x * 10^10), "$ \\times 10^{-10}$")
 # }
@@ -83,8 +84,6 @@ fig <- myplotly(gg, "", "", ylab,
 
 
 #########################################
-#########################################
-
 
 nudge<- rep(c(0.00002,0,0.00002,0),2)
 gg <- myggplot()
@@ -111,8 +110,8 @@ gg <- gg + geom_errorbar(
   ),
   width = width, size = size
 )
-ylab <- paste0("$a_{\\mu}^{\\rm HVP,SD}(s)$")
-nameout <- paste0("amu_FVE_s_SD")
+ylab <- paste0("$a_{\\mu}^{\\rm HVP,W}(s)$")
+nameout <- paste0("amu_FVE_s_W")
 scientific_10 <- function(x) {
   paste0(as.character(x * 10^10), "$ \\times 10^{-10}$")
 }
@@ -121,5 +120,5 @@ gg<- gg + theme(text = element_text(size = 15))
 fig <- myplotly(gg, "", "$a^2$", ylab,
   to_print = FALSE,
   save_pdf = nameout,
-  output = "PDF", legend_position = c(0, 0.4)
+  output = "PDF", legend_position = c(0, 0.2)
 )
