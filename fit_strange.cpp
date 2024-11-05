@@ -498,23 +498,23 @@ int main(int argc, char** argv) {
                     break;
                 case 6:
                     namefit = namefit + "_SDtmin0";
-                    fit_info.corr_id = { 211, 212 }; // SD tmin 0
+                    fit_info.corr_id = { 211, 212 , id_SD_cor[0], id_SD_cor[1] }; // SD tmin 0
                     break;
                 case 7:
                     namefit = namefit + "_SDtmin1";
-                    fit_info.corr_id = { 213, 214 }; // SD tmin 1
+                    fit_info.corr_id = { 213, 214 , id_SD_cor[0], id_SD_cor[1] }; // SD tmin 1
                     break;
                 case 8:
                     namefit = namefit + "_SDtmin2";
-                    fit_info.corr_id = { 215, 216 }; // SD tmin 2
+                    fit_info.corr_id = { 215, 216 , id_SD_cor[0], id_SD_cor[1] }; // SD tmin 2
                     break;
                 case 9:
                     namefit = namefit + "_SDtmin3";
-                    fit_info.corr_id = { 217, 218 }; // SD tmin 3
+                    fit_info.corr_id = { 217, 218 , id_SD_cor[0], id_SD_cor[1] }; // SD tmin 3
                     break;
                 case 10:
                     namefit = namefit + "_SDtmin4";
-                    fit_info.corr_id = { 219, 220 }; // SD tmin 4
+                    fit_info.corr_id = { 219, 220 , id_SD_cor[0], id_SD_cor[1] }; // SD tmin 4
                     break;
                     //////////////////  corrected
                 case 11:

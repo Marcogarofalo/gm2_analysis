@@ -435,23 +435,23 @@ int main(int argc, char** argv) {
                     break;
                 case 6:
                     namefit = namefit + "_SDtmin0";
-                    fit_info.corr_id = { 221, 222 }; // SD tmin 0
+                    fit_info.corr_id = { 221, 222 ,id_SD_cor[0], id_SD_cor[1] }; // SD tmin 0
                     break;
                 case 7:
                     namefit = namefit + "_SDtmin1";
-                    fit_info.corr_id = { 223, 224 }; // SD tmin 1
+                    fit_info.corr_id = { 223, 224 ,id_SD_cor[0], id_SD_cor[1] }; // SD tmin 1
                     break;
                 case 8:
                     namefit = namefit + "_SDtmin2";
-                    fit_info.corr_id = { 225, 226 }; // SD tmin 2
+                    fit_info.corr_id = { 225, 226 ,id_SD_cor[0], id_SD_cor[1] }; // SD tmin 2
                     break;
                 case 9:
                     namefit = namefit + "_SDtmin3";
-                    fit_info.corr_id = { 227, 228 }; // SD tmin 3
+                    fit_info.corr_id = { 227, 228 ,id_SD_cor[0], id_SD_cor[1] }; // SD tmin 3
                     break;
                 case 10:
                     namefit = namefit + "_SDtmin4";
-                    fit_info.corr_id = { 229, 230 }; // SD tmin 4
+                    fit_info.corr_id = { 229, 230,id_SD_cor[0], id_SD_cor[1]  }; // SD tmin 4
                     break;
                     //////////////////  corrected
                 case 11:
@@ -569,8 +569,8 @@ int main(int argc, char** argv) {
                     break;
                 case 13:
                     namefit = namefit + "_3b_BOS_BTM_FVE";
-                    fit_info.Nxen = { { B72_64, B72_96, C06, C112 ,D54, E112},
-                                      { B72_64, B72_96, C06, C112, D54, E112} };
+                    fit_info.Nxen = { { B72_64, C06, C112 ,D54, E112},
+                                      { B72_64, C06, C112, D54, E112} };
                     break;
                 default:
                     break;
