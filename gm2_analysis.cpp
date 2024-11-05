@@ -3164,7 +3164,8 @@ int main(int argc, char** argv) {
         asd_vec[0] = amu_sdop_simp_s;
         asd_vec[1] = amu_sdop_simp_s1;
         mysprintf(name_sd, NAMESIZE, "amu_sdtmin%d_op_MK", tmin);
-        amu_op_sdtmin[tmin] = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, name_sd, resampling);
+        // amu_op_sdtmin[tmin] = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, name_sd, resampling);
+        amu_op_sdtmin[tmin] = interpol_Z(Nstrange, Njack, Meta, asd_vec, jack_aMetas_MeV_exp, outfile, name_sd, resampling);
 
         printf("amu_sdtmin(op,MK) = %g  %g\n", amu_op_sdtmin[tmin][Njack - 1], error_jackboot(resampling, Njack, amu_op_sdtmin[tmin]));
         free(amu_sdop_simp_s); free(amu_sdop_simp_s1);
