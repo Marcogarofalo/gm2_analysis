@@ -275,11 +275,11 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     data_all jackextra;
     jackextra.resampling = jackall.resampling;
-    
+
     jackextra.en = new data_single[jackall.ens];
     jackextra.ens = jackall.ens;
     for (int count = 0; count < jackextra.ens; count++) {
-      
+
         data_single dj;
         dj.header = jackall.en[count].header;
         dj.Nobs = jackall.en[count].Nobs + 1 + 50;
@@ -289,14 +289,14 @@ int main(int argc, char** argv) {
         //
         size_t i = 0;
         for (int obs = 0; obs < jackall.en[count].Nobs; obs++) {
-    
+
             for (int j = 0;j < Njack;j++)
                 dj.jack[obs][j] = jackall.en[count].jack[obs][j];
         }
         dj.resampling = jackall.en[count].resampling;
 
         jackextra.en[count] = dj;
-    
+
     }
 
 
@@ -439,7 +439,7 @@ int main(int argc, char** argv) {
     std::string namefit;
 
 
-    for (int iW = 0;iW < 23;iW++) {
+    for (int iW = 0;iW < 28;iW++) {
         for (int ie = 0;ie < 14;ie++) {
 
             std::vector<int> fi_list;
@@ -552,6 +552,26 @@ int main(int argc, char** argv) {
                 case 22:
                     namefit = namefit + "_SDpWpLDetasFVE";
                     fit_info.corr_id = { id_SD_FVE[0], id_SD_FVE[1],id_W_FVE[0], id_W_FVE[1], id_LD_FVE[0], id_LD_FVE[1] ,id_full_cor[0], id_full_cor[1] };
+                    break;
+                case 23:
+                    namefit = namefit + "_SDetasNoCor";
+                    fit_info.corr_id = { id_SDeta[0], id_SDeta[1] };
+                    break;
+                case 24:
+                    namefit = namefit + "_WetasNoCor";
+                    fit_info.corr_id = { id_Weta[0], id_Weta[1] };
+                    break;
+                case 25:
+                    namefit = namefit + "_LDetasNoCor";
+                    fit_info.corr_id = { id_LDeta[0], id_LDeta[1] };
+                    break;
+                case 26:
+                    namefit = namefit + "_SDpWpLDetasNoCor";
+                    fit_info.corr_id = { id_SDeta[0], id_SDeta[1],id_Weta[0], id_Weta[1], id_LDeta[0], id_LDeta[1] };
+                    break;
+                case 27:
+                    namefit = namefit + "_SDetasFVENoCor";
+                    fit_info.corr_id = { id_SD_FVE[0], id_SD_FVE[1] };
                     break;
                     // case 15:
                     //     namefit = namefit + "_SDtmin0cor";
