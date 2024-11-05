@@ -390,11 +390,16 @@ window paper value: 9.074(64)e-10
 ```{r, echo=FALSE, results='asis',  warning=FALSE}
 df <- plot_the_Ambaradam("SD")
 write.table(df, file = "SD_strange", row.names = FALSE)
-# gg <- ggplot() +
-#     # geom_histogram(aes(y = df$res, weight = df$AIC)) +
-#     geom_density(aes(y = df$res, weight = df$AIC)) +
-#     theme_bw()
-# gg
+
+```
+
+```{r}
+gg <- ggplot() +
+    geom_histogram(aes(y = df$res, weight = df$AIC), binwidth = 0.5e-12) +
+    # geom_freqpoly(aes(y = df$res, weight = df$AIC), binwidth = 1e-12) +
+    theme_bw()
+    # geom_density(aes(y = df$res, weight = df$AIC)) +
+gg
 
 # gghistogram(df,
 #    x = "res", y = "..density..",

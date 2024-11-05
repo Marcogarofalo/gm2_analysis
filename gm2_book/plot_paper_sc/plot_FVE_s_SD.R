@@ -12,7 +12,7 @@ library(stringr)
 source("functions.R")
 mydata <- c("OS", "TM")
 # gg <- plot_fit(
-basename <- "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_SDpWpLDetas_3b_BOS_BTM_FVE_a4OS_a4TM"
+basename <- "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_SDetas_3b_BOS_BTM_FVE_a4OS_a4TM"
 var <- "afm"
 id_x <- 1
 data_type <- mydata
@@ -62,8 +62,8 @@ gg <- gg + geom_errorbar(
   ),
   width = 0.1, size = size
 )
-ylab <- paste0("$a_{\\mu}^{\\rm HVP}(s,L)/a_{\\mu}^{\\rm HVP}(s,L')$")
-nameout <- paste0("amu_FVE_s_ratio")
+ylab <- paste0("$a_{\\mu}^{\\rm HVP, SD}(s,L)/a_{\\mu}^{\\rm HVP, SD}(s,L')$")
+nameout <- paste0("amu_FVE_s_SD_ratio")
 # scientific_10 <- function(x) {
 #   paste0(as.character(x * 10^10), "$ \\times 10^{-10}$")
 # }
@@ -81,6 +81,10 @@ fig <- myplotly(gg, "", "", ylab,
 
 
 #########################################
+#########################################
+
+
+nudge<- rep(c(0.00002,0,0.00002,0),2)
 gg <- myggplot()
 gg <- gg + geom_point(
   data = df,
@@ -105,8 +109,8 @@ gg <- gg + geom_errorbar(
   ),
   width = width, size = size
 )
-ylab <- paste0("$a_{\\mu}^{\\rm HVP}(s)$")
-nameout <- paste0("amu_FVE_s")
+ylab <- paste0("$a_{\\mu}^{\\rm HVP,SD}(s)$")
+nameout <- paste0("amu_FVE_s_SD")
 scientific_10 <- function(x) {
   paste0(as.character(x * 10^10), "$ \\times 10^{-10}$")
 }
@@ -115,5 +119,5 @@ gg<- gg + theme(text = element_text(size = 15))
 fig <- myplotly(gg, "", "$a^2$", ylab,
   to_print = FALSE,
   save_pdf = nameout,
-  output = "PDF", legend_position = c(0, 0.2)
+  output = "PDF", legend_position = c(0, 0.4)
 )

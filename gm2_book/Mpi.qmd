@@ -324,7 +324,7 @@ fig <- myplotly(gg, "", "$a\\mu_\\ell$", "$(M_\\pi/f_\\pi)^2$", to_print = TRUE)
 
 
 
-## A12.48 no C20.48 + strange misstuning (used for $a\mu_\ell$ determination)
+## A12.48 no C20.48 + strange misstuning
 
 
 
@@ -366,5 +366,55 @@ fig <- myplotly(gg, "", "$a\\mu_\\ell$", "$(M_\\pi/f_\\pi)^2$", to_print = TRUE)
 # dft[,2] <- mapply(mean_print, df[,2],df[,3])
 # dft[,3] <- mapply(mean_print, df1[,2],df1[,3])
 # kable(dft, col.names = c("Ens.","$a\\mu_\\ell$","$a\\mu_\\ell$-no-max-tw"))
+
+```
+
+
+
+
+## A12.48 no C20.48 + strange misstuning, unitary (used for $a\mu_\ell$ determination)
+
+
+
+```{r, echo=FALSE, results='asis', dev='tikz', warning=FALSE}
+
+
+dir <- "/home/garofalo/analysis/g-2_new_stat/fit_all/"
+
+name<-"aMpi2_over_afpi2_A12_noC20_cor_cov_unitary"
+namefit <- paste0(dir, "aMpi2_over_afpi2_A12_noC20_cor_cov_unitary")
+file <- paste0(namefit, "_fit_P.dat")
+fit <- read_fit_P_file(file)
+dt <- make_table_fit_result(fit)
+print(dt)
+
+
+gg <- plot_fit(
+  basename = namefit,
+  var = "amu",
+  id_x = 1,
+  data_type = c("A", "B", "C", "D", "E", "B", "C", "D"),
+  width = 1e-4,
+  gg = NULL, 
+  labelfit = "",
+  # , single_name_for_fit = "fit"
+  # , nolabel_for_fit = TRUE
+  noline = TRUE
+)
+
+# filed <- paste0(namefit, "_fit_data.txt")
+# df <- read.table(filed, header = FALSE, fill = TRUE)
+# idy <- ncol(df) - 2
+# kable(df[, c(1,2,3,4,idy,idy+1)],col.names =c("mu","aMpi","afpi","L","afpi-inf","err") )
+gg <- gg + geom_hline(yintercept = 1.07015457788)
+fig <- myplotly(gg, "", "$a\\mu_\\ell$", "$(M_\\pi/f_\\pi)^2$", to_print = TRUE)
+df<-read.table(paste0(dir,name,"_amul_res.txt"))
+
+# df<-read.table(paste0(dir,"aMpi2_over_afpi2_a2_A_cov_amul_res.txt"))
+# df1<-read.table(paste0(dir,"aMpi2_over_afpi2_a2_A_no_max_twist_cov_amul_res.txt"))
+dft<-df[,c(1,2)]
+dft[,2] <- mapply(mean_print, df[,2],df[,3])
+# dft[,3] <- mapply(mean_print, df1[,2],df1[,3])
+kable(dft, col.names = c("Ens.","$a\\mu_\\ell$"))
 
 ```

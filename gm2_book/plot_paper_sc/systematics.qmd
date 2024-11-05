@@ -1,0 +1,126 @@
+---
+title: "Untitled"
+format: html
+---
+  
+```{r}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+
+
+
+library("gridExtra")
+library("ggpubr")
+library(stringr)
+
+source("functions.R")
+```
+
+```{r}
+df<-plot_all_fits("SDetas","SD","s",quark_full_name="strange", to_plot = FALSE)
+df1<-plot_all_fits("SDetasNoCor","SD","s",quark_full_name="strange_no_fine_tuning_latt", to_plot = FALSE)
+s_ft2<- sqrt(df$dm^2 - df1$dm^2)
+cat("mean ",df$m,"\n")
+cat("ft ",s_ft2,"\n")
+cat("cont stat ",df1$stat,"\n")
+cat("cont syst ",df1$syst,"\n")
+cat("total ",df$dm,"\n")
+```
+
+
+
+```{r}
+df<-plot_all_fits("SDcor","SD","c",quark_full_name="charm", to_plot = FALSE)
+df1<-plot_all_fits("SD","SD","c",quark_full_name="charm_no_fine_tuning_latt", to_plot = FALSE)
+s_ft2<- sqrt(df$dm^2 - df1$dm^2)
+cat("mean ",df$m,"\n")
+cat("ft ",s_ft2,"\n")
+cat("cont stat ",df1$stat,"\n")
+cat("cont syst ",df1$syst,"\n")
+cat("total ",df$dm,"\n")
+```
+
+
+## W
+
+```{r}
+df<-plot_all_fits("Wetas","W","s",quark_full_name="strange", to_plot = FALSE)
+df1<-plot_all_fits("WetasNoCor","W","s",quark_full_name="strange_no_fine_tuning_latt", to_plot = FALSE)
+s_ft2<- sqrt(df$dm^2 - df1$dm^2)
+cat("mean ",df$m,"\n")
+cat("ft ",s_ft2,"\n")
+cat("cont stat ",df1$stat,"\n")
+cat("cont syst ",df1$syst,"\n")
+cat("total ",df$dm,"\n")
+```
+
+
+
+```{r}
+df<-plot_all_fits("Wcor","W","c",quark_full_name="charm", to_plot = FALSE)
+df1<-plot_all_fits("W","W","c",quark_full_name="charm_no_fine_tuning_latt", to_plot = FALSE)
+s_ft2<- sqrt(df$dm^2 - df1$dm^2)
+cat("mean ",df$m,"\n")
+cat("ft ",s_ft2,"\n")
+cat("cont stat ",df1$stat,"\n")
+cat("cont syst ",df1$syst,"\n")
+cat("total ",df$dm,"\n")
+```
+
+## LD
+
+
+
+```{r}
+df<-plot_all_fits("LDetas","LD","s",quark_full_name="strange", to_plot = FALSE)
+df1<-plot_all_fits("LDetasNoCor","LD","s",quark_full_name="strange_no_fine_tuning_latt", to_plot = FALSE)
+s_ft2<- sqrt(df$dm^2 - df1$dm^2)
+cat("mean ",df$m,"\n")
+cat("ft ",s_ft2,"\n")
+cat("cont stat ",df1$stat,"\n")
+cat("cont syst ",df1$syst,"\n")
+cat("total ",df$dm,"\n")
+```
+
+
+
+```{r}
+df<-plot_all_fits("LDcor","LD","c",quark_full_name="charm", to_plot = FALSE)
+df1<-plot_all_fits("LD","LD","c",quark_full_name="charm_no_fine_tuning_latt", to_plot = FALSE)
+s_ft2<- sqrt(df$dm^2 - df1$dm^2)
+cat("mean ",df$m,"\n")
+cat("ft ",s_ft2,"\n")
+cat("cont stat ",df1$stat,"\n")
+cat("cont syst ",df1$syst,"\n")
+cat("total ",df$dm,"\n")
+```
+
+## full
+
+
+
+```{r}
+df<-plot_all_fits("SDpWpLDetas","full","s",quark_full_name="strange", to_plot = FALSE)
+df1<-plot_all_fits("SDpWpLDetasNoCor","full","s",quark_full_name="strange_no_fine_tuning_latt", to_plot = FALSE)
+s_ft2<- sqrt(df$dm^2 - df1$dm^2)
+cat("mean ",df$m,"\n")
+cat("ft ",s_ft2,"\n")
+cat("cont stat ",df1$stat,"\n")
+cat("cont syst ",df1$syst,"\n")
+cat("total ",df$dm,"\n")
+```
+
+
+
+```{r}
+df<-plot_all_fits("SDpWpLDcor","full","c",quark_full_name="charm", to_plot = FALSE)
+df1<-plot_all_fits("SDpWpLD","full","c",quark_full_name="charm_no_fine_tuning_latt", to_plot = FALSE)
+s_ft2<- sqrt(df$dm^2 - df1$dm^2)
+cat("mean ",df$m,"\n")
+cat("ft ",s_ft2,"\n")
+cat("cont stat ",df1$stat,"\n")
+cat("cont syst ",df1$syst,"\n")
+cat("total ",df$dm,"\n")
+```
