@@ -206,6 +206,21 @@ double comp_error_pool(double* j1, double* j2) {
 
 
 
+double comp_error_pool_func(data_all gjack, fit_type fit_info, double (*lhs_fun)(int, int, int, data_all, struct fit_type)) {
+
+    int  Nj = myres->Njack;
+    double* j1 = (double*)malloc(sizeof(double) * Nj);
+    double* j2 = (double*)malloc(sizeof(double) * Nj);
+    for (int j = 0;j < Nj;j++) {
+        j1[j] = lhs_fun(0, fit_info.myen[0], j, gjack, fit_info);
+        j2[j] = lhs_fun(0, fit_info.myen[1], j, gjack, fit_info);
+    }
+    
+    return comp_error_pool(j1,j2);
+}
+
+
+
 int main(int argc, char** argv) {
     error(argc != 4, 1, "main ",
         "usage:./fit_all_phi4  jack/boot   path_to_jack   output_dir");
@@ -853,28 +868,50 @@ int main(int argc, char** argv) {
     {
         std::vector<double> P(4);
         std::vector<int> id;
-        id = id_SD;
+        id = id_SDeta;
+        printf("%g  %g\n",jackextra.en[B72_64].jack[id[0]][Njack-1], myres->comp_error(jackextra.en[B72_64].jack[id[0]]));
+        printf("%g  %g\n",jackextra.en[B72_96].jack[id[0]][Njack-1], myres->comp_error(jackextra.en[B72_96].jack[id[0]]));
         P[0] = comp_error_pool(jackextra.en[B72_64].jack[id[0]], jackextra.en[B72_96].jack[id[0]]);
         P[1] = comp_error_pool(jackextra.en[B72_64].jack[id[1]], jackextra.en[B72_96].jack[id[1]]);
         P[2] = comp_error_pool(jackextra.en[C06].jack[id[0]], jackextra.en[C112].jack[id[0]]);
         P[3] = comp_error_pool(jackextra.en[C06].jack[id[1]], jackextra.en[C112].jack[id[1]]);
         auto delta = std::ranges::max_element(P.begin(), P.end());
+        for (double p :P) printf("%g\n",p);
         printf("SD volume error FVE to add Delta=%g\n", *delta);
-        id = id_W;
+        id = id_Weta;
         P[0] = comp_error_pool(jackextra.en[B72_64].jack[id[0]], jackextra.en[B72_96].jack[id[0]]);
         P[1] = comp_error_pool(jackextra.en[B72_64].jack[id[1]], jackextra.en[B72_96].jack[id[1]]);
         P[2] = comp_error_pool(jackextra.en[C06].jack[id[0]], jackextra.en[C112].jack[id[0]]);
         P[3] = comp_error_pool(jackextra.en[C06].jack[id[1]], jackextra.en[C112].jack[id[1]]);
         delta = std::ranges::max_element(P.begin(), P.end());
+        for (double p :P) printf("%g\n",p);
         printf("W volume error FVE to add Delta=%g\n", *delta);
-        id = id_LD;
+        id = id_LDeta;
         P[0] = comp_error_pool(jackextra.en[B72_64].jack[id[0]], jackextra.en[B72_96].jack[id[0]]);
         P[1] = comp_error_pool(jackextra.en[B72_64].jack[id[1]], jackextra.en[B72_96].jack[id[1]]);
         P[2] = comp_error_pool(jackextra.en[C06].jack[id[0]], jackextra.en[C112].jack[id[0]]);
         P[3] = comp_error_pool(jackextra.en[C06].jack[id[1]], jackextra.en[C112].jack[id[1]]);
         // for (int i = 0;i < P.size();i++) printf("Pi=%g\n", P[i]);
         delta = std::ranges::max_element(P.begin(), P.end());
+        for (double p :P) printf("%g\n",p);
         printf("LD volume error FVE to add Delta=%g\n", *delta);
+
+        /// full
+        fit_info.myen = { B72_64, B72_96 };
+        fit_info.corr_id = { id_SDeta[0], -1, id_Weta[0], -1, id_LDeta[0] };
+        P[0] = comp_error_pool_func(jackextra, fit_info, lhs_sum);
+        fit_info.corr_id = { id_SDeta[1], -1, id_Weta[1],-1, id_LDeta[1] }; // TM
+        P[1] = comp_error_pool_func(jackextra, fit_info, lhs_sum);
+        fit_info.myen = { C06,C112 };
+        fit_info.corr_id = { id_SDeta[0], -1, id_Weta[0],-1, id_LDeta[0] };
+        P[2] = comp_error_pool_func(jackextra, fit_info, lhs_sum);
+        fit_info.corr_id = { id_SDeta[1], -1, id_Weta[1],-1, id_LDeta[1] }; // TM
+        P[3] = comp_error_pool_func(jackextra, fit_info, lhs_sum);
+        delta = std::ranges::max_element(P.begin(), P.end());
+        for (double p :P) printf("%g\n",p);
+        printf("SDpWpLD volume error FVE to add Delta=%g\n", *delta);
+
+
         // id = id_full;
         // P[0] = comp_error_pool(jackextra.en[B72_64].jack[id[0]], jackextra.en[B72_96].jack[id[0]]);
         // P[1] = comp_error_pool(jackextra.en[B72_64].jack[id[1]], jackextra.en[B72_96].jack[id[1]]);

@@ -34,11 +34,13 @@ idy <- ncol(df) - 2
 
 ############ relative precision
 smallV<- df[c(1,3,5,7),]
-bigV<- df[c(2,4,6,7),]
+bigV<- df[c(2,4,6,8),]
 myen<- c("C","C ","B","B ")
 reg<- c("OS","TM","OS","TM")
 nudge<- rep(c(0.00002,0,0.00002,0),2)
 ratio<-smallV[, idy]/bigV[,idy]
+pool<- (smallV[,idy]-bigV[,idy])/sqrt(smallV[,idy+1]^2+bigV[,idy+1]^2)
+pool <- abs(smallV[,idy]-bigV[,idy])*erf(abs(pool)/sqrt(2))
 error<- (smallV[, idy+1]/bigV[,idy]) +(smallV[, idy]/bigV[,idy]^2)*bigV[,idy+1]
 gg <- myggplot()
 gg<- gg + geom_hline(yintercept = 1, color="black")
