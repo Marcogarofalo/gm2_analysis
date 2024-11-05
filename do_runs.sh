@@ -32,7 +32,7 @@ fi
 #./gm2_analysis read_plateaux -p ../../g-2_new_stat/ cB.72.64  -bin 50  -L 64  jack -mu 0.00072  1.7500e-02  1.8500e-02  0.21000  0.23000  0.25000  0.0006675 0.00072 0.00072 three_corr || bad+=("cB.72.64")
 
 # ./gm2_analysis read_plateaux -p ../../g-2_new_stat/ cB.72.96  -bin 50  -L 96  jack -mu 0.00072  0.018  0.019   0.210  0.230  0.250  0.0006675 0.00072 0.00072 three_corr || bad+=("cB.72.96")
-./gm2_analysis read_plateaux -p ../../g-2_new_stat/ cB.72.96  -bin 50  -L 96  jack -mu 0.00072  0.018  0.019   0.21000  0.23000  0.25000  three_corr || bad+=("cB.72.96")
+./gm2_analysis read_plateaux -p ../../g-2_new_stat/ cB.72.96  -bin 50  -L 96  jack -mu 0.00072  0.018  0.019   0.21000  0.23000  0.25000  three_corr || bad+=("cB.72.96") # charm fake
 ./gm2_analysis read_plateaux -p ../../g-2_new_stat/ cC.06.80  -bin 50  -L 80  jack -mu 0.00060  0.016  0.018   0.17500  0.19500  0.21500  0.0005850 0.00060 0.00060 three_corr || bad+=("cC.06.80")
 #./gm2_analysis read_plateaux -p ../../g-2_new_stat/ cC.06.112 -bin 50  -L 112 jack -mu 0.00060  0.016  0.018   0.99999  0.99999  0.99999  three_corr|| bad+=("cC.06.112")
 ./gm2_analysis read_plateaux -p ../../g-2_new_stat/ cC.06.112 -bin 50  -L 112 jack -mu 0.00060  0.016  0.018   0.18000  0.19000  0.20000  three_corr|| bad+=("cC.06.112")
