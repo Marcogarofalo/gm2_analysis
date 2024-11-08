@@ -1286,6 +1286,8 @@ int main(int argc, char** argv) {
     ms[0] = fake_sampling(resampling, header.mus[1], 1e-20, Njack, 1);
     ms[1] = fake_sampling(resampling, header.mus[2], 1e-20, Njack, 1);
     printf("reading a   =  %g  %g fm\n", a[Njack - 1], myres->comp_error(a));
+    // a =  myres->create_fake(a[Njack-1], 1e-12,1);
+    // printf("reading a   =  %g  %g fm\n", a[Njack - 1], myres->comp_error(a));
 
 
     // resampling everithing 
@@ -1493,6 +1495,8 @@ int main(int argc, char** argv) {
         ZA = interpol_Z(Nstrange, Njack, ms, Z, phys_ms, outfile, "Z_A", resampling);
 
     }
+    // ZA = myres->create_fake(ZA[Njack-1], 1e-20,1);
+    // ZV = myres->create_fake(ZV[Njack-1], 1e-20,1);
     // if (strcmp("cD.54.96", argv[4]) == 0) {
     //     double Za_WI_strange = 0.773944;
     //     double Za_WI_strange_err = 0.00014;
@@ -2995,9 +2999,9 @@ int main(int argc, char** argv) {
     free(amu_sd_sphys);
     check_correlatro_counter(185);
 
-    amu_sd_sphys = interpol_Z(Ncharm_inter, Njack, mc, amuW_c_vec[1], phys_mc, outfile, "amu_{W}_(eq,MDs)", resampling);
+    amu_sd_sphys = interpol_Z(Ncharm_inter, Njack, mc, amuW_c_vec[1], phys_mc, outfile, "amu_{W}_(op,MDs)", resampling);
     write_jack(amu_sd_sphys, Njack, jack_file);
-    printf("amu_{W}_(eq,MDs) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
+    printf("amu_{W}_(op,MDs) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
     check_correlatro_counter(186);
 
@@ -3141,6 +3145,7 @@ int main(int argc, char** argv) {
 
         mysprintf(name_sd, NAMESIZE, "amu_sdtmin%d_eq_MK", tmin);
         amu_eq_sdtmin[tmin] = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, name_sd, resampling);
+        // amu_eq_sdtmin[tmin] = interpol_Z(Nstrange, Njack, Meta, asd_vec, jack_aMetas_MeV_exp, outfile, name_sd, resampling);
         printf("amu_sdtmin(eq,MK) = %g  %g\n", amu_eq_sdtmin[tmin][Njack - 1], error_jackboot(resampling, Njack, amu_eq_sdtmin[tmin]));
 
         free(amu_sdeq_simp_s); free(amu_sdeq_simp_s1);
@@ -3164,8 +3169,8 @@ int main(int argc, char** argv) {
         asd_vec[0] = amu_sdop_simp_s;
         asd_vec[1] = amu_sdop_simp_s1;
         mysprintf(name_sd, NAMESIZE, "amu_sdtmin%d_op_MK", tmin);
-        // amu_op_sdtmin[tmin] = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, name_sd, resampling);
-        amu_op_sdtmin[tmin] = interpol_Z(Nstrange, Njack, Meta, asd_vec, jack_aMetas_MeV_exp, outfile, name_sd, resampling);
+        amu_op_sdtmin[tmin] = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, name_sd, resampling);
+        // amu_op_sdtmin[tmin] = interpol_Z(Nstrange, Njack, Meta, asd_vec, jack_aMetas_MeV_exp, outfile, name_sd, resampling);
 
         printf("amu_sdtmin(op,MK) = %g  %g\n", amu_op_sdtmin[tmin][Njack - 1], error_jackboot(resampling, Njack, amu_op_sdtmin[tmin]));
         free(amu_sdop_simp_s); free(amu_sdop_simp_s1);
