@@ -12,7 +12,7 @@ library(stringr)
 #source("functions.R")
 mydata <- c("OS", "TM")
 # gg <- plot_fit(
-basename <- "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_Wetas_3b_BOS_BTM_FVE_a4OS_a4TM"
+basename <- "/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_Wcor_3b_BOS_BTM_FVE_a4OS_a4TM"
 var <- "afm"
 id_x <- 1
 data_type <- mydata

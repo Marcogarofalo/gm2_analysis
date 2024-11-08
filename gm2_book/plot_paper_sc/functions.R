@@ -157,15 +157,28 @@ plot_all_fits <- function(name, Wind, quark, myyrange = NULL, quark_full_name = 
     #         axis.text.y=element_blank(),
     #         axis.ticks.y=element_blank())+theme(plot.margin = margin(0,0,0,0, "cm"))
     # lim<-print(layer_scales(gg)$y$range$range)
-    dfres<-df$res
+    dfres <- df$res
     #### add point to send the density to zero
-    dfres<- c(dfres,min(dfres)/2,max(dfres)*2 )
-    myaic<-c(ave_AIC$AIC,0,0)
-    gg1 <- myggplot() +ylim(0,1e-9)+
-      geom_density(adjust = 0.3,aes(
-        y = dfres, weight = myaic,
-        # fill="fits", shape="fits", colour="fits"
-      ))
+    dfres <- c(dfres, min(dfres) / 2, max(dfres) * 2)
+    myaic <- c(ave_AIC$AIC, 0, 0)
+    dferr <- c(df$err, 0, 0)
+
+    # dfres <- c(df$res)
+    # myaic <- c(ave_AIC$AIC)
+    # dferr <- df$err
+    binw <- (myyrange[2] - myyrange[1]) / 20
+    # extract gaussian sample
+    # resi<-mapply(rnorm, 1,  df$res,  df$err)
+    gg1 <- myggplot() + ylim(0, 1e-9) +
+      geom_density(
+        # adjust = 0.3,
+        aes(
+          y = dfres, weight = myaic
+          # fill="fits", shape="fits", colour="fits"
+        ),
+        bw = dferr,
+        # n = 1000
+      )
     # +
     # geom_density(aes(y = df$res, weight = ave_AIC$AIC))
 
@@ -204,33 +217,33 @@ plot_all_fits <- function(name, Wind, quark, myyrange = NULL, quark_full_name = 
       # gg1 <- gg1 + scale_y_continuous(label = scientific_10)
       # gg1 <- gg1 + ylim(lim)
     } else {
-      #gg1 <- gg1 + ylim(myyrange)
+      # gg1 <- gg1 + ylim(myyrange)
       gg <- gg + scale_y_continuous(label = scientific_10)
       gg1 <- gg1 + scale_y_continuous(label = scientific_10)
       #### xscale
-      p<-ggplot_build(gg1)
-      xmin<-min(p$data[[1]]$x)
-      xmax<-max(p$data[[1]]$x)
-      gg1 <- gg1 + coord_cartesian(ylim = myyrange, xlim = c(xmin,xmax))
+      p <- ggplot_build(gg1)
+      xmin <- min(p$data[[1]]$x)
+      xmax <- max(p$data[[1]]$x)
+      gg1 <- gg1 + coord_cartesian(ylim = myyrange, xlim = c(xmin, xmax))
       ####
       gg <- gg + coord_cartesian(ylim = myyrange)
     }
     gg <- gg + theme(text = element_text(size = 15))
     gg1 <- gg1 + theme(text = element_text(size = 15))
-    
+
 
     name_out <- paste0("amu_", Wind, "_", quark)
-    myylab <- paste0("$a_{\\mu}^{HPV,", Wind, "}(", quark, ")$")
-    if (Wind == "") myylab <- paste0("$a_{\\mu}^{HPV}(", quark, ")$")
+    myylab <- paste0("$a_{\\mu}^{\\rm HVP,", Wind, "}(", quark, ")$")
+    if (Wind == "") myylab <- paste0("$a_{\\mu}^{\\rm HVP}(", quark, ")$")
     fig1 <- myplotly(gg1, "", "$\\,^{\\,}$", myylab,
       to_print = FALSE, output = "PDF",
       legend_position = leg_pos,
-      save_pdf = FALSE,#paste0(name_out, "_hist"),
+      save_pdf = FALSE, # paste0(name_out, "_hist"),
       # width = 300
     )
-    fig <- myplotly(gg, "", "$a^2$", myylab,
+    fig <- myplotly(gg, "", "$a^2~\\mbox{[fm$^2$]}$", myylab,
       to_print = FALSE, output = "PDF",
-      save_pdf = FALSE, #name_out,
+      save_pdf = FALSE, # name_out,
       legend_position = leg_pos,
     )
     fig <- fig + theme(
@@ -244,7 +257,7 @@ plot_all_fits <- function(name, Wind, quark, myyrange = NULL, quark_full_name = 
       #   margin = margin(t = 0, r = -90, b = 0, l = 0),
       # ),
       axis.title.y = element_blank(),
-      axis.text.y = element_blank() 
+      axis.text.y = element_blank()
     )
     fig1 <- fig1 + theme(
       plot.margin = margin(
@@ -254,6 +267,11 @@ plot_all_fits <- function(name, Wind, quark, myyrange = NULL, quark_full_name = 
         l = 10
       ), # Left margin
       axis.title.y = element_text(margin = margin(t = 0, r = -60, b = 0, l = 0))
+    )
+    fig1 <- fig1 + theme(
+      axis.title.x = element_blank(),
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank()
     )
     legend_title <- NULL
     gg <- gg + ggplot2::labs(
@@ -282,7 +300,7 @@ plot_all_fits <- function(name, Wind, quark, myyrange = NULL, quark_full_name = 
       ncol = 2, nrow = 1
     )
     # gg2 <- gg2 + theme(text = element_text(size = 15))
-    
+
     # fig <- myplotly(gg2, "", "$a^2$", myylab,
     #                 to_print = FALSE, output = "PDF",
     #                 save_pdf = paste0(name_out, "_combined")

@@ -147,10 +147,14 @@ df_pert<-read.table("/home/garofalo/analysis/gm2_analysis/gm2_book/amu_SD_s_pert
 df_tilde <- df_ref
 df_tilde$amu_ref<- df_ref$amu_ref+df_pert$amu_.s._pert
 
-gg <- myggplot(fill = FALSE, shape = FALSE) + geom_pointrange(aes(
+gg <- myggplot(fill = FALSE) + geom_pointrange(aes(
   x = !!df_tilde$t_ref, y = !!df_tilde$amu_ref, ymin = !!(df_tilde$amu_ref - df_tilde$damu_ref),
-  ymax = !!(df_tilde$amu_ref + df_tilde$damu_ref), color = ""
-))
+  ymax = !!(df_tilde$amu_ref + df_tilde$damu_ref), color = "", shape=""
+), stroke=2)
+gg<- gg + geom_errorbar(aes(
+  x = !!df_tilde$t_ref, y = !!df_tilde$amu_ref, ymin = !!(df_tilde$amu_ref - df_tilde$damu_ref),
+  ymax = !!(df_tilde$amu_ref + df_tilde$damu_ref), color = "", shape=""
+), width=0.005, linewidth=1.5)
 
 df_pert<-read.table("/home/garofalo/analysis/gm2_analysis/gm2_book/amu_SD_s_pert_barMS.txt",header = TRUE)
 df_tilde <- df_ref
@@ -164,13 +168,16 @@ df_tilde$amu_ref<- df_ref$amu_ref+df_pert$amu_.s._pert
 
 gg<- gg +  geom_pointrange(aes(
   x = df_sub$t_ref, y = df_sub$amu_ref, ymin = df_sub$amu_ref - df_sub$damu_ref,
-  ymax = df_sub$amu_ref + df_sub$damu_ref, color = "SD "
-))
-
+  ymax = df_sub$amu_ref + df_sub$damu_ref, color = "SD ",shape ="SD "
+), stroke=2)
+gg<- gg +  geom_errorbar(aes(
+  x = df_sub$t_ref, y = df_sub$amu_ref, ymin = df_sub$amu_ref - df_sub$damu_ref,
+  ymax = df_sub$amu_ref + df_sub$damu_ref, color = "SD ",shape ="SD "
+), width=0.005, linewidth=1.5)
 gg<- gg + geom_hline(yintercept = df_sub$amu_ref - df_sub$damu_ref,linetype="dashed",color="blue")
 gg<- gg + geom_hline(yintercept = df_sub$amu_ref + df_sub$damu_ref,linetype="dashed",color="blue")
 gg<- gg + theme(legend.position = "none")
 gg <- gg + theme(text = element_text(size = 15))
 
-fig <- myplotly(gg, "", "$t_{min}$~[fm]", "$a_\\mu^{SD}(s,t_{min})$", to_print = FALSE,
+fig <- myplotly(gg, "", "$t_\\mathrm{min}$~[fm]", "$a_\\mu^{\\rm HVP, SD}(s,t_\\mathrm{min})$", to_print = FALSE,
                 save_pdf = "amu_SDtmin_s", legend_position = NULL)
