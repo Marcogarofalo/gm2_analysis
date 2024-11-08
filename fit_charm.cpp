@@ -702,12 +702,12 @@ int main(int argc, char** argv) {
                 }
 
                 fit_info.linear_fit = true;
-                fit_info.covariancey = true;
                 // fit_info.acc= 1e-6;
                 // fit_info.chi2_gap_jackboot=0.1;
                 // fit_info.guess_per_jack=5;
                 // fit_info.repeat_start=5;
                 fit_info.verbosity = 0;
+                fit_info.covariancey = true;
                 fit_info.compute_cov_fit(argv, jackextra, lhs_fun);
                 int ide = 0, ide1 = 0;
                 for (int n = 0;n < fit_info.Nxen.size();n++) {
