@@ -425,6 +425,36 @@ window paper value: 2.90(12)e-10
 df <- plot_the_Ambaradam("Wcor")
 ```
 
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+name<-  "/home/garofalo/analysis/g-2_new_stat/fit_all_charm//amu_Wcor_3b_BOS_BTM_a4OS_a4TM"
+file <- paste0(name, "_fit_P.dat")
+df<-Rose::read_fit_P_file(file)
+print(make_table_fit_result(df))
+gg <- plot_fit(
+  basename =name,
+  var = "afm",
+  id_x = 1,
+  data_type = c("K", "K"),
+  width = 1e-4,
+  gg = NULL,
+  single_name_for_fit = "fit",
+  noline = TRUE
+)
+# gg <- plot_fit(
+#   basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_charm//amu_SDetas_3b_BOS_BTM_a4OS_a4TM",
+#   var = "afm",
+#   id_x = 1,
+#   # data_type = c("OS-eta", "TM-eta"),
+#   data_type = c("etas", "etas"),
+#   width = 1e-4,
+#   gg = gg,
+#   single_name_for_fit = "fit-eta",
+#   noline = TRUE
+# )
+
+fig <- myplotly(gg, "", "$a^2$", "$a_{\\mu}(s)$", to_print = TRUE, output = "HTML", legend_position = c(0, 0))
+```
+
 ### LD
 ```{r, echo=FALSE, results='asis',  warning=FALSE}
 df <- plot_the_Ambaradam("LDcor")

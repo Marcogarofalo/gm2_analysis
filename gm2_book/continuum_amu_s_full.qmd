@@ -690,6 +690,41 @@ df <- plot_the_Ambaradam("SDpWpLDetas")
 write.table(df, file = "SDpWpLDetas_cor_strange", row.names = FALSE)
 ```
 
+
+## eta no corrections
+
+
+### SD etas
+
+window paper value: 9.074(64)e-10
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- plot_the_Ambaradam("SDetasNoCor")
+```
+
+### W etas
+
+window paper value: 27.28(20)e-10
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- plot_the_Ambaradam("WetasNoCor")
+```
+
+
+
+### LD etas
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- plot_the_Ambaradam("LDetasNoCor")
+```
+
+### SUM
+
+```{r, echo=FALSE, results='asis',  warning=FALSE}
+df <- plot_the_Ambaradam("SDpWpLDetasNoCor")
+```
+
+
 ## Eta + FVE
 
 
