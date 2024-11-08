@@ -1046,6 +1046,118 @@ int main(int argc, char** argv) {
     }
 
     //////////////////////////////////////////////////////////////
+    // A12 no C20 no max twist
+    //////////////////////////////////////////////////////////////
+
+    fit_info.restore_default();
+    // fit_info.N = 8;
+    fit_info.Nvar = 10;
+    fit_info.Npar = 7;
+    fit_info.Njack = Njack;
+    fit_info.Nxen = { {A53, A40, A30, A12}, {B25_48, B14_64, B72_64, B72_96},
+                        { C06, C112}, {D54},
+                        {E112},  {B72_64},
+                        {C06}, {D54} };
+    fit_info.init_N_etot_form_Nxen();
+
+    fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+    count = 0;
+    for (int n = 0;n < fit_info.Nxen.size();n++) {
+        for (int e : fit_info.Nxen[n]) {
+            for (int j = 0;j < Njack;j++) {
+                double my_mu, my_M, my_fpi;
+                if (n < 5) {
+                    my_mu = jackall.en[e].jack[165][j];
+                    my_M = jackall.en[e].jack[1][j];
+                    my_fpi = jackall.en[e].jack[163][j];
+                }
+                else if (n >= 5) {
+                    my_mu = jackall.en[e].jack[166][j];
+                    my_M = jackall.en[e].jack[123][j];
+                    my_fpi = jackall.en[e].jack[164][j];
+                }
+
+                fit_info.x[0][count][j] = my_mu; // 
+                fit_info.x[1][count][j] = my_M;  // 
+                fit_info.x[2][count][j] = my_fpi;  //
+                fit_info.x[3][count][j] = jackall.en[e].header.L;
+
+                double xi = my_M / (4 * M_PI * my_fpi);
+                xi *= xi;
+                double delta_FVE = FVE_GL_Mpi(jackall.en[e].header.L, xi, my_fpi);
+                xi *= (1 + delta_FVE) * (1 + delta_FVE) / (1 - 0.25 * delta_FVE) * (1 - 0.25 * delta_FVE);
+                fit_info.x[4][count][j] = xi;
+
+                fit_info.x[5][count][j] = jack_Mpi_phys_MeV[j] / hbarc;
+                fit_info.x[6][count][j] = jack_fpi_phys_MeV[j] / hbarc;
+
+
+                fit_info.x[7][count][j] = jack_Mpi_phys_MeV[j] / (4 * M_PI * jack_fpi_phys_MeV[j]);
+                fit_info.x[7][count][j] *= fit_info.x[7][count][j];
+
+                fit_info.x[8][count][j] = 0;
+                if (e == A12)  fit_info.x[8][count][j] = vev_mpcac[e][j];// mpcac/mu
+
+                fit_info.x[9][count][j] = jackall.en[e].jack[23][j];// Z_A
+                // fit_info.x[3][count][j] = jack_Mpi_MeV_exp[j];
+                // fit_info.x[4][count][j] = l + 1e-6;
+                // fit_info.x[5][count][j] = a + 1e-6;
+                // fit_info.x[6][count][j] = 0 + 1e-6;
+                // fit_info.x[7][count][j] = w + 1.0;
+            }
+            count++;
+        }
+    }
+
+    // fit_info.corr_id = { 1, 123, 163, 164 }; // Mpi(mu1), Mpi(mu2), fpi(mu1), fpi(mu2)
+    fit_info.corr_id = { 163, 163, 163, 163, 163, 164, 164, 164 }; //  fpi(mu1), fpi(mu2)
+    fit_info.function = rhs_afpi;
+    fit_info.linear_fit = false;
+    // fit_info.covariancey = false;
+    // fit_info.acc= 1e-10;
+    // fit_info.h=1e-7;
+    // fit_info.maxiter=500;
+    // fit_info.NM = true;
+    // // fit_info.chi2_gap_jackboot=0.1;
+    // // fit_info.guess_per_jack=5;
+    // // fit_info.repeat_start=100;
+    // fit_info.verbosity = 1;
+    // fit_info.compute_cov_fit(argv, jackall, lhs_afpi_max_twist);
+    // int ide = 0, ide1 = 0;
+    // for (int n = 0;n < fit_info.Nxen.size();n++) {
+    //     for (int e : fit_info.Nxen[n]) {
+    //         ide1 = 0;
+    //         for (int n1 = 0;n1 < fit_info.Nxen.size();n1++) {
+    //             for (int e1 : fit_info.Nxen[n1]) {
+    //                 if (e != e1)   fit_info.cov[ide][ide1] = 0;
+    //                 ide1++;
+    //             }
+    //         }
+    //         ide++;
+    //     }
+    // }
+    // fit_info.compute_cov1_fit();
+    fit_info.guess = { 0.0908026, 0.07951 , 0.06816, 0.05688, 0.04891 ,-8.75 ,-500 };
+    mysprintf(namefit, NAMESIZE, "afpi_A12_noC20_cov");
+    fit_result fit_afpi_A12_noC20 = fit_all_data(argv, jackall, lhs_afpi_max_twist, fit_info, namefit);
+    fit_info.band_range = { 0.005,0.035 };
+    // std::vector<double> xcont = { 0, 0 /*Delta*/, 0, 0,/*l, a,m*/ fit_info.x[4][0][Njack - 1],
+    //      fit_info.x[5][0][Njack - 1] , fit_info.x[6][0][Njack - 1], fit_info.x[7][0][Njack - 1] };
+
+
+    //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
+    // std::vector<double> xcont = {};
+    print_fit_band(argv, jackall, fit_info, fit_info, namefit, "xi", fit_afpi_A12_noC20, fit_afpi_A12_noC20, 4, 0, 0.0005, xcont);
+
+    myres->write_jack_in_file(fit_afpi_A12_noC20.P[0], "../../g-2_new_stat/out/a_fm_A_A12_noC20_noMaxtwist.txt");
+    myres->write_jack_in_file(fit_afpi_A12_noC20.P[1], "../../g-2_new_stat/out/a_fm_B_A12_noC20_noMaxtwist.txt");
+    myres->write_jack_in_file(fit_afpi_A12_noC20.P[2], "../../g-2_new_stat/out/a_fm_C_A12_noC20_noMaxtwist.txt");
+    myres->write_jack_in_file(fit_afpi_A12_noC20.P[3], "../../g-2_new_stat/out/a_fm_D_A12_noC20_noMaxtwist.txt");
+    myres->write_jack_in_file(fit_afpi_A12_noC20.P[4], "../../g-2_new_stat/out/a_fm_E_A12_noC20_noMaxtwist.txt");
+
+
+
+    //////////////////////////////////////////////////////////////
     // A12 no C20
     //////////////////////////////////////////////////////////////
 
@@ -1316,7 +1428,8 @@ int main(int argc, char** argv) {
                 fit_info.x[7][count][j] = jack_Mpi_phys_MeV[j] / (4 * M_PI * jack_fpi_phys_MeV[j]);
                 fit_info.x[7][count][j] *= fit_info.x[7][count][j];
 
-                fit_info.x[8][count][j] = vev_mpcac[e][j];// mpcac/mu
+                fit_info.x[8][count][j] = 0;
+                if (e == A12)  fit_info.x[8][count][j] = vev_mpcac[e][j];// mpcac/mu
                 fit_info.x[9][count][j] = jackall.en[e].jack[23][j];// Z_A
 
                 double mpcac_mu = fit_info.x[8][count][j];
@@ -1497,9 +1610,126 @@ int main(int argc, char** argv) {
     myres->write_jack_in_file(fit_afpi_max_twist_A12_noC20_corr_unitary_iter0.P[3], "../../g-2_new_stat/out/a_fm_D_A12_noC20_unitary_iter0.txt");
     myres->write_jack_in_file(fit_afpi_max_twist_A12_noC20_corr_unitary_iter0.P[4], "../../g-2_new_stat/out/a_fm_E_A12_noC20_unitary_iter0.txt");
 
+    //////////////////////////////////////////////////////////////
+    // no A12 no C20 + strange misstuning unitary only , only phys
+    //////////////////////////////////////////////////////////////
+
+    fit_info.restore_default();
+    // fit_info.N = 8;
+    fit_info.Nvar = 10;
+    fit_info.Npar = 6; //printf("fix here\n");exit(1);
+    fit_info.Njack = Njack;
+    fit_info.Nxen = {  { B72_64, B72_96},
+                        { C06, C112}, {D54},
+                        {E112},  {B72_64},
+                        {C06}, {D54} };
+    fit_info.init_N_etot_form_Nxen();
+
+    fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+    count = 0;
+    for (int n = 0;n < fit_info.Nxen.size();n++) {
+        for (int e : fit_info.Nxen[n]) {
+            for (int j = 0;j < Njack;j++) {
+                double my_mu, my_M, my_fpi;
+                if (n < 4) {
+                    my_mu = jackextra.en[e].jack[165][j];
+                    my_M = jackextra.en[e].jack[id_Mpi_cor][j];
+                    my_fpi = jackextra.en[e].jack[id_fpi_cor][j];
+                }
+                else if (n >= 4) {
+                    my_mu = jackextra.en[e].jack[166][j];
+                    my_M = jackextra.en[e].jack[id_Mpi_cor_mu1][j];
+                    my_fpi = jackextra.en[e].jack[id_fpi_cor_mu1][j];
+                }
+
+                fit_info.x[0][count][j] = my_mu; // 
+                fit_info.x[1][count][j] = my_M;  // 
+                fit_info.x[2][count][j] = my_fpi;  //
+                fit_info.x[3][count][j] = jackextra.en[e].header.L;
+
+                double xi = my_M / (4 * M_PI * my_fpi);
+                xi *= xi;
+                double delta_FVE = FVE_GL_Mpi(jackextra.en[e].header.L, xi, my_fpi);
+                xi *= (1 + delta_FVE) * (1 + delta_FVE) / (1 - 0.25 * delta_FVE) * (1 - 0.25 * delta_FVE);
+                fit_info.x[4][count][j] = xi;
+
+                fit_info.x[5][count][j] = jack_Mpi_phys_MeV[j] / hbarc;
+                fit_info.x[6][count][j] = jack_fpi_phys_MeV[j] / hbarc;
+
+
+                fit_info.x[7][count][j] = jack_Mpi_phys_MeV[j] / (4 * M_PI * jack_fpi_phys_MeV[j]);
+                fit_info.x[7][count][j] *= fit_info.x[7][count][j];
+
+                fit_info.x[8][count][j] = vev_mpcac[e][j];// mpcac/mu
+                fit_info.x[9][count][j] = jackextra.en[e].jack[23][j];// Z_A
+
+                double mpcac_mu = fit_info.x[8][count][j];
+                double ZA = fit_info.x[9][count][j];
+                double mr = 0;
+                mr = ZA * mpcac_mu;
+                double cl = sqrt(1 + mr * mr);
+                xi /= cl * cl * cl;
+                fit_info.x[4][count][j] = xi;
+                // fit_info.x[3][count][j] = jack_Mpi_MeV_exp[j];
+                // fit_info.x[4][count][j] = l + 1e-6;
+                // fit_info.x[5][count][j] = a + 1e-6;
+                // fit_info.x[6][count][j] = 0 + 1e-6;
+                // fit_info.x[7][count][j] = w + 1.0;
+            }
+            count++;
+        }
+    }
+
+    // fit_info.corr_id = { 1, 123, 163, 164 }; // Mpi(mu1), Mpi(mu2), fpi(mu1), fpi(mu2)
+    fit_info.corr_id = { 163, 163, 163, 163, 164, 164, 164  }; //  fpi(mu1), fpi(mu2)
+    fit_info.function = rhs_afpi_phys_point;
+    fit_info.linear_fit = false;
+    // fit_info.covariancey = true;
+    // fit_info.acc = 1e-10;
+    // fit_info.h = 1e-7;
+    // fit_info.maxiter = 500;
+    // fit_info.NM = true;
+    // fit_info.chi2_gap_jackboot = 0.01;
+    // fit_info.guess_per_jack = 5;
+    // fit_info.repeat_start = 100;
+    // // fit_info.verbosity = 1;
+    // fit_info.compute_cov_fit(argv, jackextra, lhs_afpi_max_twist);
+    // int ide = 0, ide1 = 0;
+    // for (int n = 0;n < fit_info.Nxen.size();n++) {
+    //     for (int e : fit_info.Nxen[n]) {
+    //         ide1 = 0;
+    //         for (int n1 = 0;n1 < fit_info.Nxen.size();n1++) {
+    //             for (int e1 : fit_info.Nxen[n1]) {
+    //                 if (e != e1)   fit_info.cov[ide][ide1] = 0;
+    //                 printf("%-12.5g ", fit_info.cov[ide][ide1] / sqrt(fit_info.cov[ide][ide] * fit_info.cov[ide1][ide1]));
+    //                 ide1++;
+    //             }
+    //         }
+    //         printf("\n");
+    //         ide++;
+    //     }
+    // }
+    // fit_info.compute_cov1_fit();
+    fit_info.guess = {  0.07951 , 0.06816, 0.05688, 0.04891 ,-8.75 ,-500 };
+    mysprintf(namefit, NAMESIZE, "afpi_max_twist_noA12_noC20_cor_cov_phys_only");
+    fit_result fit_afpi_max_twist_A12_noC20_cor_phys_only = fit_all_data(argv, jackextra, lhs_afpi_max_twist, fit_info, namefit);
+    fit_info.band_range = { 0.005,0.035 };
+    // std::vector<double> xcont = { 0, 0 /*Delta*/, 0, 0,/*l, a,m*/ fit_info.x[4][0][Njack - 1],
+    //      fit_info.x[5][0][Njack - 1] , fit_info.x[6][0][Njack - 1], fit_info.x[7][0][Njack - 1] };
+
+
+    //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
+    // std::vector<double> xcont = {};
+    print_fit_band(argv, jackextra, fit_info, fit_info, namefit, "xi", fit_afpi_max_twist_A12_noC20_cor_phys_only, fit_afpi_max_twist_A12_noC20_cor_phys_only, 4, 0, 0.0005, xcont);
+
+    // myres->write_jack_in_file(fit_afpi_max_twist_A12_noC20_cor_phys_only.P[0], "../../g-2_new_stat/out/a_fm_A_A12_noC20_cor_phys_only.txt");
+    myres->write_jack_in_file(fit_afpi_max_twist_A12_noC20_cor_phys_only.P[0], "../../g-2_new_stat/out/a_fm_B_noA12_noC20_cor_phys_only.txt");
+    myres->write_jack_in_file(fit_afpi_max_twist_A12_noC20_cor_phys_only.P[1], "../../g-2_new_stat/out/a_fm_C_noA12_noC20_cor_phys_only.txt");
+    myres->write_jack_in_file(fit_afpi_max_twist_A12_noC20_cor_phys_only.P[2], "../../g-2_new_stat/out/a_fm_D_noA12_noC20_cor_phys_only.txt");
+    myres->write_jack_in_file(fit_afpi_max_twist_A12_noC20_cor_phys_only.P[3], "../../g-2_new_stat/out/a_fm_E_noA12_noC20_cor_phys_only.txt");
 
     //////////////////////////////////////////////////////////////
-    // A12 no C20 + strange misstuning unitary only
+    // A12 no C20 + strange misstuning unitary only  (main_analysis)
     //////////////////////////////////////////////////////////////
 
     fit_info.restore_default();
@@ -2286,7 +2516,121 @@ int main(int argc, char** argv) {
         compute_amul_print_res(argv, namefit, fit_info, Njack, fit_aMpi2_over_afpi2, Mpi2_fpi2_phys, { "B","C","D","E" });
 
     }
+    //////////////////////////////////////////////////////////////
+    // Mpi with A12, NO max twist corrections, noC20
+    //////////////////////////////////////////////////////////////
 
+    {
+        fit_info.restore_default();
+        fit_info.N = 8;
+        fit_info.Nvar = 11;
+        fit_info.Npar = 7;
+        fit_info.Njack = Njack;
+        fit_info.Nxen = { {A53, A40, A30, A12}, {B25_48, B14_64, B72_64, B72_96},
+                            { C06, C112}, {D54},
+                            {E112},  {B72_64},
+                            {C06}, {D54} };
+        fit_info.init_N_etot_form_Nxen();
+
+        fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+        count = 0;
+        for (int n = 0;n < fit_info.Nxen.size();n++) {
+            for (int e : fit_info.Nxen[n]) {
+                for (int j = 0;j < Njack;j++) {
+                    double my_mu, my_M, my_fpi;
+                    if (n < 5) {
+                        my_mu = jackall.en[e].jack[165][j];
+                        my_M = jackall.en[e].jack[1][j];
+                        my_fpi = jackall.en[e].jack[163][j];
+                    }
+                    else if (n >= 5) {
+                        my_mu = jackall.en[e].jack[166][j];
+                        my_M = jackall.en[e].jack[123][j];
+                        my_fpi = jackall.en[e].jack[164][j];
+                    }
+                    fit_info.x[0][count][j] = my_mu; // 
+                    fit_info.x[1][count][j] = my_M;  // 
+                    fit_info.x[2][count][j] = my_fpi;  //
+                    fit_info.x[3][count][j] = jackall.en[e].header.L;
+
+                    double xi = my_M / (4 * M_PI * my_fpi);
+                    xi *= xi;
+                    double delta_FVE = FVE_GL_Mpi(jackall.en[e].header.L, xi, my_fpi);
+                    xi *= (1 + delta_FVE) * (1 + delta_FVE) / (1 - 0.25 * delta_FVE) * (1 - 0.25 * delta_FVE);
+                    fit_info.x[4][count][j] = xi;
+
+                    fit_info.x[5][count][j] = jack_Mpi_phys_MeV[j] / hbarc;
+                    fit_info.x[6][count][j] = jack_fpi_phys_MeV[j] / hbarc;
+
+
+                    fit_info.x[7][count][j] = jack_Mpi_phys_MeV[j] / (4 * M_PI * jack_fpi_phys_MeV[j]);
+                    fit_info.x[7][count][j] *= fit_info.x[7][count][j];
+
+                    if (e == A53 || e == A40 || e == A30 || e == A12)
+                        fit_info.x[8][count][j] = fit_afpi_A12_noC20.P[0][j];
+                    else if (e == B25_48 || e == B14_64 || e == B72_64 || e == B72_96)
+                        fit_info.x[8][count][j] = fit_afpi_A12_noC20.P[1][j];
+                    else if (e == C20 || e == C06 || e == C112)
+                        fit_info.x[8][count][j] = fit_afpi_A12_noC20.P[2][j];
+                    else if (e == D54)
+                        fit_info.x[8][count][j] = fit_afpi_A12_noC20.P[3][j];
+                    else if (e == E112)
+                        fit_info.x[8][count][j] = fit_afpi_A12_noC20.P[4][j];
+                    else { printf("error missing ensemble\n"); exit(1); }
+
+                    fit_info.x[9][count][j] =0;
+                    if (e==A12) fit_info.x[9][count][j] = vev_mpcac[e][j];// mpcac/mu
+                    fit_info.x[10][count][j] = jackall.en[e].jack[23][j];// Z_A
+
+                }
+                count++;
+            }
+        }
+
+
+
+        // fit_info.corr_id = { 1, 123, 163, 164 }; // Mpi(mu1), Mpi(mu2), fpi(mu1), fpi(mu2)
+        fit_info.corr_id = { 1, 1, 1, 1, 1, 123, 123, 123 }; //  Mpi(mu1), Mpi(mu2)
+        fit_info.function = rhs_aMpi2_over_afpi2_with_A;
+        fit_info.linear_fit = false;
+        fit_info.covariancey = false;
+        // fit_info.acc= 1e-8;
+        // fit_info.h=1e-7;
+        // fit_info.maxiter=500;
+        // fit_info.NM = true;
+        // // fit_info.chi2_gap_jackboot=0.1;
+        // // fit_info.guess_per_jack=5;
+        // fit_info.repeat_start=1000;
+        // fit_info.verbosity = 1;
+        // fit_info.compute_cov_fit(argv, jackall, lhs_Mpi2_over_afpi2_max_twist);
+        // int ide = 0, ide1 = 0;
+        // for (int n = 0;n < fit_info.Nxen.size();n++) {
+        //     for (int e : fit_info.Nxen[n]) {
+        //         ide1 = 0;
+        //         for (int n1 = 0;n1 < fit_info.Nxen.size();n1++) {
+        //             for (int e1 : fit_info.Nxen[n1]) {
+        //                 if (e != e1)   fit_info.cov[ide][ide1] = 0;
+        //                 ide1++;
+        //             }
+        //         }
+        //         ide++;
+        //     }
+        // }
+        // fit_info.compute_cov1_fit();
+        // fit_info.guess = { 0.0072, 0.0060 , 0.0050, 0.0012, -8.75 , -1 };
+        // fit_info.guess = { 866, 990 , 1169, 1346, -5.46, 0  };
+        fit_info.guess = { 812, 889, 1015 , 1200, 1381, 1.4,0 };
+        // fit_info.guess = { 1, 1 , 1, 1  };
+        // fit_info.guess = { 0.05 };
+        mysprintf(namefit, NAMESIZE, "aMpi2_over_afpi2_A12_noC20_noMaxtwist_cov");
+        fit_result fit_aMpi2_over_afpi2 = fit_all_data(argv, jackall, lhs_Mpi2_over_afpi2_max_twist, fit_info, namefit);
+        fit_info.band_range = { 0.00001,0.0055 };
+
+        print_fit_band(argv, jackall, fit_info, fit_info, namefit, "amu", fit_aMpi2_over_afpi2, fit_aMpi2_over_afpi2, 0 /*amu */, 0, 0.0001, xcont);
+
+        compute_amul_print_res(argv, namefit, fit_info, Njack, fit_aMpi2_over_afpi2, Mpi2_fpi2_phys, { "A","B","C","D","E" });
+
+    }
     //////////////////////////////////////////////////////////////
     // Mpi with A12, max twist corrections, noC20
     //////////////////////////////////////////////////////////////
@@ -2861,12 +3205,129 @@ int main(int argc, char** argv) {
         // fit_info.guess = { 1, 1 , 1, 1  };
         // fit_info.guess = { 0.05 };
         mysprintf(namefit, NAMESIZE, "aMpi2_over_afpi2_A12_noC20_cor_cov_unitary");
-        fit_result fit_aMpi2_over_afpi2 = fit_all_data(argv, jackall, lhs_Mpi2_over_afpi2_max_twist, fit_info, namefit);
+        fit_result fit_aMpi2_over_afpi2 = fit_all_data(argv, jackextra, lhs_Mpi2_over_afpi2_max_twist, fit_info, namefit);
         fit_info.band_range = { 0.00001,0.0055 };
 
-        print_fit_band(argv, jackall, fit_info, fit_info, namefit, "amu", fit_aMpi2_over_afpi2, fit_aMpi2_over_afpi2, 0 /*amu */, 0, 0.0001, xcont);
+        print_fit_band(argv, jackextra, fit_info, fit_info, namefit, "amu", fit_aMpi2_over_afpi2, fit_aMpi2_over_afpi2, 0 /*amu */, 0, 0.0001, xcont);
 
         compute_amul_print_res(argv, namefit, fit_info, Njack, fit_aMpi2_over_afpi2, Mpi2_fpi2_phys, { "A","B","C","D","E" });
+
+    }
+
+
+    //////////////////////////////////////////////////////////////
+    // Mpi with no A12, max twist corrections, noC20, stange misstuning, only phys point
+    //////////////////////////////////////////////////////////////
+
+    {
+        fit_info.restore_default();
+        // fit_info.N = 5;
+        fit_info.Nvar = 11;
+        fit_info.Npar = 6;
+        fit_info.Njack = Njack;
+        fit_info.Nxen = { { B72_64, B72_96},
+                            { C06, C112}, {D54},
+                            {E112},{ B72_64}, {C06}, {D54}  };
+        fit_info.init_N_etot_form_Nxen();
+
+        fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+        count = 0;
+        for (int n = 0;n < fit_info.Nxen.size();n++) {
+            for (int e : fit_info.Nxen[n]) {
+                for (int j = 0;j < Njack;j++) {
+                    double my_mu, my_M, my_fpi;
+                    if (n < 4) {
+                        my_mu = jackextra.en[e].jack[165][j];
+                        my_M = jackextra.en[e].jack[id_Mpi_cor][j];
+                        my_fpi = jackextra.en[e].jack[id_fpi_cor][j];
+                    }
+                    else if (n >= 4) {
+                        my_mu = jackextra.en[e].jack[166][j];
+                        my_M = jackextra.en[e].jack[id_Mpi_cor_mu1][j];
+                        my_fpi = jackextra.en[e].jack[id_fpi_cor_mu1][j];
+                    }
+                    fit_info.x[0][count][j] = my_mu; // 
+                    fit_info.x[1][count][j] = my_M;  // 
+                    fit_info.x[2][count][j] = my_fpi;  //
+                    fit_info.x[3][count][j] = jackextra.en[e].header.L;
+
+                    double xi = my_M / (4 * M_PI * my_fpi);
+                    xi *= xi;
+                    double delta_FVE = FVE_GL_Mpi(jackextra.en[e].header.L, xi, my_fpi);
+                    xi *= (1 + delta_FVE) * (1 + delta_FVE) / (1 - 0.25 * delta_FVE) * (1 - 0.25 * delta_FVE);
+                    fit_info.x[4][count][j] = xi;
+
+                    fit_info.x[5][count][j] = jack_Mpi_phys_MeV[j] / hbarc;
+                    fit_info.x[6][count][j] = jack_fpi_phys_MeV[j] / hbarc;
+
+
+                    fit_info.x[7][count][j] = jack_Mpi_phys_MeV[j] / (4 * M_PI * jack_fpi_phys_MeV[j]);
+                    fit_info.x[7][count][j] *= fit_info.x[7][count][j];
+
+                    // if (e == A53 || e == A40 || e == A30 || e == A12)
+                    //     fit_info.x[8][count][j] = fit_afpi_max_twist_A12_noC20_cor_phys_only.P[0][j];
+                    if (e == B25_48 || e == B14_64 || e == B72_64 || e == B72_96)
+                        fit_info.x[8][count][j] = fit_afpi_max_twist_A12_noC20_cor_phys_only.P[0][j];
+                    else if (e == C20 || e == C06 || e == C112)
+                        fit_info.x[8][count][j] = fit_afpi_max_twist_A12_noC20_cor_phys_only.P[1][j];
+                    else if (e == D54)
+                        fit_info.x[8][count][j] = fit_afpi_max_twist_A12_noC20_cor_phys_only.P[2][j];
+                    else if (e == E112)
+                        fit_info.x[8][count][j] = fit_afpi_max_twist_A12_noC20_cor_phys_only.P[3][j];
+                    else { printf("error missing ensemble\n"); exit(1); }
+
+                    fit_info.x[9][count][j] = vev_mpcac[e][j];// mpcac/mu
+                    fit_info.x[10][count][j] = jackextra.en[e].jack[23][j];// Z_A
+
+                }
+                count++;
+            }
+        }
+
+
+
+        // fit_info.corr_id = { 1, 123, 163, 164 }; // Mpi(mu1), Mpi(mu2), fpi(mu1), fpi(mu2)
+        fit_info.corr_id = {  1, 1, 1, 1, 123, 123, 123 }; //  Mpi(mu1), Mpi(mu2)
+        fit_info.function = rhs_aMpi2_over_afpi2_with_A_only_phys;
+        fit_info.linear_fit = false;
+        fit_info.covariancey = false;
+        // fit_info.acc = 1e-12;
+        // fit_info.h = 1e-7;
+        // fit_info.maxiter = 500;
+        // fit_info.NM = true;
+        // fit_info.chi2_gap_jackboot = 0.01;
+        // fit_info.guess_per_jack = 5;
+        // fit_info.repeat_start = 100;
+        // fit_info.verbosity = 1;
+        // fit_info.compute_cov_fit(argv, jackextra, lhs_Mpi2_over_afpi2_max_twist);
+        // int ide = 0, ide1 = 0;
+        // for (int n = 0;n < fit_info.Nxen.size();n++) {
+        //     for (int e : fit_info.Nxen[n]) {
+        //         ide1 = 0;
+        //         for (int n1 = 0;n1 < fit_info.Nxen.size();n1++) {
+        //             for (int e1 : fit_info.Nxen[n1]) {
+        //                 if (e != e1)   fit_info.cov[ide][ide1] = 0;
+        //                 printf("%-12.5g ", fit_info.cov[ide][ide1] / sqrt(fit_info.cov[ide][ide] * fit_info.cov[ide1][ide1]));
+        //                 ide1++;
+        //             }
+        //         }
+        //         printf("\n");
+        //         ide++;
+        //     }
+        // }
+        // fit_info.compute_cov1_fit();
+        // fit_info.guess = {  0.0060 , 0.0050, 0.0012, -8.75 , -1 };
+        // fit_info.guess = { 866, 990 , 1169, 1346, -5.46, 0  };
+        fit_info.guess = {  804, 948 , 1164, 1363, 6.0,20 };
+        // fit_info.guess = { 1, 1 , 1, 1  };
+        // fit_info.guess = { 0.05 };
+        mysprintf(namefit, NAMESIZE, "aMpi2_over_afpi2_A12_noC20_cor_cov_phys_only");
+        fit_result fit_aMpi2_over_afpi2_only_phys = fit_all_data(argv, jackextra, lhs_Mpi2_over_afpi2_max_twist, fit_info, namefit);
+        fit_info.band_range = { 0.00001,0.0055 };
+
+        print_fit_band(argv, jackextra, fit_info, fit_info, namefit, "amu", fit_aMpi2_over_afpi2_only_phys, fit_aMpi2_over_afpi2_only_phys, 0 /*amu */, 0, 0.0001, xcont);
+
+        compute_amul_print_res(argv, namefit, fit_info, Njack, fit_aMpi2_over_afpi2_only_phys, Mpi2_fpi2_phys, { "B","C","D","E" });
 
     }
 
