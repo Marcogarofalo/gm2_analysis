@@ -2568,7 +2568,7 @@ double lhs_Mpi2_over_afpi2_max_twist(int n, int e, int j, data_all gjack, struct
     // r = Mpi / fpi;
     // r *= (1 + delta_FVE) / (1 - 0.25 * delta_FVE);
     // r *= r;
-    r= xi*16*M_PI*M_PI;
+    r = xi * 16 * M_PI * M_PI;
     return r;
 }
 
@@ -2648,11 +2648,11 @@ double rhs_afpi_phys_point(int n, int Nvar, double* x, int Npar, double* P) {
     double fpi_phys_fm = x[6];
     double xi_phys = x[7];
 
-    r = a * fpi_phys_fm * (1 - 2 * xi * log(xi / xi_phys));
+    r = a * fpi_phys_fm * (1 /* - 2 * xi * log(xi / xi_phys) */);
     if (Npar == 6) {
         r += a * fpi_phys_fm * (-(P[4] + P[5] * a * fpi_phys_fm * a * fpi_phys_fm) * (xi - xi_phys));
     }
-
+    // r = a * fpi_phys_fm + P[4] * a * a * a;
     return r;
 }
 
@@ -2731,6 +2731,33 @@ double rhs_aMpi2_over_afpi2_with_A(int n, int Nvar, double* x, int Npar, double*
     if (Npar >= 7)
         r += 2 * aB_Zp_afpi2 * amu * (P[6] * a * a);
 
+    return r;
+}
+
+double rhs_aMpi2_over_afpi2_with_A_only_phys(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double aB_Zp_afpi2;
+    if (n < 4) {
+        aB_Zp_afpi2 = P[(n)]; // B,C,D,E
+    }
+    else {
+        aB_Zp_afpi2 = P[(n) % 4 ];// B,C,D
+    }
+
+    double a = x[8];
+
+    double amu = x[0];
+    double aMpi = x[1];
+    double afpi = x[2];
+    double L = x[3];
+
+    double Mpi_phys_fm = x[5];
+    double fpi_phys_fm = x[6];
+    double xi = 2 * aB_Zp_afpi2 * amu / ((4 * M_PI) * (4 * M_PI));
+    // r = 2 * aB_Zp_afpi2 * amu (1+ P[4]+P[5]*a*a)+  ;//* (1 + P[4] * a * a);
+    // if (Npar >= 7)
+    //     r += 2 * aB_Zp_afpi2 * amu * (P[6] * a * a);
+    r = aB_Zp_afpi2 + amu*( P[4]  + P[5]*a*a);
     return r;
 }
 
