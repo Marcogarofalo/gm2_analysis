@@ -93,6 +93,36 @@ AIC2 <- function(v, err, chi2dof, dof, npar, multiplicity = 1) {
   l$syst <- sqrt(syst)
   return(l)
 }
+AICc <- function(v, err, chi2dof, dof, npar, multiplicity = 1) {
+  l <- list()
+  Nmeas <- dof + npar
+  AIC <- exp(-0.5 * (chi2dof * dof + 2 * npar + (2*npar^2 +2 *npar)/(Nmeas-npar-1) )) / multiplicity
+  N <- sum(AIC)
+  AIC <- AIC / N
+  l$AIC <- AIC
+  l$m <- sum(v * AIC)
+  stat <- sum(AIC * err^2)
+  syst <- sum(AIC * (v - l$m)^2)
+  l$dm <- sqrt(stat + syst)
+  l$stat <- sqrt(stat)
+  l$syst <- sqrt(syst)
+  return(l)
+}
+eq28<-function(v, err, chi2dof, dof, npar, multiplicity = 1) {
+  l <- list()
+  Nmeas <- dof + npar
+  AIC <- 1 / multiplicity
+  N <- sum(AIC)
+  AIC <- 1.0 / N
+  l$AIC <- AIC
+  l$m <- sum(v * AIC)
+  stat <- sum(AIC * err^2)
+  syst <- sum(AIC * (v - l$m)^2)
+  l$dm <- sqrt(stat + syst)
+  l$stat <- sqrt(stat)
+  l$syst <- sqrt(syst)
+  return(l)
+}
 plot_the_Ambaradam <- function(name) {
   list_lat <- c(
     "_3b", "_3b_BOS", "_3b_BTM", "_3b_BOS_BTM",
@@ -131,8 +161,25 @@ plot_the_Ambaradam <- function(name) {
     "dof" = rep(0, count),
     "Npar" = rep(0, count),
     "Ndat" = rep(0, count),
-    "mult" = rep(0, count)
+    "mult" = rep(0, count),
+    "P0" = rep(NA, count),
+    "dPNA" = rep(NA, count),
+    "P1" = rep(NA, count),
+    "dP1" = rep(NA, count),
+    "P2" = rep(NA, count),
+    "dP2" = rep(NA, count),
+    "P3" = rep(NA, count),
+    "dP3" = rep(NA, count),
+    "P4" = rep(NA, count),
+    "dP4" = rep(NA, count),
+    "P5" = rep(NA, count),
+    "dP5" = rep(NA, count),
+    "P6" = rep(NA, count),
+    "dP6" = rep(NA, count),
+    "multicol"= rep(0, count),
+    "k"= rep(0, count)
   )
+  
   gg <- myggplot(repeat_color = 1)
   count <- 1
   for (lat in list_lat) {
@@ -160,7 +207,30 @@ plot_the_Ambaradam <- function(name) {
         } else {
           df[count, 8] <- 1
         }
-
+        for (i in seq_along(fit$P[,1])){
+          df[count, 9+(i-1)*2]<- fit$P[i,2]
+          df[count, 9+(i-1)*2+1]<- fit$P[i,3]
+        }
+        M<-data.matrix(fit$C)
+        for(i in c(1:dim(M)[1]) ){
+          for(j in c(1:dim(M)[1]) ){
+            M[i,j]<-as.numeric(fit$C[i,j])
+          }
+        }
+        e<-eigen(M)
+        # if (is.complex(e$values)){
+        #   df$multicol[count]<-2
+        # }
+        # else{
+          lmin<-min(abs(e$values))
+          lmax<-max(abs(e$values))
+          df$k[count]<- lmax/lmin
+          k<- (lmax/lmin)
+          if (k> 10000)
+            df$multicol[count]<-1
+          else
+            df$multicol[count]<-0
+        # }
         namelegend <- "fit"
         if (str_detect(namefit, "log")) {
           namelegend <- paste0(namelegend, "-log")
@@ -228,7 +298,14 @@ plot_the_Ambaradam <- function(name) {
   }
 
   ###########################
-
+  a<-which(df$multicol ==0)
+  df1<- df[a, ]
+  ave_AIC_mc <- AIC2(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+  cat(
+    "AIC (k<10000) = ", mean_print(ave_AIC_mc$m, ave_AIC_mc$dm),
+    "(", ave_AIC_mc$stat, ")", "[", ave_AIC_mc$syst, "]", "\n\n"
+  )
+  
   a <- which(df$dof == 1)
   if (length(a) > 0) {
     df1 <- df[-a, ]
@@ -240,6 +317,18 @@ plot_the_Ambaradam <- function(name) {
     "AIC (chi2 + 2Npar - Ndat)/2 (no dof =1) = ", mean_print(ave_AIC1$m, ave_AIC1$dm),
     "(", ave_AIC1$stat, ")", "[", ave_AIC1$syst, "]", "\n\n"
   )
+  df1<-df
+  ave_AICc <- AICc(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+  cat(
+    "AICc   = ", mean_print(ave_AICc$m, ave_AICc$dm),
+    "(", ave_AICc$stat, ")", "[", ave_AICc$syst, "]", "\n\n"
+  )
+  
+  # eq28 <- eq28(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+  # cat(
+  #   "eq28   = ", mean_print(eq28$m, eq28$dm),
+  #   "(", eq28$stat, ")", "[", eq28$syst, "]", "\n\n"
+  # )
 
   ave_AIC2 <- AIC2(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity = df$mult)
   cat(

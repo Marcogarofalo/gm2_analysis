@@ -1,4 +1,7 @@
 bad=()
+# there is a problem that ./scale_setting needs ZA to correct the maximal twist corrections, 
+# ZA is determine by gm2_analysis but needs the ms 
+
 # ./mpi_fpi read_plateaux -p ../../g-2_new_stat/ cA.53.24  -bin 50  -L 24  jack -mu 0.00530 || bad+=("cA.53.24")
 # ./mpi_fpi read_plateaux -p ../../g-2_new_stat/ cA.40.24  -bin 50  -L 24  jack -mu 0.00400 || bad+=("cA.40.24")
 # ./mpi_fpi read_plateaux -p ../../g-2_new_stat/ cA.30.32  -bin 50  -L 32  jack -mu 0.00300 || bad+=("cA.30.32")
@@ -21,7 +24,7 @@ then
 ./mpi_fpi  read_plateaux -p ../../g-2_new_stat/ cB.25.48  -bin 50  -L 48  jack -mu 0.0025 || bad+=("mpi cB.25.48")
 ./mpi_fpi  read_plateaux -p ../../g-2_new_stat/ cC.20.48  -bin 50  -L 48  jack -mu 0.0020 || bad+=("mpi cB.20.48")
 fi
-./scale_setting jack ../../g-2_new_stat/jackknife/ ../../g-2_new_stat//fit_all/|| bad+=("scale setting 1")
+./scale_setting jack ../../g-2_new_stat/jackknife/ ../../g-2_new_stat//fit_all/|| bad+=("scale setting 1") 
 
 
 ./gm2_analysis read_plateaux -p ../../g-2_new_stat/ cA.53.24  -bin 50  -L 24  jack -mu 0.00530  0.010  0.020   0.26500   0.29000   0.30000 three_corr || bad+=("cA.53.24")
