@@ -298,11 +298,13 @@ plot_the_Ambaradam <- function(name) {
   }
 
   ###########################
-  a<-which(df$multicol ==0)
+  # a<-which(df$multicol ==0)
+  tresh<-1e+4
+  a<-which(df$k <tresh)
   df1<- df[a, ]
   ave_AIC_mc <- AIC2(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
   cat(
-    "AIC (k<10000) = ", mean_print(ave_AIC_mc$m, ave_AIC_mc$dm),
+    "AIC (k<",tresh,") = ", mean_print(ave_AIC_mc$m, ave_AIC_mc$dm),
     "(", ave_AIC_mc$stat, ")", "[", ave_AIC_mc$syst, "]", "\n\n"
   )
   
@@ -394,6 +396,16 @@ plot_the_Ambaradam <- function(name) {
     "AIC (chi2 + 2Npar - Ndat)/2 (no a/log^2(3) a) = ", mean_print(ave_AIC11$m, ave_AIC11$dm),
     "(", ave_AIC11$stat, ")", "[", ave_AIC11$syst, "]", "\n\n"
   )
+  
+  a <- which(str_detect(df$fit, "BOS"))
+  a <-c(a, which(str_detect(df$fit, "BTM")))
+  a <-c(a, which(str_detect(df$fit, "only")))
+  df1 <- df[-a, ]
+  ave_AIC11 <- AIC2(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+  cat(
+    "AIC (chi2 + 2Npar -2 Ndat)/2 (only CDE ) = ", mean_print(ave_AIC11$m, ave_AIC11$dm),
+    "(", ave_AIC11$stat, ")", "[", ave_AIC11$syst, "]", "\n\n"
+  )
 
   gg <- gg + geom_pointrange(aes(
     x = 0, y = ave_AIC$m, ymin = ave_AIC$m - ave_AIC$dm,
@@ -425,24 +437,24 @@ plot_the_Ambaradam <- function(name) {
 }
 
 
-file <- sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_SD_3b_BOS_BTM_a4OS_a4TM_fit_data.txt")
+file <- sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_SDcor_3b_BOS_BTM_a4OS_a4TM_fit_data.txt")
 df <- read.table(file, header = FALSE, fill = TRUE)
 iy <- length(df[1, ]) - 2
 dft <- df[, c(1, iy)]
 # names(dft) <- c("$a^2(\\text{fm})$", "$a_{\\mu}(c)$", "r")
 dft[, 2] <- mapply(mean_print, df[, iy], df[, iy + 1])
 
-file <- sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_W_3b_BOS_BTM_a4OS_a4TM_fit_data.txt")
+file <- sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_Wcor_3b_BOS_BTM_a4OS_a4TM_fit_data.txt")
 df <- read.table(file, header = FALSE, fill = TRUE)
 iy <- length(df[1, ]) - 2
 dft <- cbind(dft, mapply(mean_print, df[, iy], df[, iy + 1]))
 
-file <- sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_LD_3b_BOS_BTM_a4OS_a4TM_fit_data.txt")
+file <- sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_LDcor_3b_BOS_BTM_a4OS_a4TM_fit_data.txt")
 df <- read.table(file, header = FALSE, fill = TRUE)
 iy <- length(df[1, ]) - 2
 dft <- cbind(dft, mapply(mean_print, df[, iy], df[, iy + 1]))
 
-file <- sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_SDpWpLD_3b_BOS_BTM_a4OS_a4TM_fit_data.txt")
+file <- sprintf("/home/garofalo/analysis/g-2_new_stat/fit_all_strange/amu_SDpWpLDcor_3b_BOS_BTM_a4OS_a4TM_fit_data.txt")
 df <- read.table(file, header = FALSE, fill = TRUE)
 iy <- length(df[1, ]) - 2
 dft <- cbind(dft, mapply(mean_print, df[, iy], df[, iy + 1]))
