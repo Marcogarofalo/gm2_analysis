@@ -185,7 +185,7 @@ gg <- plot_fit(
 gg <- gg + theme(text = element_text(size = 15))
 
 gg <- gg + geom_hline(yintercept = 1.07015457788)
-fig <- myplotly(gg, "", "$a\\mu_\\ell$", "$(M_\\pi/F_\\pi)^2$",
+fig <- myplotly(gg, "", "$am_\\ell$", "$(M_\\pi/F_\\pi)^2$",
   to_print = FALSE,
   save_pdf = "Mpi_over_fpi", yrange = c(0, 5.5),
   legend_position = c(-0.0, 0.99)
@@ -334,7 +334,7 @@ gg <- gg + ggplot2::labs(
   shape = legend_title,
   linewidth = legend_title
 )
-fig <- myplotly(gg, "", "$a\\mu_\\ell$", "$(M_\\pi/F_\\pi)^2$",
+fig <- myplotly(gg, "", "$am_\\ell$", "$(M_\\pi/F_\\pi)^2$",
   to_print = FALSE,
   save_pdf = "Mpi_over_fpi_zoom", yrange = c(1.05, 1.159),
   xrange = c(0.00042, 0.00072),

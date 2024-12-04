@@ -71,7 +71,8 @@ plot_all_fits <- function(name, Wind, quark, myyrange = NULL, quark_full_name = 
     "dof" = rep(0, count),
     "Npar" = rep(0, count),
     "Ndat" = rep(0, count),
-    "mult" = rep(0, count)
+    "mult" = rep(0, count),
+    "k" = rep(0, count)
   )
   gg <- myggplot()
   count <- 1
@@ -100,6 +101,16 @@ plot_all_fits <- function(name, Wind, quark, myyrange = NULL, quark_full_name = 
         } else {
           df[count, 8] <- 1
         }
+        M <- data.matrix(fit$C)
+        for (i in c(1:dim(M)[1])) {
+          for (j in c(1:dim(M)[1])) {
+            M[i, j] <- as.numeric(fit$C[i, j])
+          }
+        }
+        e <- eigen(M)
+        lmin <- min(abs(e$values))
+        lmax <- max(abs(e$values))
+        df$k[count] <- lmax / lmin
 
         namelegend <- "fit"
         if (str_detect(namefit, "log")) {
@@ -319,5 +330,6 @@ plot_all_fits <- function(name, Wind, quark, myyrange = NULL, quark_full_name = 
     tools::texi2dvi(texfile, texi2dvi = "pdflatex", pdf = TRUE)
   }
 
+  ave_AIC$df <- df
   return(ave_AIC)
 }

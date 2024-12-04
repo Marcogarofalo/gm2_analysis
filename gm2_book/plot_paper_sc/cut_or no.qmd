@@ -1,0 +1,155 @@
+---
+title: "Untitled"
+format: html
+---
+  
+```{r, echo=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+
+
+
+library("gridExtra")
+library("ggpubr")
+library(stringr)
+
+source("functions.R")
+tresh<-1e+4
+```
+
+## SD
+
+### s
+
+```{r, echo=FALSE}
+df<-plot_all_fits("SDcor","SD","s",quark_full_name="strange", to_plot = FALSE)
+df1<-plot_all_fits("SDetasNoCor","SD","s",quark_full_name="strange_no_fine_tuning_latt", to_plot = FALSE)
+s_ft2<- sqrt(df$dm^2 - df1$dm^2)
+cat("mean ",df$m,"  stat ", df$stat, "  syst", df$syst, " tot  ", df$dm ,"\n")
+l<-which(df$df$k<tresh)
+df1<-df$df[l,]
+ave_AICk <- AIC2(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+cat("k<",tresh,"\n")
+cat("mean ",ave_AICk$m,"  stat ", ave_AICk$stat, "  syst", ave_AICk$syst, " tot  ", ave_AICk$dm ,"\n")
+
+#cat("mean without",df1$m,"\n")
+#cat("ft ",s_ft2,"\n")
+# cat("cont stat ",df1$stat,"\n")
+# cat("cont syst ",df1$syst,"\n")
+#cat("total ",df$dm,"\n")
+```
+
+### c
+
+```{r, echo=FALSE}
+df<-plot_all_fits("SDcor","SD","c",quark_full_name="charm", to_plot = FALSE)
+df1<-plot_all_fits("SD","SD","c",quark_full_name="charm_no_fine_tuning_latt", to_plot = FALSE)
+s_ft2<- sqrt(df$dm^2 - df1$dm^2)
+cat("mean ",df$m,"  stat ", df$stat, "  syst", df$syst, " tot  ", df$dm ,"\n")
+l<-which(df$df$k<tresh)
+df1<-df$df[l,]
+ave_AICk <- AIC2(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+cat("k<",tresh,"\n")
+cat("mean ",ave_AICk$m,"  stat ", ave_AICk$stat, "  syst", ave_AICk$syst, " tot  ", ave_AICk$dm ,"\n")
+
+```
+
+
+## W
+
+### s
+
+```{r, echo=FALSE}
+df<-plot_all_fits("Wcor","W","s",quark_full_name="strange", to_plot = FALSE)
+df1<-plot_all_fits("WetasNoCor","W","s",quark_full_name="strange_no_fine_tuning_latt", to_plot = FALSE)
+s_ft2<- sqrt(df$dm^2 - df1$dm^2)
+cat("mean ",df$m,"  stat ", df$stat, "  syst", df$syst, " tot  ", df$dm ,"\n")
+l<-which(df$df$k<tresh)
+df1<-df$df[l,]
+ave_AICk <- AIC2(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+cat("k<",tresh,"\n")
+cat("mean ",ave_AICk$m,"  stat ", ave_AICk$stat, "  syst", ave_AICk$syst, " tot  ", ave_AICk$dm ,"\n")
+
+```
+
+### c
+
+```{r, echo=FALSE}
+df<-plot_all_fits("Wcor","W","c",quark_full_name="charm", to_plot = FALSE)
+df1<-plot_all_fits("W","W","c",quark_full_name="charm_no_fine_tuning_latt", to_plot = FALSE)
+s_ft2<- sqrt(df$dm^2 - df1$dm^2)
+cat("mean ",df$m,"  stat ", df$stat, "  syst", df$syst, " tot  ", df$dm ,"\n")
+l<-which(df$df$k<tresh)
+df1<-df$df[l,]
+ave_AICk <- AIC2(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+cat("k<",tresh,"\n")
+cat("mean ",ave_AICk$m,"  stat ", ave_AICk$stat, "  syst", ave_AICk$syst, " tot  ", ave_AICk$dm ,"\n")
+
+```
+
+## LD
+
+### s
+
+
+```{r, echo=FALSE}
+df<-plot_all_fits("LDcor","LD","s",quark_full_name="strange", to_plot = FALSE)
+df1<-plot_all_fits("LDetasNoCor","LD","s",quark_full_name="strange_no_fine_tuning_latt", to_plot = FALSE)
+s_ft2<- sqrt(df$dm^2 - df1$dm^2)
+cat("mean ",df$m,"  stat ", df$stat, "  syst", df$syst, " tot  ", df$dm ,"\n")
+l<-which(df$df$k<tresh)
+df1<-df$df[l,]
+ave_AICk <- AIC2(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+cat("k<",tresh,"\n")
+cat("mean ",ave_AICk$m,"  stat ", ave_AICk$stat, "  syst", ave_AICk$syst, " tot  ", ave_AICk$dm ,"\n")
+
+```
+
+### c
+
+```{r, echo=FALSE}
+df<-plot_all_fits("LDcor","LD","c",quark_full_name="charm", to_plot = FALSE)
+df1<-plot_all_fits("LD","LD","c",quark_full_name="charm_no_fine_tuning_latt", to_plot = FALSE)
+s_ft2<- sqrt(df$dm^2 - df1$dm^2)
+cat("mean ",df$m,"  stat ", df$stat, "  syst", df$syst, " tot  ", df$dm ,"\n")
+l<-which(df$df$k<tresh)
+df1<-df$df[l,]
+ave_AICk <- AIC2(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+cat("k<",tresh,"\n")
+cat("mean ",ave_AICk$m,"  stat ", ave_AICk$stat, "  syst", ave_AICk$syst, " tot  ", ave_AICk$dm ,"\n")
+
+```
+
+## full
+
+### s
+
+```{r, echo=FALSE}
+df<-plot_all_fits("SDpWpLDcor","full","s",quark_full_name="strange", to_plot = FALSE)
+df1<-plot_all_fits("SDpWpLDetasNoCor","full","s",quark_full_name="strange_no_fine_tuning_latt", to_plot = FALSE)
+s_ft2<- sqrt(df$dm^2 - df1$dm^2)
+cat("mean ",df$m,"  stat ", df$stat, "  syst", df$syst, " tot  ", df$dm ,"\n")
+l<-which(df$df$k<tresh)
+df1<-df$df[l,]
+ave_AICk <- AIC2(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+cat("k<",tresh,"\n")
+cat("mean ",ave_AICk$m,"  stat ", ave_AICk$stat, "  syst", ave_AICk$syst, " tot  ", ave_AICk$dm ,"\n")
+
+```
+
+### c
+
+```{r, echo=FALSE}
+df<-plot_all_fits("SDpWpLDcor","full","c",quark_full_name="charm", to_plot = FALSE)
+df1<-plot_all_fits("SDpWpLD","full","c",quark_full_name="charm_no_fine_tuning_latt", to_plot = FALSE)
+s_ft2<- sqrt(df$dm^2 - df1$dm^2)
+cat("mean ",df$m,"  stat ", df$stat, "  syst", df$syst, " tot  ", df$dm ,"\n")
+l<-which(df$df$k<tresh)
+df1<-df$df[l,]
+ave_AICk <- AIC2(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+cat("k<",tresh,"\n")
+cat("mean ",ave_AICk$m,"  stat ", ave_AICk$stat, "  syst", ave_AICk$syst, " tot  ", ave_AICk$dm ,"\n")
+
+```
