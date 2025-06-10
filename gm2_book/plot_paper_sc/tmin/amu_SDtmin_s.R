@@ -143,27 +143,99 @@ for (t in c(1:5)) {
   df_ref$amu_ref[t] <- AIC_res$m
   df_ref$damu_ref[t] <- AIC_res$dm
 }
-df_pert<-read.table("/home/garofalo/analysis/gm2_analysis/gm2_book/amu_SD_s_pert.txt",header = TRUE)
 df_tilde <- df_ref
-df_tilde$amu_ref<- df_ref$amu_ref+df_pert$amu_.s._pert
+df_tilde$amu_ref<- df_ref$amu_ref
 
-gg <- myggplot(fill = FALSE) + geom_pointrange(aes(
-  x = !!df_tilde$t_ref, y = !!df_tilde$amu_ref, ymin = !!(df_tilde$amu_ref - df_tilde$damu_ref),
-  ymax = !!(df_tilde$amu_ref + df_tilde$damu_ref), color = "", shape=""
+gg <- myggplot(fill = FALSE) 
+gg <- gg + geom_point(aes(
+  x = !!df_tilde$t_ref, y = !!df_tilde$amu_ref,
+  color = "LQCD", shape="LQCD"
 ), stroke=2)
 gg<- gg + geom_errorbar(aes(
   x = !!df_tilde$t_ref, y = !!df_tilde$amu_ref, ymin = !!(df_tilde$amu_ref - df_tilde$damu_ref),
-  ymax = !!(df_tilde$amu_ref + df_tilde$damu_ref), color = "", shape=""
+  ymax = !!(df_tilde$amu_ref + df_tilde$damu_ref), color = "LQCD", shape="LQCD"
+), width=0.005, linewidth=1.5)
+
+
+df_pert<-read.table("/home/garofalo/analysis/gm2_analysis/gm2_book/amu_SD_s_pert_0.65.txt",header = TRUE)
+df_tilde$amu_ref<- df_pert$amu_.s._pert
+gg <- gg + geom_point(aes(
+  x = !!df_tilde$t_ref, y = !!df_tilde$amu_ref,
+  color = "pQCD 0.65", shape="pQCD 0.65"
+), stroke=2)
+gg<- gg + geom_errorbar(aes(
+  x = !!df_tilde$t_ref, y = !!df_tilde$amu_ref, ymin = !!(df_tilde$amu_ref - df_tilde$damu_ref),
+  ymax = !!(df_tilde$amu_ref + df_tilde$damu_ref), color = "pQCD 0.65", shape="pQCD 0.65"
+), width=0.005, linewidth=1.5)
+
+df_tilde$amu_ref<- df_ref$amu_ref+df_pert$amu_.s._pert
+gg <- gg + geom_point(aes(
+  x = !!df_tilde$t_ref, y = !!df_tilde$amu_ref,
+  color = "LQCD + pQCD 0.65", shape="LQCD + pQCD 0.65"
+), stroke=2)
+gg<- gg + geom_errorbar(aes(
+  x = !!df_tilde$t_ref, y = !!df_tilde$amu_ref, ymin = !!(df_tilde$amu_ref - df_tilde$damu_ref),
+  ymax = !!(df_tilde$amu_ref + df_tilde$damu_ref), color = "LQCD + pQCD 0.65", shape="LQCD + pQCD 0.65"
+), width=0.005, linewidth=1.5)
+
+df_pert<-read.table("/home/garofalo/analysis/gm2_analysis/gm2_book/amu_SD_s_pert.txt",header = TRUE)
+df_tilde$amu_ref<- df_pert$amu_.s._pert
+gg <- gg + geom_point(aes(
+  x = !!df_tilde$t_ref, y = !!df_tilde$amu_ref,
+  color = "pQCD", shape="pQCD"
+), stroke=2)
+gg<- gg + geom_errorbar(aes(
+  x = !!df_tilde$t_ref, y = !!df_tilde$amu_ref, ymin = !!(df_tilde$amu_ref - df_tilde$damu_ref),
+  ymax = !!(df_tilde$amu_ref + df_tilde$damu_ref), color = "pQCD", shape="pQCD"
+), width=0.005, linewidth=1.5)
+
+
+df_tilde$amu_ref<- df_ref$amu_ref+df_pert$amu_.s._pert
+gg <- gg + geom_point(aes(
+  x = !!df_tilde$t_ref, y = !!df_tilde$amu_ref,
+  color = "LQCD + pQCD", shape="LQCD + pQCD"
+), stroke=2)
+gg<- gg + geom_errorbar(aes(
+  x = !!df_tilde$t_ref, y = !!df_tilde$amu_ref, ymin = !!(df_tilde$amu_ref - df_tilde$damu_ref),
+  ymax = !!(df_tilde$amu_ref + df_tilde$damu_ref), color = "LQCD + pQCD", shape="LQCD + pQCD"
 ), width=0.005, linewidth=1.5)
 
 df_pert<-read.table("/home/garofalo/analysis/gm2_analysis/gm2_book/amu_SD_s_pert_barMS.txt",header = TRUE)
 df_tilde <- df_ref
-df_tilde$amu_ref<- df_ref$amu_ref+df_pert$amu_.s._pert
 
-# gg <- gg + geom_pointrange(aes(
-#   x = !!df_tilde$t_ref+0.001, y = !!df_tilde$amu_ref, ymin = !!(df_tilde$amu_ref - df_tilde$damu_ref),
-#   ymax = !!(df_tilde$amu_ref + df_tilde$damu_ref), color = "reference time + r_had barMS"
-# ))
+df_tilde$amu_ref<- df_pert$amu_.s._pert
+gg <- gg + geom_point(aes(
+  x = !!df_tilde$t_ref, y = !!df_tilde$amu_ref,
+  color = "pQCD $\\overline{\\mbox{MS}}$", shape="pQCD $\\overline{\\mbox{MS}}$"
+), stroke=2)
+gg<- gg + geom_errorbar(aes(
+  x = !!df_tilde$t_ref, y = !!df_tilde$amu_ref, ymin = !!(df_tilde$amu_ref - df_tilde$damu_ref),
+  ymax = !!(df_tilde$amu_ref + df_tilde$damu_ref), color = "pQCD $\\overline{\\mbox{MS}}$", shape="pQCD $\\overline{\\mbox{MS}}$"
+), width=0.005, linewidth=1.5)
+
+
+df_tilde$amu_ref<- df_ref$amu_ref+df_pert$amu_.s._pert
+gg <- gg + geom_point(aes(
+  x = !!df_tilde$t_ref, y = !!df_tilde$amu_ref,
+  color = "LQCD + pQCD $\\overline{\\mbox{MS}}$", shape="LQCD + pQCD $\\overline{\\mbox{MS}}$"
+), stroke=2)
+gg<- gg + geom_errorbar(aes(
+  x = !!df_tilde$t_ref, y = !!df_tilde$amu_ref, ymin = !!(df_tilde$amu_ref - df_tilde$damu_ref),
+  ymax = !!(df_tilde$amu_ref + df_tilde$damu_ref), color = "LQCD + pQCD $\\overline{\\mbox{MS}}$", shape="LQCD + pQCD $\\overline{\\mbox{MS}}$"
+), width=0.005, linewidth=1.5)
+
+
+gg<- gg +  geom_pointrange(aes(
+  x = df_sub$t_ref, y = df_sub$amu_ref, ymin = df_sub$amu_ref - df_sub$damu_ref,
+  ymax = df_sub$amu_ref + df_sub$damu_ref, color = "SD ",shape ="SD "
+), stroke=2)
+gg<- gg +  geom_errorbar(aes(
+  x = df_sub$t_ref, y = df_sub$amu_ref, ymin = df_sub$amu_ref - df_sub$damu_ref,
+  ymax = df_sub$amu_ref + df_sub$damu_ref, color = "SD ",shape ="SD "
+), width=0.005, linewidth=1.5)
+
+
+
 
 
 gg<- gg +  geom_pointrange(aes(
@@ -180,4 +252,5 @@ gg<- gg + theme(legend.position = "none")
 gg <- gg + theme(text = element_text(size = 15))
 
 fig <- myplotly(gg, "", "$t_\\mathrm{min}$~[fm]", "$a_\\mu^{\\rm HVP, SD}(s,t_\\mathrm{min})$", to_print = FALSE,
-                save_pdf = "amu_SDtmin_s", legend_position = NULL)
+                save_pdf = "amu_SDtmin_s", legend_position = c(0.2,0.5),
+                yrange = c(0,1.6)*10e-10 )

@@ -6,3 +6,6 @@
 *.woff
 *.dcf
 /nice_plots
+plot_paper_sc/*.tex
+plot_paper_sc/**/*.tex
+*.png
