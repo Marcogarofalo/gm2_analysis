@@ -123,6 +123,10 @@ add_executable(scale_setting scale_setting.cpp)
 target_link_libraries(scale_setting PUBLIC functions_gm2_analysis)
 target_link_libraries(scale_setting PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
 
+add_executable(w0_scale_setting w0_scale_setting.cpp)
+target_link_libraries(w0_scale_setting PUBLIC functions_gm2_analysis)
+target_link_libraries(w0_scale_setting PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+
 
 IF(WITH_ARB)
   set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} ${CXXFLAGS} -DWITH_ARB   ")

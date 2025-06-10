@@ -194,6 +194,11 @@ double rhs_amu_a4_common(int n, int Nvar, double* x, int Npar, double* P);
 // void compute_syst_eq28(data_all in, const char* outpath, const char* filename) ;
 void set_a_ml_ms_mc(char *argv_i, double *a, double *phys_ml, double *phys_ms, double *phys_mc, std::string &latt);
 
+
+double lhs_w0_a(int n, int e, int j, data_all gjack, struct fit_type fit_info);
+double rhs_w0_a_simple(int n, int Nvar, double* x, int Npar, double* P);
+
+
 double lhs_afpi(int n, int e, int j, data_all gjack, struct fit_type fit_info);
 double lhs_afpi_remove_FVE(int n, int e, int j, data_all gjack, struct fit_type fit_info, struct fit_result fit_out);
 double rhs_afpi(int n, int Nvar, double* x, int Npar, double* P);
