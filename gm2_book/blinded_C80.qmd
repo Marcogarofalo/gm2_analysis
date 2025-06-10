@@ -32,16 +32,16 @@ df<-NULL
 mt<-read_df(paste0(dir,e,"_output"))
 all_obs<-Rose::get_all_corr(mt)
 df<-add_corr_to_df("amu_{bound}_(TM)_above",all_obs ,mt,df, 
-                   reshape = FALSE, print_res = FALSE
+                   reshape = FALSE, print_res = FALSE, ifit=5, idfit=6
                    )
 df<-add_corr_to_df("amu_{bound}_(TM)_below",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.2
+                   reshape = FALSE, nudge = 0.2, ifit=5, idfit=6
                    )
 df<-add_corr_to_df("amu_{bound_meff_t}_(TM)_below",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.1
+                   reshape = FALSE, nudge = 0.1, ifit=5, idfit=6
                    )
 df<-add_corr_to_df("amu_{bound_meff}_(TM)_above",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.3
+                   reshape = FALSE, nudge = 0.3, ifit=5, idfit=6
                    )
 
 df1<- get_block("amu_{full}_(TM)",all_obs ,mt,NULL ,log=FALSE,number=NULL,
@@ -64,20 +64,20 @@ df<-NULL
 mt<-read_df(paste0(dir,e,"_output"))
 all_obs<-Rose::get_all_corr(mt)
 df<-add_corr_to_df("amu_{bound}_(OS)_above",all_obs ,mt,df, 
-                   reshape = FALSE, print_res = FALSE
+                   reshape = FALSE, print_res = FALSE, ifit=5, idfit=6
                    )
 df<-add_corr_to_df("amu_{bound}_(OS)_below",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.2
+                   reshape = FALSE, nudge = 0.2, ifit=5, idfit=6
                    )
 #   
 df<-add_corr_to_df("amu_{bound_meff_t}_(OS)_below",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.1
+                   reshape = FALSE, nudge = 0.1, ifit=5, idfit=6
                    )
 df1<- get_block("amu_{full}_(OS)",all_obs ,mt,NULL ,log=FALSE,number=NULL,
                      nudge=0.0, print_res=FALSE , rename="integrand", 
                      logx=0, ix=1, iy=7, ierr=8, ifit=5, ierrfit=6, iplateau=1)
 df<-add_corr_to_df("amu_{bound_meff}_(OS)_above",all_obs ,mt,df,
-                  reshape = FALSE, nudge = 0.3
+                  reshape = FALSE, nudge = 0.3, ifit=5, idfit=6
                   )
 
 # df<-add_corr_to_df("amu_{bound_meff}_(OS)_below",all_obs ,mt,df,
@@ -103,10 +103,10 @@ df<-NULL
 mt<-read_df(paste0(dir,e,"_output"))
 all_obs<-Rose::get_all_corr(mt)
 df<-add_corr_to_df("M_VKVK_TM",all_obs ,mt,df, 
-                   reshape = TRUE
+                   reshape = TRUE, ifit=5, idfit=6
                    )
 df<-add_corr_to_df("M_VKVK_OS",all_obs ,mt,df,
-                   reshape = TRUE, nudge = 0.1
+                   reshape = TRUE, nudge = 0.1, ifit=5, idfit=6
                    )
 
 gg<-plot_df_corr_ggplot(df, extra_length_plateau = 0.4) 
@@ -140,16 +140,16 @@ df<-NULL
 mt<-read_df(paste0(dir,e,"_output"))
 all_obs<-Rose::get_all_corr(mt)
 df<-add_corr_to_df("amu_{bound}_(TM)_1_above",all_obs ,mt,df, 
-                   reshape = FALSE, print_res = FALSE
+                   reshape = FALSE, print_res = FALSE, ifit=5, idfit=6
                    )
 df<-add_corr_to_df("amu_{bound}_(TM)_1_below",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.2
+                   reshape = FALSE, nudge = 0.2, ifit=5, idfit=6
                    )
 df<-add_corr_to_df("amu_{bound_meff_t}_(TM)_1_below",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.1
+                   reshape = FALSE, nudge = 0.1, ifit=5, idfit=6
                    )
 df<-add_corr_to_df("amu_{bound_meff}_(TM)_1_above",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.3
+                   reshape = FALSE, nudge = 0.3, ifit=5, idfit=6
                    )
 
 # df1<- get_block("amu_{full}_(TM)_1",all_obs ,mt,NULL ,log=FALSE,number=NULL,
@@ -172,20 +172,20 @@ df<-NULL
 mt<-read_df(paste0(dir,e,"_output"))
 all_obs<-Rose::get_all_corr(mt)
 df<-add_corr_to_df("amu_{bound}_(OS)_1_above",all_obs ,mt,df, 
-                   reshape = FALSE, print_res = FALSE
+                   reshape = FALSE, print_res = FALSE, ifit=5, idfit=6
                    )
 df<-add_corr_to_df("amu_{bound}_(OS)_1_below",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.2
+                   reshape = FALSE, nudge = 0.2, ifit=5, idfit=6
                    )
 #   
 df<-add_corr_to_df("amu_{bound_meff_t}_(OS)_1_below",all_obs ,mt,df,
-                   reshape = FALSE, nudge = 0.1
+                   reshape = FALSE, nudge = 0.1, ifit=5, idfit=6
                    )
 # df1<- get_block("amu_{full}_(OS)",all_obs ,mt,NULL ,log=FALSE,number=NULL,
 #                      nudge=0.0, print_res=FALSE , rename="integrand", 
 #                      logx=0, ix=1, iy=7, ierr=8, ifit=5, ierrfit=6, iplateau=1)
 df<-add_corr_to_df("amu_{bound_meff}_(OS)_1_above",all_obs ,mt,df,
-                  reshape = FALSE, nudge = 0.3
+                  reshape = FALSE, nudge = 0.3, ifit=5, idfit=6
                   )
 
 # df<-add_corr_to_df("amu_{bound_meff}_(OS)_below",all_obs ,mt,df,
@@ -211,10 +211,10 @@ df<-NULL
 mt<-read_df(paste0(dir,e,"_output"))
 all_obs<-Rose::get_all_corr(mt)
 df<-add_corr_to_df("M_VKVK_TM",all_obs ,mt,df, 
-                   reshape = TRUE
+                   reshape = TRUE, ifit=5, idfit=6
                    )
 df<-add_corr_to_df("M_VKVK_OS",all_obs ,mt,df,
-                   reshape = TRUE, nudge = 0.1
+                   reshape = TRUE, nudge = 0.1, ifit=5, idfit=6
                    )
 
 gg<-plot_df_corr_ggplot(df, extra_length_plateau = 0.4) 
