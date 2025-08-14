@@ -133,3 +133,7 @@ IF(WITH_ARB)
   target_link_libraries(fit_all_gm2 PUBLIC flint-arb flint)
 ENDIF()
 target_link_libraries(fit_all_gm2 PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+
+add_executable(scale_setting_rew scale_setting_rew.cpp)
+target_link_libraries(scale_setting_rew PUBLIC functions_gm2_analysis)
+target_link_libraries(scale_setting_rew PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
