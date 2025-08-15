@@ -2494,7 +2494,7 @@ double lhs_w0_a(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
 
 double lhs_afpi_max_twist(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
     double r;
-    r = gjack.en[e].jack[fit_info.corr_id[n]][j];
+    // r = gjack.en[e].jack[fit_info.corr_id[n]][j];
     int count = 0;
     for (int in = 0;in < n;in++) {
         for (int ie : fit_info.Nxen[in]) {
@@ -2564,7 +2564,7 @@ double lhs_afpi_max_twist_remove_FVE(int n, int e, int j, data_all gjack, struct
 
 double lhs_Mpi2_over_afpi2_max_twist(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
     double r;
-    r = gjack.en[e].jack[fit_info.corr_id[n]][j];
+    // r = gjack.en[e].jack[fit_info.corr_id[n]][j];
     int count = 0;
     for (int in = 0;in < n;in++) {
         for (int ie : fit_info.Nxen[in]) {
