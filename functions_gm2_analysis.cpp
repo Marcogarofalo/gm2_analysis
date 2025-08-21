@@ -2702,9 +2702,12 @@ double rhs_afpi_phys_point(int n, int Nvar, double* x, int Npar, double* P) {
     double fpi_phys_fm = x[6];
     double xi_phys = x[7];
 
-    r = a * fpi_phys_fm * (1 /* - 2 * xi * log(xi / xi_phys) */);
-    if (Npar == 6) {
-        r += a * fpi_phys_fm * (-(P[4] + P[5] * a * fpi_phys_fm * a * fpi_phys_fm) * (xi - xi_phys));
+    r = a * fpi_phys_fm * (1  - 2 * xi * log(xi / xi_phys) );
+    if (Npar > 4) {
+        r += a * fpi_phys_fm * (-P[4]  * (xi - xi_phys));
+    }
+    if (Npar > 5) {
+        r += a * fpi_phys_fm * (-  P[5] * a * fpi_phys_fm * a * fpi_phys_fm * (xi - xi_phys));
     }
     // r = a * fpi_phys_fm + P[4] * a * a * a;
     return r;
