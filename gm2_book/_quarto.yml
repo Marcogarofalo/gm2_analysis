@@ -13,6 +13,8 @@ book:
     - pi0.qmd
     - VKVK.qmd
     - scale_setting.qmd
+    - scale_setting_rew.qmd
+    - Mpi_rew.qmd
     - scratch.qmd
     - SD_tmin.qmd
     - continuum_amu_s_full.qmd
