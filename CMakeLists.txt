@@ -36,6 +36,29 @@ MESSAGE("uncomment the lines after this message")
 #   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 # endif()
 # include_directories(SYSTEM ${OpenMP_INCLUDE_PATH})
+
+
+IF(WITH_ARB)
+  if(NOT DEFINED ARB_ROOT)
+        message(FATAL_ERROR "WITH_ARB=ON but ARB_ROOT is not specified. Use -DARB_ROOT=/path/to/flint")
+  endif()
+  set(CMAKE_CXX_FLAGS  " ${CMAKE_CXX_FLAGS} ${CXXFLAGS} -DWITH_ARB  ")#-larb -lflint -lgmp -lmpfr 
+  # Find GMP and MPFR (required by Flint/Arb)
+  # find_package(GMP REQUIRED)
+  # find_package(MPFR REQUIRED)
+  
+  # Include directories
+  include_directories(
+      ${ARB_ROOT}/include
+      ${ARB_ROOT}/include/flint
+  )
+
+  # Library directories
+  link_directories(${ARB_ROOT}/lib)
+  MESSAGE(${ARB_ROOT}/lib)
+  set(ARB_LIBS flint)
+  # include_directories(${CMAKE_INCLUDE_PATH})
+ENDIF()
 #############################################
 # add a local library for this project
 #############################################
@@ -45,59 +68,60 @@ add_library(
     # do_analysis_charm.hpp
     functions_gm2_analysis.cpp
 )
-target_link_libraries(functions_gm2_analysis PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(functions_gm2_analysis PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
 target_include_directories(functions_gm2_analysis PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_executable(gm2_analysis gm2_analysis.cpp)
 target_link_libraries(gm2_analysis PUBLIC functions_gm2_analysis)
+
+
 IF(WITH_ARB)
-  set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} ${CXXFLAGS} -DWITH_ARB   ")
-  target_link_libraries(gm2_analysis PUBLIC flint-arb flint)
+  target_link_libraries(gm2_analysis PUBLIC  ${ARB_LIBS})
 ENDIF()
-target_link_libraries(gm2_analysis PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(gm2_analysis PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
 
 add_executable(mpi_fpi mpi_fpi.cpp)
-target_link_libraries(mpi_fpi PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(mpi_fpi PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS}) 
 target_link_libraries(mpi_fpi PUBLIC functions_gm2_analysis)
 
 add_executable(m_Ds m_Ds.cpp)
-target_link_libraries(m_Ds PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(m_Ds PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
 target_link_libraries(m_Ds PUBLIC functions_gm2_analysis)
 
 add_executable(perturbative_sd perturbative_sd.cpp)
-target_link_libraries(perturbative_sd PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(perturbative_sd PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
 target_link_libraries(perturbative_sd PUBLIC functions_gm2_analysis)
 
 
 add_executable(mpcac mpcac.cpp)
-target_link_libraries(mpcac PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(mpcac PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
 target_link_libraries(mpcac PUBLIC functions_gm2_analysis)
 
 add_executable(m_Ds_2x2 m_Ds_2x2.cpp)
-target_link_libraries(m_Ds_2x2 PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(m_Ds_2x2 PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
 target_link_libraries(m_Ds_2x2 PUBLIC functions_gm2_analysis)
 
 add_executable(m_K_2x2 m_K_2x2.cpp)
-target_link_libraries(m_K_2x2 PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(m_K_2x2 PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
 target_link_libraries(m_K_2x2 PUBLIC functions_gm2_analysis)
 
 
 add_executable(m_K_2p2 m_K_2p2.cpp)
-target_link_libraries(m_K_2p2 PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(m_K_2p2 PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
 target_link_libraries(m_K_2p2 PUBLIC functions_gm2_analysis)
 
 add_executable(m_K_ndata m_K_ndata.cpp)
-target_link_libraries(m_K_ndata PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(m_K_ndata PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
 target_link_libraries(m_K_ndata PUBLIC functions_gm2_analysis)
 
 
 add_executable(m_Ds_ndata m_Ds_ndata.cpp)
-target_link_libraries(m_Ds_ndata PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(m_Ds_ndata PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
 target_link_libraries(m_Ds_ndata PUBLIC functions_gm2_analysis)
 
 
 add_executable(VKVK VKVK.cpp)
-target_link_libraries(VKVK PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(VKVK PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
 
 
 add_executable(fit_all_gm2 fit_all_gm2.cpp)
@@ -107,33 +131,32 @@ add_executable(some_custom_fits some_custom_fits.cpp)
 target_link_libraries(some_custom_fits PUBLIC functions_gm2_analysis)
 
 add_executable(fit_strange fit_strange.cpp)
-target_link_libraries(fit_strange PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(fit_strange PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
 target_link_libraries(fit_strange PUBLIC functions_gm2_analysis)
 
 add_executable(fit_etas fit_etas.cpp)
-target_link_libraries(fit_etas PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(fit_etas PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
 target_link_libraries(fit_etas PUBLIC functions_gm2_analysis)
 
 
 add_executable(fit_charm fit_charm.cpp)
-target_link_libraries(fit_charm PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(fit_charm PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
 target_link_libraries(fit_charm PUBLIC functions_gm2_analysis)
 
 add_executable(scale_setting scale_setting.cpp)
 target_link_libraries(scale_setting PUBLIC functions_gm2_analysis)
-target_link_libraries(scale_setting PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(scale_setting PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
 
 add_executable(w0_scale_setting w0_scale_setting.cpp)
 target_link_libraries(w0_scale_setting PUBLIC functions_gm2_analysis)
-target_link_libraries(w0_scale_setting PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(w0_scale_setting PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
 
 
 IF(WITH_ARB)
-  set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} ${CXXFLAGS} -DWITH_ARB   ")
-  target_link_libraries(fit_all_gm2 PUBLIC flint-arb flint)
+  target_link_libraries(fit_all_gm2 PUBLIC  flint)
 ENDIF()
-target_link_libraries(fit_all_gm2 PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(fit_all_gm2 PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
 
 add_executable(scale_setting_rew scale_setting_rew.cpp)
 target_link_libraries(scale_setting_rew PUBLIC functions_gm2_analysis)
-target_link_libraries(scale_setting_rew PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+target_link_libraries(scale_setting_rew PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
