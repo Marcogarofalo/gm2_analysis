@@ -220,55 +220,6 @@ void compute_amul_print_res(char** argv, char* namefit, fit_type fit_info, int N
     }
 }
 
-fit_result read_file_P(std::string file_der) {
-
-    std::string line;
-    std::ifstream f_der(file_der);
-
-    fit_result fit_out;
-    fit_out.Njack = myres->Njack;
-    fit_out.chi2 = (double*)malloc(sizeof(double) * myres->Njack);
-    std::vector<std::string>  what = { "npar", "chi2dof" };
-    for (int i = 0;i < 2;i++) {
-        if (std::getline(f_der, line)) {
-            std::vector<std::string> array_l = split(line, ' ');
-            error(array_l.size() != 2, 1, "main", "error reading %s", file_der.c_str());
-            if (i == 0)        fit_out.Npar = stoi(array_l[1]);
-            else fit_out.chi2[myres->Njack - 1] = stod(array_l[1]);
-            error(array_l[0].compare(what[i]) != 0, 1, "main", "error reading %s", file_der.c_str());
-        }
-    }
-    std::vector<double> par(fit_out.Npar);
-    std::vector<double> err_p(fit_out.Npar);
-    for (int i = 0;i < fit_out.Npar;i++) {
-        if (std::getline(f_der, line)) {
-            std::vector<std::string> array_l = split(line, ' ');
-            // printf("read %s    %d\n", line.c_str(), (int)array_l.size());
-            error(array_l.size() != 3, 1, "main", "error reading %s", file_der.c_str());
-            par[i] = stod(array_l[1]);
-            err_p[i] = stod(array_l[2]);
-        }
-    }
-    std::vector<std::vector<double>> cov(fit_out.Npar, std::vector<double>(fit_out.Npar));
-    for (int i = 0;i < fit_out.Npar;i++) {
-        if (std::getline(f_der, line)) {
-            std::vector<std::string> array_l = split(line, ' ');
-            for (int j = 0;j < fit_out.Npar;j++) {
-                error(array_l.size() != fit_out.Npar, 1, "main", "error reading %s", file_der.c_str());
-                cov[i][j] = stod(array_l[j]) * err_p[i] * err_p[j];
-            }
-        }
-    }
-    // Convert cov to double**
-    double** cov_ptr = new double* [fit_out.Npar];
-    for (int i = 0; i < fit_out.Npar; ++i) {
-        cov_ptr[i] = cov[i].data();
-    }
-    fit_out.P = myres->create_fake_covariance(par.data(), fit_out.Npar, cov_ptr, 1);
-    delete[] cov_ptr;
-    f_der.close();
-    return fit_out;
-}
 
 int main(int argc, char** argv) {
     error(argc != 4, 1, "main ",
