@@ -666,7 +666,7 @@ int main(int argc, char** argv) {
             corr_w0[e][0][j] = dmu * muder_s_MeV[j];
             jackextra.en[e].jack[id_w0_rew][j] += corr_w0[e][0][j];
 
-            for (int p = 0; p < fit_der_w0.Npar; p++) // w0 m0
+            for (int p = 0; p < fit_der_w0_m0.Npar; p++) // w0 m0
                 tif_m0[p] = fit_der_w0_m0.P[p][j];
             muder_s_MeV[j] = fit_fun_m0(0, 0, tmp_x, fit_der_w0_m0.Npar, tif_m0) / (a_fm) / m0iso;
             dmu = (m0iso - m0sim);
@@ -700,7 +700,7 @@ int main(int argc, char** argv) {
             corr_w0[e][1][j] = dmu * muder_s_MeV[j];
             jackextra.en[e].jack[id_w0_rew][j] += corr_w0[e][1][j];
 
-            for (int p = 0; p < fit_der_w0.Npar; p++) // w0 m0
+            for (int p = 0; p < fit_der_w0_m0.Npar; p++) // w0 m0
                 tif_m0[p] = fit_der_w0_m0.P[p][j];
             muder_s_MeV[j] = fit_fun_m0(0, 0, tmp_x, fit_der_w0_m0.Npar, tif_m0) / (a_fm) / m0iso;
             dmu = (m0iso - m0sim);
@@ -1709,7 +1709,7 @@ int main(int argc, char** argv) {
 
 
     //////////////////////////////////////////////////////////////
-    // w0
+    // w0 fits
     //////////////////////////////////////////////////////////////
 
     {
@@ -1734,8 +1734,8 @@ int main(int argc, char** argv) {
                     double my_mu, my_M, my_fpi;
 
                     my_mu = jackextra.en[e].jack[165][j];
-                    my_M = jackextra.en[e].jack[id_Mpi_cor][j];
-                    my_fpi = jackextra.en[e].jack[id_fpi_cor][j];
+                    my_M = jackextra.en[e].jack[id_Mpi_rew][j];
+                    my_fpi = jackextra.en[e].jack[id_fpi_rew][j];
 
 
                     fit_info.x[0][count][j] = my_mu; // 
@@ -1951,13 +1951,13 @@ int main(int argc, char** argv) {
                     double my_mu, my_M, my_fpi;
                     if (n < 5) {
                         my_mu = jackextra.en[e].jack[165][j];
-                        my_M = jackextra.en[e].jack[id_Mpi_cor][j];
-                        my_fpi = jackextra.en[e].jack[id_fpi_cor][j];
+                        my_M = jackextra.en[e].jack[id_Mpi_rew][j];
+                        my_fpi = jackextra.en[e].jack[id_fpi_rew][j];
                     }
                     else if (n >= 5) {
                         my_mu = jackextra.en[e].jack[166][j];
-                        my_M = jackextra.en[e].jack[id_Mpi_cor_mu1][j];
-                        my_fpi = jackextra.en[e].jack[id_fpi_cor_mu1][j];
+                        my_M = jackextra.en[e].jack[id_Mpi_rew1][j];
+                        my_fpi = jackextra.en[e].jack[id_fpi_rew1][j];
                     }
                     fit_info.x[0][count][j] = my_mu; // 
                     fit_info.x[1][count][j] = my_M;  // 
@@ -2080,8 +2080,8 @@ int main(int argc, char** argv) {
                 double my_mu, my_M, my_fpi;
 
                 my_mu = jackextra.en[e].jack[165][j];
-                my_M = jackextra.en[e].jack[id_Mpi_cor][j];
-                my_fpi = jackextra.en[e].jack[id_fpi_cor][j];
+                my_M = jackextra.en[e].jack[id_Mpi_rew][j];
+                my_fpi = jackextra.en[e].jack[id_fpi_rew][j];
 
 
                 fit_info.x[0][count][j] = my_mu; // 
