@@ -26,7 +26,8 @@ then
 fi
 ./scale_setting jack ../../g-2_new_stat/jackknife/ ../../g-2_new_stat//fit_all/|| bad+=("scale setting 1") 
 ./scale_setting_rew jack ../../g-2_new_stat/jackknife/ ../../g-2_new_stat//fit_all_rew/
-./w0_scale_setting jack ../../g-2_new_stat/jackknife/ ../../g-2_new_stat//fit_all_rew/
+# ./w0_scale_setting jack ../../g-2_new_stat/jackknife/ ../../g-2_new_stat//fit_all_rew/   # REMOVED because ot didn't have access to fpi and Mpi corrected
+                                                                                           # with reweighting.  Analysis moved in scale_setting_rew.cpp
 
 
 ./gm2_analysis read_plateaux -p ../../g-2_new_stat/ cA.53.24  -bin 50  -L 24  jack -mu 0.00530  0.010  0.020   0.26500   0.29000   0.30000 three_corr || bad+=("cA.53.24")
