@@ -2635,6 +2635,28 @@ double lhs_afpi_remove_FVE(int n, int e, int j, data_all gjack, struct fit_type 
 }
 
 
+double rhs_w0_a_simple_a_from_fpi(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[11];
+
+    double aMpi = x[1];
+    double afpi = x[2];
+    double xi = x[4];
+    double L = x[3];
+    // double delta_FVE = FVE_GL_Mpi(L, xi, afpi);
+    // xi *= (1 + delta_FVE) * (1 + delta_FVE) / (1 - 0.25 * delta_FVE) * (1 - 0.25 * delta_FVE);
+    double Mpi_phys_Mev = x[5];
+    double fpi_phys_Mev = x[6];
+    double xi_phys = x[7];
+
+    double w0_phys_fm = P[0];
+
+    // r = a * P[6] * (1-2*xi*log(xi)+2*P[7]*xi+aMpi*aMpi*(P[8]+P[9]*xi)); 
+    r = (w0_phys_fm / a) * (1 - 2 * P[1] * (xi - xi_phys) + P[2] * a * a + P[3] * a * a * a * a);
+    return r;
+}
+
+
 double rhs_w0_a_simple(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
     double a;
@@ -2653,11 +2675,11 @@ double rhs_w0_a_simple(int n, int Nvar, double* x, int Npar, double* P) {
     double Mpi_phys_Mev = x[5];
     double fpi_phys_Mev = x[6];
     double xi_phys = x[7];
-    
+
     double w0_phys_fm = x[10];
 
     // r = a * P[6] * (1-2*xi*log(xi)+2*P[7]*xi+aMpi*aMpi*(P[8]+P[9]*xi)); 
-    r = (w0_phys_fm /a) * (1 - 2 * P[5] * (xi - xi_phys));
+    r = (w0_phys_fm / a) * (1 - 2 * P[5] * (xi - xi_phys));
     return r;
 }
 
@@ -2702,12 +2724,12 @@ double rhs_afpi_phys_point(int n, int Nvar, double* x, int Npar, double* P) {
     double fpi_phys_fm = x[6];
     double xi_phys = x[7];
 
-    r = a * fpi_phys_fm * (1  - 2 * xi * log(xi / xi_phys) );
+    r = a * fpi_phys_fm * (1 - 2 * xi * log(xi / xi_phys));
     if (Npar > 4) {
-        r += a * fpi_phys_fm * (-P[4]  * (xi - xi_phys));
+        r += a * fpi_phys_fm * (-P[4] * (xi - xi_phys));
     }
     if (Npar > 5) {
-        r += a * fpi_phys_fm * (-  P[5] * a * fpi_phys_fm * a * fpi_phys_fm * (xi - xi_phys));
+        r += a * fpi_phys_fm * (-P[5] * a * fpi_phys_fm * a * fpi_phys_fm * (xi - xi_phys));
     }
     // r = a * fpi_phys_fm + P[4] * a * a * a;
     return r;
@@ -2798,7 +2820,7 @@ double rhs_aMpi2_over_afpi2_with_A_only_phys(int n, int Nvar, double* x, int Npa
         aB_Zp_afpi2 = P[(n)]; // B,C,D,E
     }
     else {
-        aB_Zp_afpi2 = P[(n) % 4 ];// B,C,D
+        aB_Zp_afpi2 = P[(n) % 4];// B,C,D
     }
 
     double a = x[8];
@@ -2814,7 +2836,7 @@ double rhs_aMpi2_over_afpi2_with_A_only_phys(int n, int Nvar, double* x, int Npa
     // r = 2 * aB_Zp_afpi2 * amu (1+ P[4]+P[5]*a*a)+  ;//* (1 + P[4] * a * a);
     // if (Npar >= 7)
     //     r += 2 * aB_Zp_afpi2 * amu * (P[6] * a * a);
-    r = aB_Zp_afpi2 + amu*( P[4]  + P[5]*a*a);
+    r = aB_Zp_afpi2 + amu * (P[4] + P[5] * a * a);
     return r;
 }
 
