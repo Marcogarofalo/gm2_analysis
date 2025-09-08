@@ -147,10 +147,6 @@ add_executable(scale_setting scale_setting.cpp)
 target_link_libraries(scale_setting PUBLIC functions_gm2_analysis)
 target_link_libraries(scale_setting PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
 
-add_executable(w0_scale_setting w0_scale_setting.cpp)
-target_link_libraries(w0_scale_setting PUBLIC functions_gm2_analysis)
-target_link_libraries(w0_scale_setting PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
-
 
 IF(WITH_ARB)
   target_link_libraries(fit_all_gm2 PUBLIC  flint)
