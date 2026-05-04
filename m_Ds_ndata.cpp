@@ -980,10 +980,49 @@ int main(int argc, char** argv) {
     mysprintf(namefile, NAMESIZE, "%s/out/mc_from_MDs_%s.txt", argv[3], latt.c_str());
     myres->write_jack_in_file(mc_MDs.data(), namefile);
 
+    // fit result 
+    printf("print fit result\n");
+    for (int i = 0; i < fit_Z0_sigma.Npar;i++) {
+        printf("P[%d]= %g  %g\n", i, fit_Z0_sigma.P[i][Njack - 1], myres->comp_error(fit_Z0_sigma.P[i]));
+    }
+    if (all_mus_equal) {
+        double* der_an = (double*)malloc(sizeof(double) * Njack);
+        for (int j = 0;j < Njack;j++) {
+            der_an[j] = fit_Z0_sigma.P[1][j] + 2 * mc_MDs[j] * fit_Z0_sigma.P[2][j];
+        }
+        printf("analytic derivative %g  %g\n", der_an[Njack - 1], myres->comp_error(der_an));
+    }
+    else {
+        printf("analytic derivative %g  %g\n", fit_Z0_sigma.P[2][Njack - 1], myres->comp_error(fit_Z0_sigma.P[2]));
+
+    }
+
+    // compute derivative 
+    double h = mc_MDs[j] / 100;
+    double* deriv = (double*)malloc(sizeof(double) * Njack);
+    for (int j = 0;j < Njack;j++) {
+
+        swapped_x[0] = phys_ms[j];
+        swapped_x[1] = mc_MDs[j] + h;
+        double fp = fit_info.function(0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j]);
+
+        swapped_x[1] = mc_MDs[j] - h;
+        double fm = fit_info.function(0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j]);
+
+        deriv[j] = (fp - fm) / (2 * h);
+    }
+    printf("dMDs/dmuc = %.12g    %.12g\n", deriv[Njack - 1], myres->comp_error(deriv));
 
     //////////////////////
+    double* MDs_sim = (double*)malloc(sizeof(double) * Njack);
+    for (int j = 0;j < Njack;j++) {
+        swapped_x[0] = phys_ms[j];
+        swapped_x[1] = mc_MDs[j] + h;
+        MDs_sim[j] = fit_info.function(0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j]);
 
-
+    }
+    printf("aMDs(sim) = %.12g    %.12g\n", MDs_sim[Njack - 1], myres->comp_error(MDs_sim));
+    printf("aMDs(iso) = %.12g    %.12g\n", jack_aMDs_exp[Njack-1], myres->comp_error(jack_aMDs_exp));
 
 }
 

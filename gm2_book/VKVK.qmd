@@ -73,8 +73,8 @@ all_obs <- Rose::get_all_corr(mt)
 
 df <- add_corr_to_df("meff_VKVK_ll_OS", all_obs, mt, df)
 df <- add_corr_to_df("meff_VKVK_ss_OS", all_obs, mt, df)
-df <- add_corr_to_df("meff_GEVP_VKVK_OS_l0", all_obs, mt, df)
-df <- add_corr_to_df("meff_GEVP_VKVK_OS_l1", all_obs, mt, df)
+# df <- add_corr_to_df("meff_GEVP_VKVK_OS_l0", all_obs, mt, df)
+# df <- add_corr_to_df("meff_GEVP_VKVK_OS_l1", all_obs, mt, df)
 
 aMpi <- get_full_res("M_{pi}", all_obs, mt)
 a_fm <- 0.079388
@@ -107,7 +107,7 @@ all_obs <- Rose::get_all_corr(mt)
 
 df <- add_corr_to_df("meff_VKVK_ll_OS", all_obs, mt, df)
 df <- add_corr_to_df("meff_VKVK_ss_OS", all_obs, mt, df, rename="meff_VKVK_ss_OS_0.5_40" )
-df <- add_corr_to_df("meff_GEVP_VKVK_OS_l0", all_obs, mt, df, rename="meff_GEVP_VKVK_OS_0.5_40")
+# df <- add_corr_to_df("meff_GEVP_VKVK_OS_l0", all_obs, mt, df, rename="meff_GEVP_VKVK_OS_0.5_40")
 #df <- add_corr_to_df("meff_GEVP_VKVK_OS_l1", all_obs, mt, df)
 
 ###################################

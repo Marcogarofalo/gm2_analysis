@@ -198,7 +198,13 @@ void set_a_ml_ms_mc(char *argv_i, double *a, double *phys_ml, double *phys_ms, d
 double lhs_w0_a(int n, int e, int j, data_all gjack, struct fit_type fit_info);
 double rhs_w0_a_simple_a_from_fpi(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_w0_a_simple(int n, int Nvar, double* x, int Npar, double* P);
+double rhs_w0_a_a2xi(int n, int Nvar, double* x, int Npar, double* P);
 
+double rhs_ratio_a_w0_a_fpi(int n, int Nvar, double* x, int Npar, double* P);
+double lhs_ratio_a_w0_a_fpi(int n, int e, int j, data_all gjack, struct fit_type fit_info);
+
+double rhs_a_w0_a_fpi(int n, int Nvar, double* x, int Npar, double* P);
+double lhs_a_w0_a_fpi(int n, int e, int j, data_all gjack, struct fit_type fit_info);
 
 double lhs_afpi(int n, int e, int j, data_all gjack, struct fit_type fit_info);
 double lhs_afpi_remove_FVE(int n, int e, int j, data_all gjack, struct fit_type fit_info, struct fit_result fit_out);

@@ -9,3 +9,5 @@
 plot_paper_sc/*.tex
 plot_paper_sc/**/*.tex
 *.png
+
+**/*.quarto_ipynb

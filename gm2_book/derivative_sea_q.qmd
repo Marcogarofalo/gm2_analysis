@@ -1,0 +1,216 @@
+# derivative sea
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+# library(hadron)
+# library(kableExtra) # breaks latex
+# library(tidyverse)
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+# widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
+```
+
+```{r, echo=FALSE, results='asis'}
+df <- data.frame(
+  "e" = numeric(),
+  "mu/mul" = numeric(),
+  "der_TM" = numeric(),
+  "dder_TM" = numeric(),
+  "der_OS" = numeric(),
+  "dder_OS" = numeric(),
+  "der_TM_all" = numeric(),
+  "dder_TM_all" = numeric(),
+  "der_OS_all" = numeric(),
+  "dder_OS_all" = numeric()
+)
+get_df_file <- function(e, dir, file) {
+  df <- NULL
+  mt <- read_df(paste0(dir, file))
+  all_obs <- Rose::get_all_corr(mt)
+  fit_T_all <- get_full_res("mul*damu_TM_all/dmu", all_obs, mt)
+  fit_O_all <- get_full_res("mul*damu_OS_all/dmu", all_obs, mt)
+  fit_mu_all <- get_full_res("mu/mul", all_obs, mt)
+  fit_T <- get_full_res("mul*damu_TM/dmu", all_obs, mt)
+  fit_O <- get_full_res("mul*damu_OS/dmu", all_obs, mt)
+  df <- data.frame(
+    "e" = e,
+    "mu/mul" = fit_mu_all[1, 1],
+    "der_TM" = fit_T[1, 1],
+    "dder_TM" = fit_T[1, 2],
+    "der_OS" = fit_O[1, 1],
+    "dder_OS" = fit_O[1, 2],
+    "der_TM_all" = fit_T_all[1, 1],
+    "dder_TM_all" = fit_T_all[1, 2],
+    "der_OS_all" = fit_O_all[1, 1],
+    "dder_OS_all" = fit_O_all[1, 2]
+  )
+  return(df)
+}
+e <- "B64"
+dir <- "/home/garofalo/analysis/blinded_gm2/data_tov/out/"
+file <- "B64_reweight_charm_0.1_OS_B64_LMA.dat_output"
+df <- rbind(df, get_df_file(e, dir, file))
+file <- "B64_reweight_strange_OS_B64_LMA.dat_output"
+df <- rbind(df, get_df_file(e, dir, file))
+file <- "B64_reweight_light_OS_B64_LMA.dat_output"
+df <- rbind(df, get_df_file(e, dir, file))
+
+e<-"C80"
+dir <- "/home/garofalo/analysis/blinded_gm2/data_tov/out/"
+file <- "C80_reweight_charm_0.1_OS_C80_LMA.dat_output"
+df <- rbind(df, get_df_file(e, dir, file))
+file <- "C80_reweight_strange_OS_C80_LMA.dat_output"
+df <- rbind(df, get_df_file(e, dir, file))
+file <- "C80_reweight_light_OS_C80_LMA.dat_output"
+df <- rbind(df, get_df_file(e, dir, file))
+
+```
+
+
+```{r, echo=FALSE, results='asis'}
+gg <- ggplot()+theme_bw()
+gg <- gg + geom_pointrange(aes(
+  x = df$mu.mul,
+  y = df$der_TM,
+  ymin = df$der_TM - df$dder_TM,
+  ymax = df$der_TM + df$dder_TM,
+  color = paste(df$e,"der_TM")
+))
+gg <- gg + geom_pointrange(aes(
+  x = df$mu.mul+1,
+  y = df$der_TM_all,
+  ymin = df$der_TM_all - df$dder_TM_all,
+  ymax = df$der_TM_all + df$dder_TM_all,
+  color = paste(df$e,"der_TM_all")
+))
+gg <- gg + geom_pointrange(aes(
+  x = df$mu.mul+2,
+  y = df$der_OS,
+  ymin = df$der_OS - df$dder_OS,
+  ymax = df$der_OS + df$dder_OS,
+  color = paste(df$e,"der_OS")
+))
+gg <- gg + geom_pointrange(aes(
+  x = df$mu.mul+3,
+  y = df$der_OS_all,
+  ymin = df$der_OS_all - df$dder_OS_all,
+  ymax = df$der_OS_all + df$dder_OS_all,
+  color = paste(df$e,"der_OS_all")
+))
+
+fig <- myplotly(gg, "", "$\\mu/\\mu_\\ell$", "$\\mu_\\ell \\frac{d a_\\mu}{d \\mu}$", to_print = TRUE, legend_position = c(0.8,0.01))
+```
+
+
+
+```{r, results='asis',echo=FALSE}
+source("/home/garofalo/programs/Rose/R/plot_routines.R")
+e<-"B64_reweight_strange_OS_B64_LMA.dat_output"
+dir <-"/home/garofalo/analysis/blinded_gm2/data_tov/out/"
+df<-NULL
+mt<-read_df(paste0(dir,e))
+all_obs<-Rose::get_all_corr(mt)
+df<-add_corr_to_df("amu_TM_all{bound_meff_t}_(TM)_above",all_obs ,mt,df, 
+                   reshape = FALSE, print_res = FALSE, ifit=5, idfit=6
+                   )
+df<-add_corr_to_df("amu_TM_all{bound_meff_t}_(TM)_below",all_obs ,mt,df, 
+                   reshape = FALSE, print_res = FALSE, ifit=5, idfit=6
+                   )
+df<-add_corr_to_df("amu_TM_all{bound_meff_t}_(TM)_rew_above",all_obs ,mt,df, 
+                   reshape = FALSE, print_res = FALSE, ifit=5, idfit=6
+                   )
+df<-add_corr_to_df("amu_TM_all{bound_meff_t}_(TM)_rew_below",all_obs ,mt,df, 
+                   reshape = FALSE, print_res = FALSE, ifit=5, idfit=6
+                   )
+
+
+# df<-add_corr_to_df("amu_{bound}_(TM)_below",all_obs ,mt,df,
+#                    reshape = FALSE, nudge = 0.2, ifit=5, idfit=6
+#                    )
+
+
+gg<-plot_df_corr_ggplot(df)
+
+fig<-myplotly(gg, to_print = TRUE)
+```
+
+
+
+
+```{r, results='asis',echo=FALSE}
+source("/home/garofalo/programs/Rose/R/plot_routines.R")
+e<-"B24_reweight_charm_OS_B24.dat_output"
+dir <-"/home/garofalo/analysis/blinded_gm2/data_tov/out/"
+df<-NULL
+mt<-read_df(paste0(dir,e))
+all_obs<-Rose::get_all_corr(mt)
+df<-add_corr_to_df("amu_TM_all{bound_meff_t}_(TM)_above",all_obs ,mt,df, 
+                   reshape = FALSE, print_res = FALSE, ifit=5, idfit=6
+                   )
+df<-add_corr_to_df("amu_TM_all{bound_meff_t}_(TM)_below",all_obs ,mt,df, 
+                   reshape = FALSE, print_res = FALSE, ifit=5, idfit=6
+                   )
+df<-add_corr_to_df("amu_TM_all{bound_meff_t}_(TM)_rew_above",all_obs ,mt,df, 
+                   reshape = FALSE, print_res = FALSE, ifit=5, idfit=6
+                   )
+df<-add_corr_to_df("amu_TM_all{bound_meff_t}_(TM)_rew_below",all_obs ,mt,df, 
+                   reshape = FALSE, print_res = FALSE, ifit=5, idfit=6
+                   )
+
+
+# df<-add_corr_to_df("amu_{bound}_(TM)_below",all_obs ,mt,df,
+#                    reshape = FALSE, nudge = 0.2, ifit=5, idfit=6
+#                    )
+
+
+gg<-plot_df_corr_ggplot(df)
+
+fig<-myplotly(gg, to_print = TRUE)
+```
+```{r, results='asis',echo=FALSE}
+source("/home/garofalo/programs/Rose/R/plot_routines.R")
+# e<-"B24_reweight_charm_OS_B24.dat_output"
+dir <-"/home/garofalo/analysis/blinded_gm2/data_tov/out/B24_reweight_charm_OS_B24.dat_raw_correlators"
+df<-NULL
+mt<-read_df(paste0(dir))
+all_obs<-Rose::get_all_corr(mt)
+df<-add_corr_to_df("",all_obs ,mt,df, 
+                    reshape = FALSE, print_res = FALSE, number = 1
+                    )
+df<-add_corr_to_df("",all_obs ,mt,df, rename = "OS",
+                    reshape = FALSE, print_res = FALSE, number = 3
+                    )
+
+# df<-add_corr_to_df("amu_TM_all{bound_meff_t}_(TM)_below",all_obs ,mt,df, 
+#                    reshape = FALSE, print_res = FALSE, ifit=5, idfit=6
+#                    )
+# df<-add_corr_to_df("amu_TM_all{bound_meff_t}_(TM)_rew_above",all_obs ,mt,df, 
+#                    reshape = FALSE, print_res = FALSE, ifit=5, idfit=6
+#                    )
+# df<-add_corr_to_df("amu_TM_all{bound_meff_t}_(TM)_rew_below",all_obs ,mt,df, 
+#                    reshape = FALSE, print_res = FALSE, ifit=5, idfit=6
+#                    )
+
+
+# df<-add_corr_to_df("amu_{bound}_(TM)_below",all_obs ,mt,df,
+#                    reshape = FALSE, nudge = 0.2, ifit=5, idfit=6
+#                    )
+
+
+gg<-plot_df_corr_ggplot(df)
+
+fig<-myplotly(gg, to_print = TRUE)
+```

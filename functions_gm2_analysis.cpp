@@ -2491,6 +2491,61 @@ double lhs_w0_a(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
 
     return r;
 }
+double lhs_a_w0_a_fpi(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
+    double r;
+    // r = gjack.en[e].jack[fit_info.corr_id[n]][j];
+
+    int count = 0;
+    for (int in = 0;in < n;in++) {
+        for (int ie : fit_info.Nxen[in]) {
+            count++;
+        }
+    }
+    for (int ee : fit_info.Nxen[n]) {
+        if (ee == e) {
+            break;
+        }
+        count++;
+    }
+
+    // double mu = fit_info.x[0][count][j];
+    // double Mpi = fit_info.x[1][count][j];
+    // double fpi = fit_info.x[2][count][j];
+    // double L = fit_info.x[3][count][j];
+    // double xi = fit_info.x[4][count][j];
+    // double mpcac_mu = fit_info.x[8][count][j];
+    // double ZA = fit_info.x[9][count][j];
+
+    double aw0 = fit_info.x[12][count][j];
+    double afpi = fit_info.x[11][count][j];
+
+    return aw0 - afpi;
+}
+
+double lhs_ratio_a_w0_a_fpi(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
+    double r;
+    // r = gjack.en[e].jack[fit_info.corr_id[n]][j];
+
+    int count = 0;
+    for (int in = 0;in < n;in++) {
+        for (int ie : fit_info.Nxen[in]) {
+            count++;
+        }
+    }
+    for (int ee : fit_info.Nxen[n]) {
+        if (ee == e) {
+            break;
+        }
+        count++;
+    }
+
+
+    double aw0 = fit_info.x[12][count][j];
+    double afpi = fit_info.x[11][count][j];
+
+    return aw0 / afpi;
+}
+
 
 double lhs_afpi_max_twist(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
     double r;
@@ -2656,6 +2711,50 @@ double rhs_w0_a_simple_a_from_fpi(int n, int Nvar, double* x, int Npar, double* 
     return r;
 }
 
+double rhs_a_w0_a_fpi(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a2 = x[13];
+
+    double aMpi = x[1];
+    double afpi = x[2];
+    double xi = x[4];
+    double L = x[3];
+    // double delta_FVE = FVE_GL_Mpi(L, xi, afpi);
+    // xi *= (1 + delta_FVE) * (1 + delta_FVE) / (1 - 0.25 * delta_FVE) * (1 - 0.25 * delta_FVE);
+    double Mpi_phys_Mev = x[5];
+    double fpi_phys_Mev = x[6];
+    double xi_phys = x[7];
+
+    // double w0_phys_fm = P[0];
+
+    // r = a * P[6] * (1-2*xi*log(xi)+2*P[7]*xi+aMpi*aMpi*(P[8]+P[9]*xi)); 
+    r = P[0] * a2 + P[1] * a2 * a2;
+    return r;
+}
+
+double rhs_ratio_a_w0_a_fpi(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a2 = x[13];
+
+    double aMpi = x[1];
+    double afpi = x[2];
+    double xi = x[4];
+    double L = x[3];
+    // double delta_FVE = FVE_GL_Mpi(L, xi, afpi);
+    // xi *= (1 + delta_FVE) * (1 + delta_FVE) / (1 - 0.25 * delta_FVE) * (1 - 0.25 * delta_FVE);
+    double Mpi_phys_Mev = x[5];
+    double fpi_phys_Mev = x[6];
+    double xi_phys = x[7];
+
+    // double w0_phys_fm = P[0];
+
+    // r = a * P[6] * (1-2*xi*log(xi)+2*P[7]*xi+aMpi*aMpi*(P[8]+P[9]*xi)); 
+    r = P[0] + P[1] * a2;
+    if (Npar > 2)
+        r += P[2] * a2 * a2;
+    return r;
+}
+
 
 double rhs_w0_a_simple(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
@@ -2683,6 +2782,31 @@ double rhs_w0_a_simple(int n, int Nvar, double* x, int Npar, double* P) {
     return r;
 }
 
+double rhs_w0_a_a2xi(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a;
+    if (n < 5) {
+        a = P[(n)]; // A,B,C,D,E
+    }
+    else {
+        a = P[(n) % 5 + 1];// B,C,D
+    }
+    double aMpi = x[1];
+    double afpi = x[2];
+    double xi = x[4];
+    double L = x[3];
+    // double delta_FVE = FVE_GL_Mpi(L, xi, afpi);
+    // xi *= (1 + delta_FVE) * (1 + delta_FVE) / (1 - 0.25 * delta_FVE) * (1 - 0.25 * delta_FVE);
+    double Mpi_phys_Mev = x[5];
+    double fpi_phys_Mev = x[6];
+    double xi_phys = x[7];
+
+    double w0_phys_fm = x[10];
+
+    // r = a * P[6] * (1-2*xi*log(xi)+2*P[7]*xi+aMpi*aMpi*(P[8]+P[9]*xi)); 
+    r = (w0_phys_fm / a) * (1 - 2 * P[5] * (xi - xi_phys) + P[6] * (xi - xi_phys) * a * a);
+    return r;
+}
 double rhs_afpi(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
     double a;

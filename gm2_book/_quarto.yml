@@ -27,6 +27,7 @@ book:
     # - continuum_amu_s_sd.qmd
     # - continuum_amu_l_W.qmd
     # - continuum_amu_l_sd.qmd
+    - derivative_sea_q.qmd
     - blinded_B64.qmd
     - blinded_C80.qmd
     - blinded_D96.qmd
