@@ -3244,7 +3244,7 @@ int main(int argc, char** argv) {
 
             free_fit_result(fit_info, amu_W_s_common_a4);
             fit_info.restore_default();
-            // exit(0);
+            // exit(1);
 
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             printf("\n/////////////////////////////////     amu_W_c_common_a4_eq    //////////////////\n");
