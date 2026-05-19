@@ -1,0 +1,42 @@
+# HVP charm 
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+# library(hadron)
+# library(kableExtra) # breaks latex
+# library(tidyverse)
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+# widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
+```
+
+
+```{r, echo=FALSE, results='asis'}
+df <- read.table("/home/garofalo/analysis/gm2_analysis/build/mc_vs_amuLDc.txt", header = TRUE)
+data <- matrix(c(
+  3.51921e-12, 4.6031e-14,
+  2.09313e-12, 2.7147e-14,
+  1.29735e-12, 1.72339e-14
+), nrow=3,ncol=2, byrow = TRUE)
+mc<- c( 0.21000,  0.23000,  0.25000)
+
+gg <- myggplot()
+gg <- gg + geom_point(data = df, map = aes(x = mc, y = amuLDc))
+fig<-myplotly(gg,"","mc_phys","amu_HVP_c")
+gg<- myggplot()
+gg<- gg + geom_pointrange(aes(x=mc , y =data[,1], ymin=data[,1]-data[,2],ymax=data[,1]+data[,2]))
+fig<-myplotly(gg,"","mc_val","amu_HVP_c")
+```

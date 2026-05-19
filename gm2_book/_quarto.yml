@@ -16,9 +16,11 @@ book:
     - scale_setting_rew.qmd
     - Mpi_rew.qmd
     - scratch.qmd
+    - HVP_charm.qmd
     - SD_tmin.qmd
     - continuum_amu_s_full.qmd
     - continuum_amu_c_full.qmd
+    - update_2026.qmd
     - unitary_K_B64.qmd
     - unitary_K_C80.qmd
     - unitary_K_D96.qmd

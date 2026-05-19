@@ -1,0 +1,135 @@
+# Update 2026
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+# library(hadron)
+# library(kableExtra) # breaks latex
+# library(tidyverse)
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+# widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
+
+library("gridExtra")
+library("ggpubr")
+library(stringr)
+
+source("plot_paper_sc/functions.R")
+```
+
+
+## strange
+
+## SD
+
+```{r}
+cat("2024\n")
+df<-plot_all_fits("SDcor","SD","s",quark_full_name="strange", to_plot = FALSE, fpi="")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("2026\n")
+df<-plot_all_fits("SD","SD","s",quark_full_name="strange", to_plot = FALSE, fpi="130.5")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+
+```
+
+## W
+
+```{r}
+cat("2024\n")
+df<-plot_all_fits("Wcor","W","s",quark_full_name="strange", to_plot = FALSE, fpi="")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("2026\n")
+df<-plot_all_fits("W","W","s",quark_full_name="strange", to_plot = FALSE, fpi="130.5")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+
+```
+
+## LD
+
+```{r}
+cat("2024\n")
+df<-plot_all_fits("LDcor","LD","s",quark_full_name="strange", to_plot = FALSE, fpi="")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("2026\n")
+df<-plot_all_fits("LD","LD","s",quark_full_name="strange", to_plot = FALSE, fpi="130.5")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+
+```
+
+## full
+
+```{r}
+cat("2024\n")
+df<-plot_all_fits("SDpWpLDcor","LD","s",quark_full_name="strange", to_plot = FALSE, fpi="")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("2026\n")
+df<-plot_all_fits("SDpWpLD","LD","s",quark_full_name="strange", to_plot = FALSE, fpi="130.5")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+
+```
+
+
+
+## charm
+
+## SD
+
+```{r}
+cat("2024\n")
+df<-plot_all_fits("SDcor","SD","c",quark_full_name="charm", to_plot = FALSE, fpi="")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("2026\n")
+df<-plot_all_fits("SD","SD","c",quark_full_name="charm", to_plot = FALSE, fpi="130.5")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+
+```
+
+## W
+
+```{r}
+cat("2024\n")
+df<-plot_all_fits("Wcor","W","c",quark_full_name="charm", to_plot = FALSE, fpi="")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("2026\n")
+df<-plot_all_fits("W","W","c",quark_full_name="charm", to_plot = FALSE, fpi="130.5")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+
+```
+
+## LD
+
+```{r}
+cat("2024\n")
+df<-plot_all_fits("LDcor","LD","c",quark_full_name="charm", to_plot = FALSE, fpi="")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("2026\n")
+df<-plot_all_fits("LD","LD","c",quark_full_name="charm", to_plot = FALSE, fpi="130.5")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+
+```
+
+## full
+
+```{r}
+cat("2024\n")
+df<-plot_all_fits("SDpWpLDcor","LD","c",quark_full_name="charm", to_plot = FALSE, fpi="")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("2026\n")
+df<-plot_all_fits("SDpWpLD","LD","c",quark_full_name="charm", to_plot = FALSE, fpi="130.5")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+
+```
+
+
