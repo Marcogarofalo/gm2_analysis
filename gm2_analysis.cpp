@@ -592,6 +592,152 @@ double* resample_value_and_free(double* a, int seed) {
     free(tmp);
     return(a);
 }
+struct DataPoint {
+    std::string ens;
+    std::string reg;
+    double der;
+    double err;
+};
+
+double* create_misstuning(std::string filename, std::string latt, std::string reg) {
+    std::ifstream file(filename.c_str());
+    std::vector<DataPoint> entries;
+    std::string line;
+
+    std::cout << "Reading file: " << filename << std::endl;
+    if (!file.is_open()) {
+        std::cerr << "Unable to open file: " << filename << std::endl;
+        exit(1);
+    }
+
+    // Skip the header line
+    std::getline(file, line);
+
+    // Read row by row
+    std::string ens, reg_in;
+    double der, err;
+    while (file >> ens >> reg_in >> der >> err) {
+        entries.push_back({ ens, reg_in, der, err });
+    }
+
+    // Print first entry to verify
+    if (!entries.empty()) {
+        std::cout << "First row: " << entries[0].ens << " | " << entries[0].reg << " | " << entries[0].der << std::endl;
+    }
+
+    double* r;
+    bool found = false;
+    for (int i = 0; i < entries.size(); i++) {
+        printf("Checking entry %d: ens=%s, reg=%s      matching %s  %s\n", i, entries[i].ens.c_str(), entries[i].reg.c_str(), latt.c_str(), reg.c_str());
+        if (entries[i].ens == latt && entries[i].reg == reg) {
+            double* result = (double*)malloc(2 * sizeof(double));
+            result[0] = entries[i].der * 1e-10;
+            result[1] = entries[i].err * 1e-10;
+            r = myres->create_fake_exact(result[0], result[1], -1);
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        std::cerr << "No matching entry found for lattice: " << latt << " and regularization: " << reg << std::endl;
+        exit(1);
+    }
+    return r;
+}
+
+double** read_light_corr(std::string filename, int T) {
+    FILE* f = fopen(filename.c_str(), "r");
+    printf("Reading file: %s\n", filename.c_str());
+    if (f == NULL) {
+        std::cerr << "Unable to open file: " << filename << std::endl;
+        exit(1);
+    }
+    int lines, fi = 0;
+    char tmp[100];
+    fi += fscanf(f, "%d", &lines);
+    printf("lines=%d\n", lines);
+    resampling_boot myb(lines - 1);
+    double** boot = malloc_2<double>(T / 2 + 1, lines);
+    for (int j = 0; j < lines - 1; j++) {
+        for (int t = 0; t < T / 2 + 1; t++) {
+            double val;
+            fi += fscanf(f, "%lf", &boot[t][j]);
+            boot[t][j] *= 1e-10;
+        }
+        fi += fscanf(f, "%s", tmp);
+    }
+    for (int t = 0; t < T / 2 + 1; t++) {
+        double val;
+        fi += fscanf(f, "%lf", &boot[t][lines - 1]);    
+        boot[t][lines - 1] *= 1e-10;
+    }
+    fi += fscanf(f, "%s", tmp);
+    std::vector<double> mean(T / 2 + 1, 0.0);
+    for (int t = 0; t < T / 2 + 1; t++) {
+        mean[t] = myb.mean(boot[t]);
+        // printf("t=%d  mean=%lf   %lf\n", t, mean[t], myb.comp_error(boot[t]));
+    }
+    double** cov = myb.comp_cov(T / 2 + 1, boot);
+    for (int t1 = 0; t1 < T / 2 + 1; t1++) {
+        cov[t1][t1] += 1e-8;
+    }
+    for (int t1 = 0; t1 < T / 2 + 1; t1++) {
+        for (int t2 = t1 + 1; t2 < T / 2 + 1; t2++) {
+            double cor = cov[t1][t2] / sqrt(cov[t1][t1] * cov[t2][t2]);
+            if (cor < 0.1) {
+                while (t2 < T / 2 + 1) {
+                    cov[t1][t2] = 0;
+                    cov[t2][t1] = 0;
+                    t2++;
+                }
+            }
+        }
+    }
+    // double **cov_d= malloc_2<double>(T / 2 + 1, T / 2 + 1);
+    // for (int t1 = 0; t1 < T / 2 + 1; t1++) {
+    //     printf("{");
+    //     for (int t2 = 0; t2 < T / 2 + 1; t2++) {
+    //         printf("%.1lf\t", cov[t1][t2] / sqrt(cov[t1][t1] * cov[t2][t2]));
+    //         if (t1==t2)cov_d[t1][t2] = 0.01;
+    //         else cov_d[t1][t2] = 0;
+
+    //     }
+    //     printf("}\n");
+    // }
+    std::vector<double> mean_vec(T / 2 + 1, 1.0);
+
+    int T_max_cov = T / 4;
+    // double** data_cov = myres->create_fake_covariance_exact(mean.data(), T_max_cov, cov, -1);
+    double** data_cov = myres->create_fake_covariance(mean.data(), T_max_cov, cov, -1);
+    double** data = (double**)malloc(sizeof(double*) * T);
+
+    for (int j = 0; j < myres->Njack;j++) {
+        for (int t = 0; t < T_max_cov; t++) {
+            data[t] = data_cov[t];
+        }
+        for (int t = T_max_cov; t < T / 2 + 1; t++) {
+            data[t] = myres->create_fake(myb.mean(boot[t]), myb.comp_error(boot[t]), -1);
+        }
+        for (int t = T / 2 + 1; t < T; t++) {
+            data[t] = myres->create_fake(0, 1e-20, -1);
+        }
+    }
+
+    // data = myres->create_fake_covariance(mean_vec.data(), T /2+1, cov_d, -1);
+    // myres->change_mean_and_error_covarinace(data, data, T / 2+1, mean.data(), cov);
+    // printf("here\n");
+    // exit(1);
+    // for (int t = 0; t < T / 2 + 1; t++) {
+    //     printf("%lf\t", myres->mean(data[t]));
+    // }
+    // printf("\n");
+    // exit(1);
+
+    error(fi != lines * (T / 2 + 2) + 1, 1, "read_light_corr", "Expected to read %d values but read %d", lines * (T / 2 + 2) + 1, fi);
+    free_2(T / 2 + 1, boot);
+    fclose(f);
+    return data;
+}
 
 int main(int argc, char** argv) {
     int size;
@@ -617,6 +763,10 @@ int main(int argc, char** argv) {
     FILE* plateaux_masses = NULL, * plateaux_masses_GEVP = NULL;
     char namefile_plateaux[NAMESIZE];
     mysprintf(namefile_plateaux, NAMESIZE, "plateaux.txt");
+
+
+
+
     FILE* plateaux_f = NULL;
     char namefile[NAMESIZE];
     srand(1);
@@ -628,8 +778,8 @@ int main(int argc, char** argv) {
         "   -L L jack/boot  -mu mul    mus1 mus2     muc1 muc2 muc3   [mul'] [bolla]  [free_corr]   [three_corr]");
 
 
-    error(strcmp(argv[1], "blind") != 0 && strcmp(argv[1], "see") != 0 && strcmp(argv[1], "read_plateaux") != 0, 1, "main ",
-        "argv[1] only options:  blind/see/read_plateaux ");
+    // error(strcmp(argv[1], "blind") != 0 && strcmp(argv[1], "see") != 0 && strcmp(argv[1], "read_plateaux") != 0, 1, "main ",
+    //     "argv[1] only options:  blind/see/read_plateaux ");
 
     // cluster::IO_params params;
     // mysprintf(namefile, NAMESIZE, "%s/%s", argv[3], argv[4]);
@@ -656,7 +806,7 @@ int main(int argc, char** argv) {
     option[5] = (char*)malloc(sizeof(char) * NAMESIZE);
     option[6] = (char*)malloc(sizeof(char) * NAMESIZE);
 
-    mysprintf(option[1], NAMESIZE, argv[1]); // blind/see/read_plateaux
+    mysprintf(option[1], NAMESIZE, "read_plateaux"); // blind/see/read_plateaux
     mysprintf(option[2], NAMESIZE, "-p"); // -p
     mysprintf(option[3], NAMESIZE, argv[3]); // path
     mysprintf(option[4], NAMESIZE, argv[9]); //resampling
@@ -724,21 +874,27 @@ int main(int argc, char** argv) {
         file_head.mom[i][3] = 0;
     }
 
+    char path_fpi[NAMESIZE];
+    if (strcmp(argv[1], "read_plateaux") == 0)
+        mysprintf(path_fpi, NAMESIZE, "%s", argv[3]);
+    else
+        mysprintf(path_fpi, NAMESIZE, "%s/%s", argv[3], argv[1]);
 
-    mysprintf(namefile, NAMESIZE, "%s/out/%s_output", argv[3], option[6]);
+
+    mysprintf(namefile, NAMESIZE, "%s/out/%s_output", path_fpi, option[6]);
     printf("writing output in :\n %s \n", namefile);
     FILE* outfile = open_file(namefile, "w+");
 
-    mysprintf(namefile, NAMESIZE, "%s/out/%s_gamma", argv[3], option[6]);
+    mysprintf(namefile, NAMESIZE, "%s/out/%s_gamma", path_fpi, option[6]);
     printf("writing output in :\n %s \n", namefile);
     FILE* out_gamma = open_file(namefile, "w+");
 
 
-    mysprintf(namefile, NAMESIZE, "%s/jackknife/%s_%s", argv[3], option[4], option[6]);
+    mysprintf(namefile, NAMESIZE, "%s/jackknife/%s_%s", path_fpi, option[4], option[6]);
     FILE* jack_file = open_file(namefile, "w+");
     write_header_g2(jack_file, header);
 
-    mysprintf(namefile, NAMESIZE, "%s/jackknife/jack_%s_Z.txt", argv[3], argv[4]);
+    mysprintf(namefile, NAMESIZE, "%s/jackknife/jack_%s_Z.txt", path_fpi, argv[4]);
     FILE* ASCII_Z = open_file(namefile, "w+");
 
 
@@ -1240,7 +1396,7 @@ int main(int argc, char** argv) {
     double* phys_mc = (double*)malloc(sizeof(double) * Njack);// allocate memory 
 
     std::string latt;
-    set_a_ml_ms_mc(argv[4], a, phys_ml, phys_ms, phys_mc, latt);
+    set_a_ml_ms_mc(argv[4], a, phys_ml, phys_ms, phys_mc, latt, argv[1]);
 
     // if (strcmp("cA.53.24", argv[4]) == 0 || strcmp("cA.40.24", argv[4]) == 0 || strcmp("cA.30.32", argv[4]) == 0) {
     //     myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_A.txt");
@@ -1301,6 +1457,228 @@ int main(int argc, char** argv) {
 
     // line_read_param(option, "a", mean, err, seed, namefile_plateaux);
     // a = fake_sampling(resampling, mean, err, Njack, seed);
+
+
+    //////////////////////////////////////////////////////////////
+    // read misstuning
+    //////////////////////////////////////////////////////////////
+// (\mu_l/HVP(SD,l)) * d/d(ms-sea) HVP(SD,l): 0.000253 , 0.000059
+// (\mu_l/HVP(SD,l)) * d/d(mc-sea) HVP(SD,l): 0.000195 , 0.000054
+// (\mu_l/HVP(SD,s)) * d/d(ms-sea) HVP(SD,s): 0.000036 , 0.000036
+// (\mu_l/HVP(SD,s)) * d/d(mc-sea) HVP(SD,s): 0.000083 , 0.000032
+// (\mu_l/HVP(SD,c)) * d/d(ms-sea) HVP(SD,c): -0.000109 , 0.000022
+// (\mu_l/HVP(SD,c)) * d/d(mc-sea) HVP(SD,c): -0.000045 , 0.000019
+
+// (\mu_l/HVP(IW,l)) * d/d(ms-sea) HVP(IW,l): -0.000541 , 0.000389
+// (\mu_l/HVP(IW,l)) * d/d(mc-sea) HVP(IW,l): 0.000411 , 0.000333
+
+// (\mu_l/HVP(IW,s)) * d/d(ms-sea) HVP(IW,s): -0.001073 , 0.000107
+// (\mu_l/HVP(IW,s)) * d/d(mc-sea) HVP(IW,s): -0.000194 , 0.000094
+
+// (\mu_l/HVP(IW,c)) * d/d(ms-sea) HVP(IW,c): -0.000307 , 0.000037
+// (\mu_l/HVP(IW,c)) * d/d(mc-sea) HVP(IW,c): -0.000195 , 0.000033
+
+// (\mu_l/HVP(full,l)) * d/d(ms-sea) HVP(full,l): -0.001440 , 0.000757
+// (\mu_l/HVP(full,l)) * d/d(mc-sea) HVP(full,l): 0.000191 , 0.000149
+
+// (\mu_l/HVP(full,s)) * d/d(ms-sea) HVP(full,s): -0.001864 , 0.000140
+// (\mu_l/HVP(full,s)) * d/d(mc-sea) HVP(full,s): -0.000347 , 0.000122
+
+// (\mu_l/HVP(full,c)) * d/d(ms-sea) HVP(full,c): -0.000154 , 0.000025
+// (\mu_l/HVP(full,c)) * d/d(mc-sea) HVP(full,c): -0.000080 , 0.000022
+
+    std::string lattL;
+    int T_small;
+    if (latt == "B") {
+        lattL = "B64";
+        T_small = 64 * 2;
+    }
+    else if (latt == "C") {
+        lattL = "C80";
+        T_small = 80 * 2;
+    }
+    else if (latt == "D") {
+        lattL = "D96";
+        T_small = 96 * 2;
+    }
+    else if (latt == "E") {
+        lattL = "E112";
+        T_small = 112 * 2;
+    }
+
+    double***** dHVP = malloc_5<double>(3, 4, 3, 2, Njack);
+    std::string path("/home/garofalo/analysis/gm2_analysis/build/misstuning/");
+    dHVP[es][eSD][es][eOS] = create_misstuning(path + "amu_s_sea_mus_derivatives_SD.txt", lattL, "OS");
+    dHVP[es][eSD][es][etm] = create_misstuning(path + "amu_s_sea_mus_derivatives_SD.txt", lattL, "tm");
+    dHVP[es][eSD][ec][eOS] = create_misstuning(path + "amu_s_sea_muc_derivatives_SD.txt", lattL, "OS");
+    dHVP[es][eSD][ec][etm] = create_misstuning(path + "amu_s_sea_muc_derivatives_SD.txt", lattL, "tm");
+
+    dHVP[es][eW][es][eOS] = create_misstuning(path + "amu_s_sea_mus_derivatives_IW.txt", lattL, "OS");
+    dHVP[es][eW][es][etm] = create_misstuning(path + "amu_s_sea_mus_derivatives_IW.txt", lattL, "tm");
+    dHVP[es][eW][ec][eOS] = create_misstuning(path + "amu_s_sea_muc_derivatives_IW.txt", lattL, "OS");
+    dHVP[es][eW][ec][etm] = create_misstuning(path + "amu_s_sea_muc_derivatives_IW.txt", lattL, "tm");
+
+    dHVP[es][efull][es][eOS] = create_misstuning(path + "amu_s_sea_mus_derivatives_full.txt", lattL, "OS");
+    dHVP[es][efull][es][etm] = create_misstuning(path + "amu_s_sea_mus_derivatives_full.txt", lattL, "tm");
+    dHVP[es][efull][ec][eOS] = create_misstuning(path + "amu_s_sea_muc_derivatives_full.txt", lattL, "OS");
+    dHVP[es][efull][ec][etm] = create_misstuning(path + "amu_s_sea_muc_derivatives_full.txt", lattL, "tm");
+
+    // charm
+    dHVP[ec][eSD][es][eOS] = create_misstuning(path + "amu_c_sea_mus_derivatives_SD.txt", lattL, "OS");
+    dHVP[ec][eSD][es][etm] = create_misstuning(path + "amu_c_sea_mus_derivatives_SD.txt", lattL, "tm");
+    dHVP[ec][eSD][ec][eOS] = create_misstuning(path + "amu_c_sea_muc_derivatives_SD.txt", lattL, "OS");
+    dHVP[ec][eSD][ec][etm] = create_misstuning(path + "amu_c_sea_muc_derivatives_SD.txt", lattL, "tm");
+
+    dHVP[ec][eW][es][eOS] = create_misstuning(path + "amu_c_sea_mus_derivatives_IW.txt", lattL, "OS");
+    dHVP[ec][eW][es][etm] = create_misstuning(path + "amu_c_sea_mus_derivatives_IW.txt", lattL, "tm");
+    dHVP[ec][eW][ec][eOS] = create_misstuning(path + "amu_c_sea_muc_derivatives_IW.txt", lattL, "OS");
+    dHVP[ec][eW][ec][etm] = create_misstuning(path + "amu_c_sea_muc_derivatives_IW.txt", lattL, "tm");
+
+    dHVP[ec][efull][es][eOS] = create_misstuning(path + "amu_c_sea_mus_derivatives_full.txt", lattL, "OS");
+    dHVP[ec][efull][es][etm] = create_misstuning(path + "amu_c_sea_mus_derivatives_full.txt", lattL, "tm");
+    dHVP[ec][efull][ec][eOS] = create_misstuning(path + "amu_c_sea_muc_derivatives_full.txt", lattL, "OS");
+    dHVP[ec][efull][ec][etm] = create_misstuning(path + "amu_c_sea_muc_derivatives_full.txt", lattL, "tm");
+
+    for (int i = 1;i < 3;i++) {
+        for (int k = 1;k < 3;k++) {
+            for (int l = 0;l < 2;l++) {
+                printf("dHVP[%d][%d][%d][%d] = %g +- %g\n", i, eSD, k, l, dHVP[i][eSD][k][l][Njack - 1], myres->comp_error(dHVP[i][eSD][k][l]));
+                dHVP[i][eLD][k][l] = myres->create_copy(dHVP[i][efull][k][l]);
+                for (int j = 0; j < Njack;j++) {
+                    dHVP[i][eLD][k][l][j] -= dHVP[i][eW][k][l][j];
+                    dHVP[i][eLD][k][l][j] -= dHVP[i][eSD][k][l][j];
+                }
+            }
+        }
+
+    }
+    for (int i = 1;i < 3;i++) {
+        for (int j = 0;j < 4;j++) {
+            for (int k = 1;k < 3;k++) {
+                for (int l = 0;l < 2;l++) {
+                    printf("dHVP[%d][%d][%d][%d] = %g +- %g\n", i, j, k, l, dHVP[i][j][k][l][Njack - 1], myres->comp_error(dHVP[i][j][k][l]));
+                }
+            }
+        }
+    }
+
+    path = path + "vkvk_s_and_c_derivatives/";
+    // /home/garofalo/analysis/gm2_analysis/build/misstuning/vkvk_s_and_c_derivatives/B64_vkvk_OS_c_der_sea-ml.boot
+    double**** dHVP_l = (double****)malloc(sizeof(double***) * 3);
+    for (int i = 0;i < 3;i++) {
+        dHVP_l[i] = (double***)malloc(sizeof(double**) * 2);
+    }
+
+    dHVP_l[es][eOS] = read_light_corr(path + lattL + "_vkvk_OS_s_der_sea-ml.boot", T_small);
+    dHVP_l[es][etm] = read_light_corr(path + lattL + "_vkvk_tm_s_der_sea-ml.boot", T_small);
+
+    dHVP_l[ec][eOS] = read_light_corr(path + lattL + "_vkvk_OS_c_der_sea-ml.boot", T_small);
+    dHVP_l[ec][etm] = read_light_corr(path + lattL + "_vkvk_tm_c_der_sea-ml.boot", T_small);
+
+
+
+
+    double* dHVPc_s_SD_tm = myres->create_fake_exact(-0.00013, 0.00004, -1);
+    double* dHVPc_s_SD_OS = myres->create_fake_exact(-0.00009, 0.00003, -1);
+    double* dHVPc_c_SD_tm = myres->create_fake_exact(-0.00006, 0.00003, -1);
+    double* dHVPc_c_SD_OS = myres->create_fake_exact(-0.00004, 0.00002, -1);
+
+    double* dHVPc_s_W_tm = myres->create_fake_exact(-0.00033, 0.00006, -1);
+    double* dHVPc_s_W_OS = myres->create_fake_exact(-0.00029, 0.00005, -1);
+    double* dHVPc_c_W_tm = myres->create_fake_exact(-0.00021, 0.00005, -1);
+    double* dHVPc_c_W_OS = myres->create_fake_exact(-0.00019, 0.00004, -1);
+
+    double* dHVPc_s_full_tm = myres->create_fake_exact(-0.00018, 0.00004, -1);
+    double* dHVPc_s_full_OS = myres->create_fake_exact(-0.00014, 0.00003, -1);
+    double* dHVPc_c_full_tm = myres->create_fake_exact(-0.00010, 0.00003, -1);
+    double* dHVPc_c_full_OS = myres->create_fake_exact(-0.00007, 0.00003, -1);
+
+    double* dHVPc_s_LD_tm = myres->create_copy(dHVPc_s_full_tm);
+    double* dHVPc_s_LD_OS = myres->create_copy(dHVPc_s_full_OS);
+    double* dHVPc_c_LD_tm = myres->create_copy(dHVPc_c_full_tm);
+    double* dHVPc_c_LD_OS = myres->create_copy(dHVPc_c_full_OS);
+
+    // myres->sub(dHVPc_s_LD_tm, dHVPc_s_LD_tm, dHVPc_s_W_tm);
+    // myres->sub(dHVPc_s_LD_OS, dHVPc_s_LD_OS, dHVPc_s_W_OS);
+    // myres->sub(dHVPc_c_LD_tm, dHVPc_c_LD_tm, dHVPc_c_W_tm);
+    // myres->sub(dHVPc_c_LD_OS, dHVPc_c_LD_OS, dHVPc_c_W_OS);
+
+    // myres->sub(dHVPc_s_LD_tm, dHVPc_s_LD_tm, dHVPc_s_SD_tm);
+    // myres->sub(dHVPc_s_LD_OS, dHVPc_s_LD_OS, dHVPc_s_SD_OS);
+    // myres->sub(dHVPc_c_LD_tm, dHVPc_c_LD_tm, dHVPc_c_SD_tm);
+    // myres->sub(dHVPc_c_LD_OS, dHVPc_c_LD_OS, dHVPc_c_SD_OS);
+
+    std::vector<double*> amusim(3);
+    line_read_param(option, "mulsim", mean, err, seed, namefile_plateaux);
+    amusim[0] = myres->create_fake(mean, err, -1);
+    line_read_param(option, "mussim", mean, err, seed, namefile_plateaux);
+    amusim[1] = myres->create_fake(mean, err, -1);
+    line_read_param(option, "mucsim", mean, err, seed, namefile_plateaux);
+    amusim[2] = myres->create_fake(mean, err, -1);
+
+    std::vector<std::vector<double>> deltamu(3, std::vector<double>(Njack));
+    for (int j = 0; j < Njack;j++) {
+        deltamu[0][j] = phys_ml[j] - amusim[0][j];
+        deltamu[1][j] = phys_ms[j] - amusim[1][j];
+        deltamu[2][j] = phys_mc[j] - amusim[2][j];
+
+
+        for (int reg = 0;reg < 2;reg++) {
+            for (int t = 0;t < T_small;t++) {
+                dHVP_l[es][reg][t][j] *= deltamu[el][j] * (9.0/1.0);
+                dHVP_l[ec][reg][t][j] *= deltamu[el][j] * (9.0/4.0);
+            }
+        }
+
+        // light correction to amu_HVP strange and charm
+            for (int t = 0;t < T_small;t++) {
+                // strange
+                //OS
+                conf_jack[j][2 + 6][t][0] += dHVP_l[es][eOS][t][j] * deltamu[el][j];
+                conf_jack[j][2 + 12][t][0] += dHVP_l[es][eOS][t][j] * deltamu[el][j];
+                //tm
+                conf_jack[j][5 + 6][t][0] += dHVP_l[es][etm][t][j] * deltamu[el][j];
+                conf_jack[j][5 + 12][t][0] += dHVP_l[es][etm][t][j] * deltamu[el][j];
+
+                // charm
+                // OS
+                conf_jack[j][2 + 6 * (3 + 0)][t][0] += dHVP_l[ec][eOS][t][j] * deltamu[el][j];
+                conf_jack[j][2 + 6 * (3 + 1)][t][0] += dHVP_l[ec][eOS][t][j] * deltamu[el][j];
+                conf_jack[j][2 + 6 * (3 + 2)][t][0] += dHVP_l[ec][eOS][t][j] * deltamu[el][j];
+                // tm
+                conf_jack[j][2 + 6 * (3 + 0) + 3][t][0] += dHVP_l[ec][etm][t][j] * deltamu[el][j];
+                conf_jack[j][2 + 6 * (3 + 1) + 3][t][0] += dHVP_l[ec][etm][t][j] * deltamu[el][j];
+                conf_jack[j][2 + 6 * (3 + 2) + 3][t][0] += dHVP_l[ec][etm][t][j] * deltamu[el][j];
+            }
+
+        for (int iq = 0;iq < 3;iq++) {
+            for (int iW = 0;iW < 4;iW++) {
+                for (int imass = 1;imass < 3;imass++) {
+                    for (int reg = 0;reg < 2;reg++) {
+                        dHVP[iq][iW][imass][reg][j] *= deltamu[imass][j];
+                    }
+                }
+            }
+        }
+
+
+        // dHVPc_s_SD_tm[j] *= deltamu[1][j] / phys_ml[j];
+        // dHVPc_s_SD_OS[j] *= deltamu[1][j] / phys_ml[j];
+        // dHVPc_c_SD_tm[j] *= deltamu[2][j] / phys_ml[j];
+        // dHVPc_c_SD_OS[j] *= deltamu[2][j] / phys_ml[j];
+
+        // dHVPc_s_W_tm[j] *= deltamu[1][j] / phys_ml[j];
+        // dHVPc_s_W_OS[j] *= deltamu[1][j] / phys_ml[j];
+        // dHVPc_c_W_tm[j] *= deltamu[2][j] / phys_ml[j];
+        // dHVPc_c_W_OS[j] *= deltamu[2][j] / phys_ml[j];
+
+        // dHVPc_s_full_tm[j] *= deltamu[1][j] / phys_ml[j];
+        // dHVPc_s_full_OS[j] *= deltamu[1][j] / phys_ml[j];
+        // dHVPc_c_full_tm[j] *= deltamu[2][j] / phys_ml[j];
+        // dHVPc_c_full_OS[j] *= deltamu[2][j] / phys_ml[j];
+    }
+
+
 
     ////////////////////////////////////////////////
     corr_counter = -1;
@@ -2823,6 +3201,11 @@ int main(int argc, char** argv) {
     asd_vec[1] = amu_sdeq_simp_s1;
 
     amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{sd}_(eq,MK)", resampling);
+    if (strcmp(argv[1], "read_plateaux") != 0) {
+        for (int j = 0; j < Njack;j++) {
+            amu_sd_sphys[j] += (dHVP[es][eSD][es][eOS][j] + dHVP[es][eSD][ec][eOS][j]);
+        }
+    }
     write_jack(amu_sd_sphys, Njack, jack_file);
     printf("amu_{sd}_(eq,MK) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
@@ -2832,6 +3215,11 @@ int main(int argc, char** argv) {
     asd_vec[1] = amu_sdop_simp_s1;
 
     amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{sd}_(op,MK)", resampling);
+    if (strcmp(argv[1], "read_plateaux") != 0) {
+        for (int j = 0; j < Njack;j++) {
+            amu_sd_sphys[j] += (dHVP[es][eSD][es][etm][j] + dHVP[es][eSD][ec][etm][j]);
+        }
+    }
     write_jack(amu_sd_sphys, Njack, jack_file);
     printf("amu_{sd}_(op,MK) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
@@ -2840,6 +3228,11 @@ int main(int argc, char** argv) {
     asd_vec[0] = amu_Weq_simp_s;
     asd_vec[1] = amu_Weq_simp_s1;
     amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{W}_(eq,MK)", resampling);
+    if (strcmp(argv[1], "read_plateaux") != 0) {
+        for (int j = 0; j < Njack;j++) {
+            amu_sd_sphys[j] += (dHVP[es][eW][es][eOS][j] + dHVP[es][eW][ec][eOS][j]);
+        }
+    }
     write_jack(amu_sd_sphys, Njack, jack_file);
     printf("interpolation Ndata:%d\n", Nstrange);
     printf("%g    %12g    %12g\n", vec_ms[0][Njack - 1], asd_vec[0][Njack - 1], myres->comp_error(asd_vec[0]));
@@ -2861,6 +3254,11 @@ int main(int argc, char** argv) {
     asd_vec[1] = amu_Wop_simp_s1;
 
     amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{W}_(op,MK)", resampling);
+    if (strcmp(argv[1], "read_plateaux") != 0) {
+        for (int j = 0; j < Njack;j++) {
+            amu_sd_sphys[j] += (dHVP[es][eW][es][etm][j] + dHVP[es][eW][ec][etm][j]);
+        }
+    }
     write_jack(amu_sd_sphys, Njack, jack_file);
     printf("amu_{W}_(op,MK) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
@@ -2872,16 +3270,16 @@ int main(int argc, char** argv) {
 
     int_scheme = integrate_simpson38;
     double* amu_LDeq_simp_s = compute_amu_LD(conf_jack, 2 + 6, Njack, ZVs.P[0], a, q2s, int_scheme, outfile, "amu_{LD}_simpson38(eq,s)", resampling);
-    write_jack(amu_Weq_simp_s, Njack, jack_file);
+    write_jack(amu_LDeq_simp_s, Njack, jack_file);
     check_correlatro_counter(171);
-    printf("amu_W_simpson38(eq,s) = %g  %g\n", amu_Weq_simp_s[Njack - 1], error_jackboot(resampling, Njack, amu_Weq_simp_s));
+    printf("amu_LD_simpson38(eq,s) = %g  %g\n", amu_LDeq_simp_s[Njack - 1], error_jackboot(resampling, Njack, amu_LDeq_simp_s));
 
 
     int_scheme = integrate_simpson38;
     double* amu_LDeq_simp_s1 = compute_amu_LD(conf_jack, 2 + 12, Njack, ZVs1.P[0], a, q2s, int_scheme, outfile, "amu_{LD}_simpson38(eq,s1)", resampling);
-    write_jack(amu_Weq_simp_s1, Njack, jack_file);
+    write_jack(amu_LDeq_simp_s1, Njack, jack_file);
     check_correlatro_counter(172);
-    printf("amu_W_simpson38(eq,s1) = %g  %g\n", amu_Weq_simp_s1[Njack - 1], error_jackboot(resampling, Njack, amu_Weq_simp_s1));
+    printf("amu_LD_simpson38(eq,s1) = %g  %g\n", amu_LDeq_simp_s1[Njack - 1], error_jackboot(resampling, Njack, amu_LDeq_simp_s1));
 
 
 
@@ -2891,16 +3289,16 @@ int main(int argc, char** argv) {
 
     int_scheme = integrate_simpson38;
     double* amu_LDop_simp_s = compute_amu_LD(conf_jack, 5 + 6, Njack, ZAs.P[0], a, q2s, int_scheme, outfile, "amu_{LD}_simpson38(op,s)", resampling);
-    write_jack(amu_Wop_simp_s, Njack, jack_file);
+    write_jack(amu_LDop_simp_s, Njack, jack_file);
     check_correlatro_counter(173);
-    printf("amu_LS_simpson38(op,l) = %g  %g\n", amu_Wop_simp_s[Njack - 1], error_jackboot(resampling, Njack, amu_Wop_simp_s));
+    printf("amu_LD_simpson38(op,s) = %g  %g\n", amu_LDop_simp_s[Njack - 1], error_jackboot(resampling, Njack, amu_LDop_simp_s));
 
 
     int_scheme = integrate_simpson38;
     double* amu_LDop_simp_s1 = compute_amu_LD(conf_jack, 5 + 12, Njack, ZAs1.P[0], a, q2s, int_scheme, outfile, "amu_{LD}_simpson38(op,s1)", resampling);
-    write_jack(amu_Wop_simp_s1, Njack, jack_file);
+    write_jack(amu_LDop_simp_s1, Njack, jack_file);
     check_correlatro_counter(174);
-    printf("amu_LD_simpson38(op,l) = %g  %g\n", amu_Wop_simp_s1[Njack - 1], error_jackboot(resampling, Njack, amu_Wop_simp_s1));
+    printf("amu_LD_simpson38(op,s1) = %g  %g\n", amu_LDop_simp_s1[Njack - 1], error_jackboot(resampling, Njack, amu_LDop_simp_s1));
 
     //////////////////////////////////////////////////////////////
     // interpol LD s
@@ -2910,6 +3308,11 @@ int main(int argc, char** argv) {
     asd_vec[1] = amu_LDeq_simp_s1;
 
     amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{LD}_(eq,MK)", resampling);
+    if (strcmp(argv[1], "read_plateaux") != 0) {
+        for (int j = 0; j < Njack;j++) {
+            amu_sd_sphys[j] += (dHVP[es][eLD][es][eOS][j] + dHVP[es][eLD][ec][eOS][j]);
+        }
+    }
     write_jack(amu_sd_sphys, Njack, jack_file);
     printf("amu_{LD}_(eq,MK) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
@@ -2918,7 +3321,12 @@ int main(int argc, char** argv) {
     asd_vec[0] = amu_LDop_simp_s;
     asd_vec[1] = amu_LDop_simp_s1;
 
-    amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{LD}_(eq,MK)", resampling);
+    amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{LD}_(op,MK)", resampling);
+    if (strcmp(argv[1], "read_plateaux") != 0) {
+        for (int j = 0; j < Njack;j++) {
+            amu_sd_sphys[j] += (dHVP[es][eLD][es][etm][j] + dHVP[es][eLD][ec][etm][j]);
+        }
+    }
     write_jack(amu_sd_sphys, Njack, jack_file);
     printf("amu_{LD}_(eq,MK) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
@@ -2960,7 +3368,7 @@ int main(int argc, char** argv) {
     printf("amu_fulltree_simpson38(op,s1) = %g  %g\n", amu_fulltreeop_simp_s1[Njack - 1], error_jackboot(resampling, Njack, amu_fulltreeop_simp_s1));
 
     //////////////////////////////////////////////////////////////
-    // interpol LD s
+    // interpol fulltree s
     //////////////////////////////////////////////////////////////
 
     asd_vec[0] = amu_fulltreeeq_simp_s;
@@ -2968,16 +3376,16 @@ int main(int argc, char** argv) {
 
     amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{fulltree}_(eq,MK)", resampling);
     write_jack(amu_sd_sphys, Njack, jack_file);
-    printf("amu_{LD}_(eq,MK) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
+    printf("amu_{fulltree}_(eq,MK) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
     check_correlatro_counter(181);
 
     asd_vec[0] = amu_fulltreeop_simp_s;
     asd_vec[1] = amu_fulltreeop_simp_s1;
 
-    amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{fulltree}_(eq,MK)", resampling);
+    amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{fulltree}_(op,MK)", resampling);
     write_jack(amu_sd_sphys, Njack, jack_file);
-    printf("amu_{LD}_(eq,MK) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
+    printf("amu_{fulltree}_(op,MK) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
     check_correlatro_counter(182);
 
@@ -2990,12 +3398,22 @@ int main(int argc, char** argv) {
 
 
     amu_sd_sphys = interpol_Z(Ncharm_inter, Njack, mc, amusd_c_vec[0], phys_mc, outfile, "amu_{sd}_(eq,MDs)", resampling);
+    if (strcmp(argv[1], "read_plateaux") != 0) {
+        for (int j = 0; j < Njack;j++) {
+            amu_sd_sphys[j] += (dHVP[ec][eSD][es][eOS][j] + dHVP[ec][eSD][ec][eOS][j]);
+        }
+    }
     write_jack(amu_sd_sphys, Njack, jack_file);
     printf("amu_{sd}_(eq,MDs) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
     check_correlatro_counter(183);
 
     amu_sd_sphys = interpol_Z(Ncharm_inter, Njack, mc, amusd_c_vec[1], phys_mc, outfile, "amu_{sd}_(op,MDs)", resampling);
+    if (strcmp(argv[1], "read_plateaux") != 0) {
+        for (int j = 0; j < Njack;j++) {
+            amu_sd_sphys[j] += (dHVP[ec][eSD][es][etm][j] + dHVP[ec][eSD][ec][etm][j]);
+        }
+    }
     write_jack(amu_sd_sphys, Njack, jack_file);
     printf("amu_{sd}_(op,MDs) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
@@ -3012,20 +3430,31 @@ int main(int argc, char** argv) {
     printf("%g   %g\n", mc[1][Njack - 1], myres->comp_error(mc[1]));
     printf("%g   %g\n", mc[2][Njack - 1], myres->comp_error(mc[2]));
     amu_sd_sphys = interpol_Z(Ncharm_inter, Njack, mc, amuW_c_vec[0], phys_mc, outfile, "amu_{W}_(eq,MDs)", resampling);
+    if (strcmp(argv[1], "read_plateaux") != 0) {
+        for (int j = 0; j < Njack;j++) {
+            amu_sd_sphys[j] += (dHVP[ec][eW][es][eOS][j] + dHVP[ec][eW][ec][eOS][j]);
+        }
+    }
     write_jack(amu_sd_sphys, Njack, jack_file);
     printf("amu_{W}_(eq,MDs) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
     check_correlatro_counter(185);
 
     amu_sd_sphys = interpol_Z(Ncharm_inter, Njack, mc, amuW_c_vec[1], phys_mc, outfile, "amu_{W}_(op,MDs)", resampling);
+    if (strcmp(argv[1], "read_plateaux") != 0) {
+        for (int j = 0; j < Njack;j++) {
+            amu_sd_sphys[j] += (dHVP[ec][eW][es][etm][j] + dHVP[ec][eW][ec][etm][j]);
+
+        }
+    }
     write_jack(amu_sd_sphys, Njack, jack_file);
     printf("amu_{W}_(op,MDs) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
     check_correlatro_counter(186);
     // exit(1);
-        //////////////////////////////////////////////////////////////
-        // LD c
-        //////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////
+    // LD c
+    //////////////////////////////////////////////////////////////
 
     double*** amuLD_c_vec = (double***)malloc(sizeof(double**) * 2);
     amuLD_c_vec[0] = (double**)malloc(sizeof(double*) * Ncharm);
@@ -3077,16 +3506,89 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // interpol LD charm
     //////////////////////////////////////////////////////////////
+    // double **tmp_c = (double**)malloc(sizeof(double*) * 2);
+    // tmp_c[0] = amuLD_c_vec[0][1];
+    // tmp_c[1] = phys_mc;
+    // double ** cov_c = myres->comp_cov(2, tmp_c);
+    // printf("correlation:\n");
+    // for (int i = 0;i < 2;i++) {
+    //     for (int k = 0;k < 2;k++) {
+    //         printf("%-12.5g ", cov_c[i][k] / sqrt(cov_c[i][i] * cov_c[k][k]));
+    //     }
+    //     printf("\n");
+    // }
+    // printf("mc   amuLDc\n");
+    // for(int j = 0; j < Njack ;j++){
+    //     printf("%g   %g\n", phys_mc[j], amuLD_c_vec[0][1][j]);
+    // }
+    {
+        afull_c_vec[0] = amu_fulleq_simp_c0;
+        afull_c_vec[1] = amu_fulleq_simp_c1;
+        afull_c_vec[2] = amu_fulleq_simp_c2;
+
+        amu_full_cphys = interpol_Z(Ncharm_inter, Njack, mc, afull_c_vec, phys_mc, outfile, "amu_{full}_(eq,MDs)", resampling);
+        for (int j = 0; j < Njack;j++) {
+            dHVPc_s_full_OS[j] *= amu_full_cphys[j];
+            dHVPc_c_full_OS[j] *= amu_full_cphys[j];
+            dHVPc_s_LD_OS[j] = dHVPc_s_full_OS[j] - dHVPc_s_W_OS[j] - dHVPc_s_SD_OS[j];
+            dHVPc_c_LD_OS[j] = dHVPc_c_full_OS[j] - dHVPc_c_W_OS[j] - dHVPc_c_SD_OS[j];
+        }
+        printf("dHVPc_s_SD_OS =  %g \n", dHVPc_s_SD_OS[Njack - 1]);
+        printf("dHVPc_s_W_OS =  %g \n", dHVPc_s_W_OS[Njack - 1]);
+        printf("dHVPc_s_LD_OS =  %g \n", dHVPc_s_LD_OS[Njack - 1]);
+        printf("dHVPc_s_full_OS =  %g \n", dHVPc_s_full_OS[Njack - 1]);
+
+        printf("dHVPc_c_SD_OS =  %g \n", dHVPc_c_SD_OS[Njack - 1]);
+        printf("dHVPc_c_W_OS =  %g \n", dHVPc_c_W_OS[Njack - 1]);
+        printf("dHVPc_c_LD_OS =  %g \n", dHVPc_c_LD_OS[Njack - 1]);
+        printf("dHVPc_c_full_OS =  %g \n", dHVPc_c_full_OS[Njack - 1]);
+
+        afull_c_vec[0] = amu_fullop_simp_c0;
+        afull_c_vec[1] = amu_fullop_simp_c1;
+        afull_c_vec[2] = amu_fullop_simp_c2;
+
+        amu_full_cphys = interpol_Z(Ncharm_inter, Njack, mc, afull_c_vec, phys_mc, outfile, "amu_{full}_(op,MDs)", resampling);
+        for (int j = 0; j < Njack;j++) {
+            dHVPc_s_full_tm[j] *= amu_full_cphys[j];
+            dHVPc_c_full_tm[j] *= amu_full_cphys[j];
+            dHVPc_s_LD_tm[j] = dHVPc_s_full_tm[j] - dHVPc_s_W_tm[j] - dHVPc_s_SD_tm[j];
+            dHVPc_c_LD_tm[j] = dHVPc_c_full_tm[j] - dHVPc_c_W_tm[j] - dHVPc_c_SD_tm[j];
+        }
+        printf("dHVPc_s_SD_tm =  %g \n", dHVPc_s_SD_tm[Njack - 1]);
+        printf("dHVPc_s_W_tm =  %g \n", dHVPc_s_W_tm[Njack - 1]);
+        printf("dHVPc_s_LD_tm =  %g \n", dHVPc_s_LD_tm[Njack - 1]);
+        printf("dHVPc_s_full_tm =  %g \n", dHVPc_s_full_tm[Njack - 1]);
+
+        printf("dHVPc_c_SD_tm =  %g \n", dHVPc_c_SD_tm[Njack - 1]);
+        printf("dHVPc_c_W_tm =  %g \n", dHVPc_c_W_tm[Njack - 1]);
+        printf("dHVPc_c_LD_tm =  %g \n", dHVPc_c_LD_tm[Njack - 1]);
+        printf("dHVPc_c_full_tm =  %g \n", dHVPc_c_full_tm[Njack - 1]);
+
+
+    }
+
 
     amu_sd_sphys = interpol_Z(Ncharm, Njack, mc, amuLD_c_vec[0], phys_mc, outfile, "amu_{LD}_(eq,MDs)", resampling);
+    if (strcmp(argv[1], "read_plateaux") != 0) {
+        for (int j = 0; j < Njack;j++) {
+            // amu_sd_sphys[j] += (dHVPc_s_LD_OS[j] + dHVPc_c_LD_OS[j]);
+            amu_sd_sphys[j] += (dHVP[ec][eLD][es][eOS][j] + dHVP[ec][eLD][ec][eOS][j]);
+
+        }
+    }
     write_jack(amu_sd_sphys, Njack, jack_file);
     printf("amu_{LD}_(eq,MDs) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
     check_correlatro_counter(207);
 
-    amu_sd_sphys = interpol_Z(Ncharm, Njack, mc, amuLD_c_vec[1], phys_mc, outfile, "amu_{LD}_(eq,MDs)", resampling);
+    amu_sd_sphys = interpol_Z(Ncharm, Njack, mc, amuLD_c_vec[1], phys_mc, outfile, "amu_{LD}_(op,MDs)", resampling);
+    if (strcmp(argv[1], "read_plateaux") != 0) {
+        for (int j = 0; j < Njack;j++) {
+            amu_sd_sphys[j] += (dHVP[ec][eLD][es][etm][j] + dHVP[ec][eLD][ec][etm][j]);
+        }
+    }
     write_jack(amu_sd_sphys, Njack, jack_file);
-    printf("amu_{LD}_(eq,MDs) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
+    printf("amu_{LD}_(op,MDs) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
     check_correlatro_counter(208);
 
@@ -3103,7 +3605,7 @@ int main(int argc, char** argv) {
     // free(amu_full_cphys);
     check_correlatro_counter(209);
 
-    double* tmp1 = interpol_Z(Ncharm_inter, Njack, Jpsi_vec, afull_c_vec, jack_aJpsi_MeV_exp, outfile, "amu_{full}_(eq,MDs)", resampling);
+    double* tmp1 = interpol_Z(Ncharm_inter, Njack, Jpsi_vec, afull_c_vec, jack_aJpsi_MeV_exp, outfile, "amu_{full}_(eq,Jpsi)", resampling);
     printf("data:\n");
     printf("%g   %g\n", afull_c_vec[0][Njack - 1], myres->comp_error(afull_c_vec[0]));
     printf("%g   %g\n", afull_c_vec[1][Njack - 1], myres->comp_error(afull_c_vec[1]));
