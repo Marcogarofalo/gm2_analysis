@@ -812,7 +812,7 @@ int main(int argc, char** argv) {
     double* phys_ms = (double*)malloc(sizeof(double) * Njack);// allocate memory 
     double* phys_mc = (double*)malloc(sizeof(double) * Njack);// allocate memory 
     std::string latt;
-    set_a_ml_ms_mc(argv[4], a, ml, phys_ms, phys_mc, latt);
+    set_a_ml_ms_mc(argv[4], a, ml, phys_ms, phys_mc, latt, argv[1]);
     corr_counter = -1;
     write_jack(a, Njack, jack_file);
 

@@ -836,7 +836,7 @@ int main(int argc, char** argv) {
     double* phys_ms = (double*)malloc(sizeof(double) * Njack);// allocate memory 
     double* phys_mc = (double*)malloc(sizeof(double) * Njack);// allocate memory 
     std::string latt;
-    set_a_ml_ms_mc(argv[4], a, ml, phys_ms, phys_mc, latt);
+    set_a_ml_ms_mc(argv[4], a, ml, phys_ms, phys_mc, latt, argv[1]);
 
     // if (strcmp("cA.53.24", argv[4]) == 0 || strcmp("cA.40.24", argv[4]) == 0 || strcmp("cA.30.32", argv[4]) == 0) {
     //     myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_A.txt");
