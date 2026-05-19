@@ -2,6 +2,8 @@
 #include "functions_gm2_analysis.hpp"
 #include "correlators_analysis.hpp"
 #include "fve.hpp"
+#include <map>
+
 
 // double integrand_K(double x, void* params) {
 //     double z = *(double*)params;
@@ -3137,8 +3139,65 @@ double rhs_amu_alog3OS_alog3TM_common(int n, int Nvar, double* x, int Npar, doub
     return r;
 }
 
+struct LatticeData {
+    std::map<std::string, double> params;
+    std::vector<std::vector<double>> matrix;
+};
 
-void set_a_ml_ms_mc(char* argv_i, double* a, double* phys_ml, double* phys_ms, double* phys_mc, std::string& latt) {
+LatticeData parseLatticeFile(const std::string& path) {
+    LatticeData data;
+    std::ifstream file(path);
+    std::string line;
+
+    while (std::getline(file, line)) {
+        if (line.empty() || line[0] == '#') continue;
+
+        size_t colon = line.find(':');
+        if (colon == std::string::npos) continue;
+
+        std::string label = line.substr(0, colon);
+        std::string values = line.substr(colon + 1);
+        std::stringstream ss(values);
+
+
+        // Logic: if label starts with C_, it's a matrix row
+        if (label.find("C_") == 0) {
+            std::vector<double> row;
+            double val;
+            while (ss >> val) row.push_back(val);
+            data.matrix.push_back(row);
+        }
+        else {
+            // Otherwise, it's a single parameter
+            double val;
+            if (ss >> val) {
+                // Trim trailing spaces from label key
+                label.erase(label.find_last_not_of(" \t") + 1);
+                data.params[label] = val;
+            }
+        }
+    }
+
+
+    return data;
+}
+
+double compare_matrix(double** m1, double** m2, int N) {
+    double max_diff = 0.0;
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            double diff = std::abs((m1[i][j] - m2[i][j]) / m1[i][j]);
+            if (diff > max_diff) {
+                max_diff = diff;
+            }
+        }
+    }
+    return max_diff;
+}
+
+
+void set_a_ml_ms_mc(char* argv_i, double* a, double* phys_ml, double* phys_ms, double* phys_mc, std::string& latt, const char* fpi) {
+
     if (strcmp("cA.53.24", argv_i) == 0 || strcmp("cA.40.24", argv_i) == 0 || strcmp("cA.30.32", argv_i) == 0) {
         // myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_A_A12_noC20.txt");
         // myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_A12_noC20_cov_amul_jack_A.txt");
@@ -3153,42 +3212,115 @@ void set_a_ml_ms_mc(char* argv_i, double* a, double* phys_ml, double* phys_ms, d
         free(tmp);
         latt = "A";
     }
-    else if (strcmp("cB.72.64", argv_i) == 0 || strcmp("cB.72.96", argv_i) == 0) {
-        // myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_B_A12_noC20.txt");
-        // myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_A12_noC20_cov_amul_jack_B.txt");
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_B_A12_noC20_cor_unitary.txt");
-        myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_A12_noC20_cor_cov_unitary_amul_jack_B.txt");
-        myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_B.txt");
-        myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_B.txt");
-        latt = "B";
+    else { /// if not A
+        if (strcmp("cB.72.64", argv_i) == 0 || strcmp("cB.72.96", argv_i) == 0) {
+            latt = "B";
+        }
+        else if (strcmp("cC.06.80", argv_i) == 0 || strcmp("cC.06.112", argv_i) == 0) {
+            latt = "C";
+        }
+        else if (strcmp("cD.54.96", argv_i) == 0) {
+            latt = "D";
+        }
+        else if (strcmp("cE.44.112", argv_i) == 0) {
+            latt = "E";
+        }
+        // generate the jacks in the old way, since they are correlated
+        if (strcmp("cB.72.64", argv_i) == 0 || strcmp("cB.72.96", argv_i) == 0) {
+            // myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_B_A12_noC20.txt");
+            // myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_A12_noC20_cov_amul_jack_B.txt");
+            myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_B_A12_noC20_cor_unitary.txt");
+            myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_A12_noC20_cor_cov_unitary_amul_jack_B.txt");
+            myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_B.txt");
+            myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_B.txt");
+        }
+        else if (strcmp("cC.06.80", argv_i) == 0 || strcmp("cC.06.112", argv_i) == 0) {
+            // myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_C_A12_noC20.txt");
+            // myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_A12_noC20_cov_amul_jack_C.txt");
+            myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_C_A12_noC20_cor_unitary.txt");
+            myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_A12_noC20_cor_cov_unitary_amul_jack_C.txt");
+            myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_C.txt");
+            myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_C.txt");
+        }
+        else if (strcmp("cD.54.96", argv_i) == 0) {
+            // myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_D_A12_noC20.txt");
+            // myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_A12_noC20_cov_amul_jack_D.txt");
+            myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_D_A12_noC20_cor_unitary.txt");
+            myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_A12_noC20_cor_cov_unitary_amul_jack_D.txt");
+            myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_D.txt");
+            myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_D.txt");
+        }
+        else if (strcmp("cE.44.112", argv_i) == 0) {
+            // myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_E_A12_noC20.txt");
+            // myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_A12_noC20_cov_amul_jack_E.txt");
+            myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_E_A12_noC20_cor_unitary.txt");
+            myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_A12_noC20_cor_cov_unitary_amul_jack_E.txt");
+            myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_E.txt");
+            myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_E.txt");
+        }
+
+        if (strcmp(fpi, "read_plateaux") != 0) {
+            char path[NAMESIZE];
+            mysprintf(path, NAMESIZE, "/home/garofalo/analysis/g-2_new_stat/iso_params/fpi_%s_MeV", fpi);
+            char namefile[NAMESIZE];
+            int seed = 123;
+            if (strcmp("cB.72.64", argv_i) == 0 || strcmp("cB.72.96", argv_i) == 0) {
+                mysprintf(namefile, NAMESIZE, "%s/B64_iso_parameters.txt", path);
+                seed += 1;
+            }
+            else if (strcmp("cC.06.80", argv_i) == 0 || strcmp("cC.06.112", argv_i) == 0) {
+                mysprintf(namefile, NAMESIZE, "%s/C80_iso_parameters.txt", path);
+                seed += 2;
+            }
+            else if (strcmp("cD.54.96", argv_i) == 0) {
+                mysprintf(namefile, NAMESIZE, "%s/D96_iso_parameters.txt", path);
+                seed += 3;
+            }
+            else if (strcmp("cE.44.112", argv_i) == 0) {
+                mysprintf(namefile, NAMESIZE, "%s/E112_iso_parameters.txt", path);
+                seed += 4;
+            }
+            printf("Reading lattice parameters from %s\n", namefile);
+            LatticeData data = parseLatticeFile(namefile);
+ 
+            myres->change_mean_and_error(a, data.params["a [fm]"], data.params["error on a [fm]"]);
+            myres->change_mean_and_error(phys_ml, data.params["a*mu_l"], data.params["error on a*mu_l"]);
+            myres->change_mean_and_error(phys_ms, data.params["a*mu_s"], data.params["error on a*mu_s"]);
+            myres->change_mean_and_error(phys_mc, data.params["a*mu_c"], data.params["error on a*mu_c"]);
+
+            // // this was to generate fresh jacks
+            // {
+            //     std::vector<double> means = { data.params["a [fm]"], data.params["a*mu_l"], data.params["a*mu_s"], data.params["a*mu_c"] };
+            //     double** cov_matrix = (double**)malloc(4 * sizeof(double*));
+            //     for (int i = 0; i < 4; i++) {
+            //         cov_matrix[i] = data.matrix[i].data();
+            //     }
+            //     double** jacks = myres->create_fake_covariance(means.data(), 4, cov_matrix, seed);
+            //     // double** cov_jack = myres->comp_cov(4, jacks);
+            //     // double max_diff = compare_matrix(cov_matrix, cov_jack, 4);
+            //     // while (max_diff > 0.1) {
+            //     //     printf("Max relative difference in covariance matrix: %g\n", max_diff);
+            //     //     free(jacks);
+            //     //     jacks = myres->create_fake_covariance(means.data(), 4, cov_matrix, -1);
+            //     //     free_2(4, cov_jack);
+            //     //     cov_jack = myres->comp_cov(4, jacks);
+            //     //     max_diff = compare_matrix(cov_matrix, cov_jack, 4);
+            //     // }
+
+            //     myres->copy(a, jacks[0]);
+            //     myres->copy(phys_ml, jacks[1]);
+            //     myres->copy(phys_ms, jacks[2]);
+            //     myres->copy(phys_mc, jacks[3]);
+            // }
+
+
+        }
     }
-    else if (strcmp("cC.06.80", argv_i) == 0 || strcmp("cC.06.112", argv_i) == 0) {
-        // myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_C_A12_noC20.txt");
-        // myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_A12_noC20_cov_amul_jack_C.txt");
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_C_A12_noC20_cor_unitary.txt");
-        myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_A12_noC20_cor_cov_unitary_amul_jack_C.txt");
-        myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_C.txt");
-        myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_C.txt");
-        latt = "C";
-    }
-    else if (strcmp("cD.54.96", argv_i) == 0) {
-        // myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_D_A12_noC20.txt");
-        // myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_A12_noC20_cov_amul_jack_D.txt");
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_D_A12_noC20_cor_unitary.txt");
-        myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_A12_noC20_cor_cov_unitary_amul_jack_D.txt");
-        myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_D.txt");
-        myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_D.txt");
-        latt = "D";
-    }
-    else if (strcmp("cE.44.112", argv_i) == 0) {
-        // myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_E_A12_noC20.txt");
-        // myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_A12_noC20_cov_amul_jack_E.txt");
-        myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_E_A12_noC20_cor_unitary.txt");
-        myres->read_jack_from_file(phys_ml, "../../g-2_new_stat/fit_all/aMpi2_over_afpi2_A12_noC20_cor_cov_unitary_amul_jack_E.txt");
-        myres->read_jack_from_file(phys_ms, "../../g-2_new_stat/out/ms_from_MK_E.txt");
-        myres->read_jack_from_file(phys_mc, "../../g-2_new_stat/out/mc_from_MDs_E.txt");
-        latt = "E";
-    }
+    printf("Lattice %s:\n", latt.c_str());
+    printf("a        %-20.12g   %-20.12g\n", myres->mean(a), myres->comp_error(a));
+    printf("phys_ml  %-20.12g   %-20.12g\n", myres->mean(phys_ml), myres->comp_error(phys_ml));
+    printf("phys_ms  %-20.12g   %-20.12g\n", myres->mean(phys_ms), myres->comp_error(phys_ms));
+    printf("phys_mc  %-20.12g   %-20.12g\n", myres->mean(phys_mc), myres->comp_error(phys_mc));
 }
 
 

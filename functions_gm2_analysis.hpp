@@ -34,6 +34,21 @@ extern "C" {
 // static int once = 0;
 
 using namespace std::complex_literals;
+enum  ew {
+    eSD,
+    eW,
+    eLD,
+    efull
+};
+enum  er {
+    eOS,
+    etm
+};
+enum  eq {
+    el,
+    es,
+    ec
+};
 
 
 // double integrand_K(double x, void* params);
@@ -192,7 +207,7 @@ double rhs_amu_a4_common(int n, int Nvar, double* x, int Npar, double* P);
 
 
 // void compute_syst_eq28(data_all in, const char* outpath, const char* filename) ;
-void set_a_ml_ms_mc(char *argv_i, double *a, double *phys_ml, double *phys_ms, double *phys_mc, std::string &latt);
+void set_a_ml_ms_mc(char *argv_i, double *a, double *phys_ml, double *phys_ms, double *phys_mc, std::string &latt, const char* fpi);
 
 
 double lhs_w0_a(int n, int e, int j, data_all gjack, struct fit_type fit_info);
