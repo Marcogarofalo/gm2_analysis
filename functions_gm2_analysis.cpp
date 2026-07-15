@@ -3288,36 +3288,70 @@ void set_a_ml_ms_mc(char* argv_i, double* a, double* phys_ml, double* phys_ms, d
             printf("ml = %g  %g\n",myres->mean(phys_ml), myres->comp_error(phys_ml));
             printf("ms = %g  %g\n",myres->mean(phys_ms), myres->comp_error(phys_ms));
             printf("mc = %g  %g\n",myres->mean(phys_mc), myres->comp_error(phys_mc));
- 
+            
+            double **data_2024 = (double**) malloc(sizeof(double*)*4);
+            data_2024[0]=a;
+            data_2024[1]=phys_ml;
+            data_2024[2]=phys_ms;
+            data_2024[3]=phys_mc;
+
+            printf("corr 2024\n");
+            double **cov_2024 = myres->comp_cov(4,data_2024);
+            for (int i=0;i<4;i++){
+                for (int k=0;k<4;k++){
+                    printf("%-12.5g ",cov_2024[i][k]/sqrt(cov_2024[i][i]*cov_2024[k][k]));
+                }
+                printf("\n");
+            }
+
             myres->change_mean_and_error(a, data.params["a [fm]"], data.params["error on a [fm]"]);
+            // a = myres->create_fake(data.params["a [fm]"],1e-20,-1);
             myres->change_mean_and_error(phys_ml, data.params["a*mu_l"], data.params["error on a*mu_l"]);
             myres->change_mean_and_error(phys_ms, data.params["a*mu_s"], data.params["error on a*mu_s"]);
             myres->change_mean_and_error(phys_mc, data.params["a*mu_c"], data.params["error on a*mu_c"]);
+            // phys_mc = myres->create_fake(data.params["a*mu_c"],1e-20,-1);
 
-            // // this was to generate fresh jacks
-            // {
-            //     std::vector<double> means = { data.params["a [fm]"], data.params["a*mu_l"], data.params["a*mu_s"], data.params["a*mu_c"] };
-            //     double** cov_matrix = (double**)malloc(4 * sizeof(double*));
-            //     for (int i = 0; i < 4; i++) {
-            //         cov_matrix[i] = data.matrix[i].data();
-            //     }
-            //     double** jacks = myres->create_fake_covariance(means.data(), 4, cov_matrix, seed);
-            //     // double** cov_jack = myres->comp_cov(4, jacks);
-            //     // double max_diff = compare_matrix(cov_matrix, cov_jack, 4);
-            //     // while (max_diff > 0.1) {
-            //     //     printf("Max relative difference in covariance matrix: %g\n", max_diff);
-            //     //     free(jacks);
-            //     //     jacks = myres->create_fake_covariance(means.data(), 4, cov_matrix, -1);
-            //     //     free_2(4, cov_jack);
-            //     //     cov_jack = myres->comp_cov(4, jacks);
-            //     //     max_diff = compare_matrix(cov_matrix, cov_jack, 4);
-            //     // }
 
-            //     myres->copy(a, jacks[0]);
-            //     myres->copy(phys_ml, jacks[1]);
-            //     myres->copy(phys_ms, jacks[2]);
-            //     myres->copy(phys_mc, jacks[3]);
-            // }
+            printf("corr 2026 as 2024\n");
+            double **cov_2026 = myres->comp_cov(4,data_2024);
+            for (int i=0;i<4;i++){
+                for (int k=0;k<4;k++){
+                    printf("%-12.5g ",cov_2026[i][k]/sqrt(cov_2026[i][i]*cov_2026[k][k]));
+                }
+                printf("\n");
+            }
+
+            // this was to generate fresh jacks
+            {
+                std::vector<double> means = { data.params["a [fm]"], data.params["a*mu_l"], data.params["a*mu_s"], data.params["a*mu_c"] };
+                double** cov_matrix = (double**)malloc(4 * sizeof(double*));
+                for (int i = 0; i < 4; i++) {
+                    cov_matrix[i] = data.matrix[i].data();
+                }
+                printf("corr 2026 lorenzo\n");
+                for (int i=0;i<4;i++){
+                    for (int k=0;k<4;k++){
+                        printf("%-12.5g ",cov_matrix[i][k]/sqrt(cov_matrix[i][i]*cov_matrix[k][k]));
+                    }
+                    printf("\n");
+                }
+                double** jacks = myres->create_fake_covariance_exact(means.data(), 4, cov_matrix, seed);
+                // double** cov_jack = myres->comp_cov(4, jacks);
+                // double max_diff = compare_matrix(cov_matrix, cov_jack, 4);
+                // while (max_diff > 0.1) {
+                //     printf("Max relative difference in covariance matrix: %g\n", max_diff);
+                //     free(jacks);
+                //     jacks = myres->create_fake_covariance(means.data(), 4, cov_matrix, -1);
+                //     free_2(4, cov_jack);
+                //     cov_jack = myres->comp_cov(4, jacks);
+                //     max_diff = compare_matrix(cov_matrix, cov_jack, 4);
+                // }
+
+                myres->copy(a, jacks[0]);
+                myres->copy(phys_ml, jacks[1]);
+                myres->copy(phys_ms, jacks[2]);
+                myres->copy(phys_mc, jacks[3]);
+            }
 
 
         }
