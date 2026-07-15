@@ -621,14 +621,14 @@ double* create_misstuning(std::string filename, std::string latt, std::string re
     }
 
     // Print first entry to verify
-    if (!entries.empty()) {
-        std::cout << "First row: " << entries[0].ens << " | " << entries[0].reg << " | " << entries[0].der << std::endl;
-    }
+    // if (!entries.empty()) {
+    //     std::cout << "First row: " << entries[0].ens << " | " << entries[0].reg << " | " << entries[0].der << std::endl;
+    // }
 
     double* r;
     bool found = false;
     for (int i = 0; i < entries.size(); i++) {
-        printf("Checking entry %d: ens=%s, reg=%s      matching %s  %s\n", i, entries[i].ens.c_str(), entries[i].reg.c_str(), latt.c_str(), reg.c_str());
+        // printf("Checking entry %d: ens=%s, reg=%s      matching %s  %s\n", i, entries[i].ens.c_str(), entries[i].reg.c_str(), latt.c_str(), reg.c_str());
         if (entries[i].ens == latt && entries[i].reg == reg) {
             double* result = (double*)malloc(2 * sizeof(double));
             result[0] = entries[i].der * 1e-10;
@@ -679,7 +679,7 @@ double** read_light_corr(std::string filename, int T) {
     }
     double** cov = myb.comp_cov(T / 2 + 1, boot);
     for (int t1 = 0; t1 < T / 2 + 1; t1++) {
-        cov[t1][t1] += 1e-8;
+        cov[t1][t1] += 1e-15;
     }
     for (int t1 = 0; t1 < T / 2 + 1; t1++) {
         for (int t2 = t1 + 1; t2 < T / 2 + 1; t2++) {
@@ -1441,10 +1441,10 @@ int main(int argc, char** argv) {
     double** ms = (double**)malloc(sizeof(double*) * 2);
     ms[0] = fake_sampling(resampling, header.mus[1], 1e-20, Njack, 1);
     ms[1] = fake_sampling(resampling, header.mus[2], 1e-20, Njack, 1);
-    printf("reading a   =  %g  %g fm\n", a[Njack - 1], myres->comp_error(a));
+    // printf("reading a   =  %g  %g fm\n", a[Njack - 1], myres->comp_error(a));
     // a =  myres->create_fake(a[Njack-1], 1e-12,1);
     // phys_mc = myres->create_fake(phys_mc[Njack-1], 1e-12,1);
-    printf("reading a   =  %g  %g fm\n", a[Njack - 1], myres->comp_error(a));
+    // printf("reading a   =  %g  %g fm\n", a[Njack - 1], myres->comp_error(a));
 
 
     // resampling everithing 
@@ -1488,7 +1488,7 @@ int main(int argc, char** argv) {
 // (\mu_l/HVP(full,c)) * d/d(mc-sea) HVP(full,c): -0.000080 , 0.000022
 
     std::string lattL;
-    int T_small;
+    int T_small = 0;
     if (latt == "B") {
         lattL = "B64";
         T_small = 64 * 2;
@@ -1506,39 +1506,58 @@ int main(int argc, char** argv) {
         T_small = 112 * 2;
     }
 
+    bool misstuning_correction = (!lattL.empty()) && strcmp(argv[1], "read_plateaux") != 0;
+    printf("misstuing correction?  %d    (true =%d, false =%d)\n", misstuning_correction,true,false);
     double***** dHVP = malloc_5<double>(3, 4, 3, 2, Njack);
     std::string path("/home/garofalo/analysis/gm2_analysis/build/misstuning/");
-    dHVP[es][eSD][es][eOS] = create_misstuning(path + "amu_s_sea_mus_derivatives_SD.txt", lattL, "OS");
-    dHVP[es][eSD][es][etm] = create_misstuning(path + "amu_s_sea_mus_derivatives_SD.txt", lattL, "tm");
-    dHVP[es][eSD][ec][eOS] = create_misstuning(path + "amu_s_sea_muc_derivatives_SD.txt", lattL, "OS");
-    dHVP[es][eSD][ec][etm] = create_misstuning(path + "amu_s_sea_muc_derivatives_SD.txt", lattL, "tm");
+    if (!misstuning_correction) {
+        for (int i = 1;i < 3;i++) {
+            for (int q = 0; q<4;q++){
+                for (int k = 0;k < 3;k++) {
+                    for (int l = 0;l < 2;l++) {
+                        for (int j = 0; j < Njack;j++) {
+                            dHVP[i][q][k][l][j] =0.0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else{
 
-    dHVP[es][eW][es][eOS] = create_misstuning(path + "amu_s_sea_mus_derivatives_IW.txt", lattL, "OS");
-    dHVP[es][eW][es][etm] = create_misstuning(path + "amu_s_sea_mus_derivatives_IW.txt", lattL, "tm");
-    dHVP[es][eW][ec][eOS] = create_misstuning(path + "amu_s_sea_muc_derivatives_IW.txt", lattL, "OS");
-    dHVP[es][eW][ec][etm] = create_misstuning(path + "amu_s_sea_muc_derivatives_IW.txt", lattL, "tm");
+        // strange
+        dHVP[es][eSD][es][eOS] = create_misstuning(path + "amu_s_sea_mus_derivatives_SD.txt", lattL, "OS");
+        dHVP[es][eSD][es][etm] = create_misstuning(path + "amu_s_sea_mus_derivatives_SD.txt", lattL, "tm");
+        dHVP[es][eSD][ec][eOS] = create_misstuning(path + "amu_s_sea_muc_derivatives_SD.txt", lattL, "OS");
+        dHVP[es][eSD][ec][etm] = create_misstuning(path + "amu_s_sea_muc_derivatives_SD.txt", lattL, "tm");
 
-    dHVP[es][efull][es][eOS] = create_misstuning(path + "amu_s_sea_mus_derivatives_full.txt", lattL, "OS");
-    dHVP[es][efull][es][etm] = create_misstuning(path + "amu_s_sea_mus_derivatives_full.txt", lattL, "tm");
-    dHVP[es][efull][ec][eOS] = create_misstuning(path + "amu_s_sea_muc_derivatives_full.txt", lattL, "OS");
-    dHVP[es][efull][ec][etm] = create_misstuning(path + "amu_s_sea_muc_derivatives_full.txt", lattL, "tm");
+        dHVP[es][eW][es][eOS] = create_misstuning(path + "amu_s_sea_mus_derivatives_IW.txt", lattL, "OS");
+        dHVP[es][eW][es][etm] = create_misstuning(path + "amu_s_sea_mus_derivatives_IW.txt", lattL, "tm");
+        dHVP[es][eW][ec][eOS] = create_misstuning(path + "amu_s_sea_muc_derivatives_IW.txt", lattL, "OS");
+        dHVP[es][eW][ec][etm] = create_misstuning(path + "amu_s_sea_muc_derivatives_IW.txt", lattL, "tm");
 
-    // charm
-    dHVP[ec][eSD][es][eOS] = create_misstuning(path + "amu_c_sea_mus_derivatives_SD.txt", lattL, "OS");
-    dHVP[ec][eSD][es][etm] = create_misstuning(path + "amu_c_sea_mus_derivatives_SD.txt", lattL, "tm");
-    dHVP[ec][eSD][ec][eOS] = create_misstuning(path + "amu_c_sea_muc_derivatives_SD.txt", lattL, "OS");
-    dHVP[ec][eSD][ec][etm] = create_misstuning(path + "amu_c_sea_muc_derivatives_SD.txt", lattL, "tm");
+        dHVP[es][efull][es][eOS] = create_misstuning(path + "amu_s_sea_mus_derivatives_full.txt", lattL, "OS");
+        dHVP[es][efull][es][etm] = create_misstuning(path + "amu_s_sea_mus_derivatives_full.txt", lattL, "tm");
+        dHVP[es][efull][ec][eOS] = create_misstuning(path + "amu_s_sea_muc_derivatives_full.txt", lattL, "OS");
+        dHVP[es][efull][ec][etm] = create_misstuning(path + "amu_s_sea_muc_derivatives_full.txt", lattL, "tm");
 
-    dHVP[ec][eW][es][eOS] = create_misstuning(path + "amu_c_sea_mus_derivatives_IW.txt", lattL, "OS");
-    dHVP[ec][eW][es][etm] = create_misstuning(path + "amu_c_sea_mus_derivatives_IW.txt", lattL, "tm");
-    dHVP[ec][eW][ec][eOS] = create_misstuning(path + "amu_c_sea_muc_derivatives_IW.txt", lattL, "OS");
-    dHVP[ec][eW][ec][etm] = create_misstuning(path + "amu_c_sea_muc_derivatives_IW.txt", lattL, "tm");
+        // charm
+        dHVP[ec][eSD][es][eOS] = create_misstuning(path + "amu_c_sea_mus_derivatives_SD.txt", lattL, "OS");
+        dHVP[ec][eSD][es][etm] = create_misstuning(path + "amu_c_sea_mus_derivatives_SD.txt", lattL, "tm");
+        dHVP[ec][eSD][ec][eOS] = create_misstuning(path + "amu_c_sea_muc_derivatives_SD.txt", lattL, "OS");
+        dHVP[ec][eSD][ec][etm] = create_misstuning(path + "amu_c_sea_muc_derivatives_SD.txt", lattL, "tm");
 
-    dHVP[ec][efull][es][eOS] = create_misstuning(path + "amu_c_sea_mus_derivatives_full.txt", lattL, "OS");
-    dHVP[ec][efull][es][etm] = create_misstuning(path + "amu_c_sea_mus_derivatives_full.txt", lattL, "tm");
-    dHVP[ec][efull][ec][eOS] = create_misstuning(path + "amu_c_sea_muc_derivatives_full.txt", lattL, "OS");
-    dHVP[ec][efull][ec][etm] = create_misstuning(path + "amu_c_sea_muc_derivatives_full.txt", lattL, "tm");
+        dHVP[ec][eW][es][eOS] = create_misstuning(path + "amu_c_sea_mus_derivatives_IW.txt", lattL, "OS");
+        dHVP[ec][eW][es][etm] = create_misstuning(path + "amu_c_sea_mus_derivatives_IW.txt", lattL, "tm");
+        dHVP[ec][eW][ec][eOS] = create_misstuning(path + "amu_c_sea_muc_derivatives_IW.txt", lattL, "OS");
+        dHVP[ec][eW][ec][etm] = create_misstuning(path + "amu_c_sea_muc_derivatives_IW.txt", lattL, "tm");
 
+        dHVP[ec][efull][es][eOS] = create_misstuning(path + "amu_c_sea_mus_derivatives_full.txt", lattL, "OS");
+        dHVP[ec][efull][es][etm] = create_misstuning(path + "amu_c_sea_mus_derivatives_full.txt", lattL, "tm");
+        dHVP[ec][efull][ec][eOS] = create_misstuning(path + "amu_c_sea_muc_derivatives_full.txt", lattL, "OS");
+        dHVP[ec][efull][ec][etm] = create_misstuning(path + "amu_c_sea_muc_derivatives_full.txt", lattL, "tm");
+    }
+    
     for (int i = 1;i < 3;i++) {
         for (int k = 1;k < 3;k++) {
             for (int l = 0;l < 2;l++) {
@@ -1547,6 +1566,7 @@ int main(int argc, char** argv) {
                 for (int j = 0; j < Njack;j++) {
                     dHVP[i][eLD][k][l][j] -= dHVP[i][eW][k][l][j];
                     dHVP[i][eLD][k][l][j] -= dHVP[i][eSD][k][l][j];
+                    // dHVP[i][eLD][k][l][j] =0;
                 }
             }
         }
@@ -1568,13 +1588,25 @@ int main(int argc, char** argv) {
     for (int i = 0;i < 3;i++) {
         dHVP_l[i] = (double***)malloc(sizeof(double**) * 2);
     }
+    if (lattL.empty()) {
+        dHVP_l[es][eOS] = (double**)malloc(sizeof(double*) * T_small);
+        dHVP_l[es][etm] = (double**)malloc(sizeof(double*) * T_small);
+        dHVP_l[ec][eOS] = (double**)malloc(sizeof(double*) * T_small);
+        dHVP_l[ec][etm] = (double**)malloc(sizeof(double*) * T_small);
+        for (int t = 0;t < T_small;t++) {
+            dHVP_l[es][eOS][t] = myres->create_zero();
+            dHVP_l[es][etm][t] = myres->create_zero();
+            dHVP_l[ec][eOS][t] = myres->create_zero();
+            dHVP_l[ec][etm][t] = myres->create_zero();
+        }
+    }
+    else{
+        dHVP_l[es][eOS] = read_light_corr(path + lattL + "_vkvk_OS_s_der_sea-ml.boot", T_small);
+        dHVP_l[es][etm] = read_light_corr(path + lattL + "_vkvk_tm_s_der_sea-ml.boot", T_small);
 
-    dHVP_l[es][eOS] = read_light_corr(path + lattL + "_vkvk_OS_s_der_sea-ml.boot", T_small);
-    dHVP_l[es][etm] = read_light_corr(path + lattL + "_vkvk_tm_s_der_sea-ml.boot", T_small);
-
-    dHVP_l[ec][eOS] = read_light_corr(path + lattL + "_vkvk_OS_c_der_sea-ml.boot", T_small);
-    dHVP_l[ec][etm] = read_light_corr(path + lattL + "_vkvk_tm_c_der_sea-ml.boot", T_small);
-
+        dHVP_l[ec][eOS] = read_light_corr(path + lattL + "_vkvk_OS_c_der_sea-ml.boot", T_small);
+        dHVP_l[ec][etm] = read_light_corr(path + lattL + "_vkvk_tm_c_der_sea-ml.boot", T_small);
+    }
 
 
 
@@ -1609,13 +1641,24 @@ int main(int argc, char** argv) {
     // myres->sub(dHVPc_c_LD_OS, dHVPc_c_LD_OS, dHVPc_c_SD_OS);
 
     std::vector<double*> amusim(3);
-    line_read_param(option, "mulsim", mean, err, seed, namefile_plateaux);
-    amusim[0] = myres->create_fake(mean, err, -1);
-    line_read_param(option, "mussim", mean, err, seed, namefile_plateaux);
-    amusim[1] = myres->create_fake(mean, err, -1);
-    line_read_param(option, "mucsim", mean, err, seed, namefile_plateaux);
-    amusim[2] = myres->create_fake(mean, err, -1);
-
+    if (lattL.empty()){
+        amusim[0] = (double*) malloc(sizeof(double)*Njack);
+        amusim[1] = (double*) malloc(sizeof(double)*Njack);
+        amusim[2] = (double*) malloc(sizeof(double)*Njack);
+        for (int j = 0; j < Njack;j++) {
+            amusim[0][j] = phys_ml[j];
+            amusim[1][j] = phys_ms[j];
+            amusim[2][j] = phys_mc[j];
+        }
+    }
+    else {
+        line_read_param(option, "mulsim", mean, err, seed, namefile_plateaux);
+        amusim[0] = myres->create_fake(mean, err, -1);
+        line_read_param(option, "mussim", mean, err, seed, namefile_plateaux);
+        amusim[1] = myres->create_fake(mean, err, -1);
+        line_read_param(option, "mucsim", mean, err, seed, namefile_plateaux);
+        amusim[2] = myres->create_fake(mean, err, -1);
+    }
     std::vector<std::vector<double>> deltamu(3, std::vector<double>(Njack));
     for (int j = 0; j < Njack;j++) {
         deltamu[0][j] = phys_ml[j] - amusim[0][j];
@@ -1625,31 +1668,33 @@ int main(int argc, char** argv) {
 
         for (int reg = 0;reg < 2;reg++) {
             for (int t = 0;t < T_small;t++) {
-                dHVP_l[es][reg][t][j] *= deltamu[el][j] * (9.0/1.0);
-                dHVP_l[ec][reg][t][j] *= deltamu[el][j] * (9.0/4.0);
+                dHVP_l[es][reg][t][j] *= 0.0; // I think the factor here should be  (9.0/1.0)* 1e-10 /(alpha_em^2 Z^2)//    deltamu[el][j] * (9.0/1.0);
+                dHVP_l[ec][reg][t][j] *= deltamu[el][j] ;//* (9.0/4.0);
             }
         }
 
         // light correction to amu_HVP strange and charm
+        if (misstuning_correction){
             for (int t = 0;t < T_small;t++) {
                 // strange
                 //OS
-                conf_jack[j][2 + 6][t][0] += dHVP_l[es][eOS][t][j] * deltamu[el][j];
-                conf_jack[j][2 + 12][t][0] += dHVP_l[es][eOS][t][j] * deltamu[el][j];
+                conf_jack[j][2 + 6][t][0] += dHVP_l[es][eOS][t][j] ;
+                conf_jack[j][2 + 12][t][0] += dHVP_l[es][eOS][t][j];
                 //tm
-                conf_jack[j][5 + 6][t][0] += dHVP_l[es][etm][t][j] * deltamu[el][j];
-                conf_jack[j][5 + 12][t][0] += dHVP_l[es][etm][t][j] * deltamu[el][j];
+                conf_jack[j][5 + 6][t][0] += dHVP_l[es][etm][t][j] ;
+                conf_jack[j][5 + 12][t][0] += dHVP_l[es][etm][t][j];
 
                 // charm
                 // OS
-                conf_jack[j][2 + 6 * (3 + 0)][t][0] += dHVP_l[ec][eOS][t][j] * deltamu[el][j];
-                conf_jack[j][2 + 6 * (3 + 1)][t][0] += dHVP_l[ec][eOS][t][j] * deltamu[el][j];
-                conf_jack[j][2 + 6 * (3 + 2)][t][0] += dHVP_l[ec][eOS][t][j] * deltamu[el][j];
+                conf_jack[j][2 + 6 * (3 + 0)][t][0] += dHVP_l[ec][eOS][t][j] ;
+                conf_jack[j][2 + 6 * (3 + 1)][t][0] += dHVP_l[ec][eOS][t][j] ;
+                conf_jack[j][2 + 6 * (3 + 2)][t][0] += dHVP_l[ec][eOS][t][j] ;
                 // tm
-                conf_jack[j][2 + 6 * (3 + 0) + 3][t][0] += dHVP_l[ec][etm][t][j] * deltamu[el][j];
-                conf_jack[j][2 + 6 * (3 + 1) + 3][t][0] += dHVP_l[ec][etm][t][j] * deltamu[el][j];
-                conf_jack[j][2 + 6 * (3 + 2) + 3][t][0] += dHVP_l[ec][etm][t][j] * deltamu[el][j];
+                conf_jack[j][2 + 6 * (3 + 0) + 3][t][0] += dHVP_l[ec][etm][t][j] ;
+                conf_jack[j][2 + 6 * (3 + 1) + 3][t][0] += dHVP_l[ec][etm][t][j] ;
+                conf_jack[j][2 + 6 * (3 + 2) + 3][t][0] += dHVP_l[ec][etm][t][j] ;
             }
+        }
 
         for (int iq = 0;iq < 3;iq++) {
             for (int iW = 0;iW < 4;iW++) {
@@ -1676,6 +1721,17 @@ int main(int argc, char** argv) {
         // dHVPc_s_full_OS[j] *= deltamu[1][j] / phys_ml[j];
         // dHVPc_c_full_tm[j] *= deltamu[2][j] / phys_ml[j];
         // dHVPc_c_full_OS[j] *= deltamu[2][j] / phys_ml[j];
+    }
+    printf("after multiplication by dmu\n");
+    for (int i = 1;i < 3;i++) {
+        for (int j = 0;j < 4;j++) {
+            for (int k = 1;k < 3;k++) {
+                printf("deltamu[%d] = %g +- %g\n", k, deltamu[k][Njack - 1], myres->comp_error(deltamu[k].data()));
+                for (int l = 0;l < 2;l++) {
+                    printf("dHVP[%d][%d][%d][%d] = %g +- %g\n", i, j, k, l, dHVP[i][j][k][l][Njack - 1], myres->comp_error(dHVP[i][j][k][l]));
+                }
+            }
+        }
     }
 
 
@@ -3201,7 +3257,7 @@ int main(int argc, char** argv) {
     asd_vec[1] = amu_sdeq_simp_s1;
 
     amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{sd}_(eq,MK)", resampling);
-    if (strcmp(argv[1], "read_plateaux") != 0) {
+    if (misstuning_correction) {
         for (int j = 0; j < Njack;j++) {
             amu_sd_sphys[j] += (dHVP[es][eSD][es][eOS][j] + dHVP[es][eSD][ec][eOS][j]);
         }
@@ -3215,7 +3271,7 @@ int main(int argc, char** argv) {
     asd_vec[1] = amu_sdop_simp_s1;
 
     amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{sd}_(op,MK)", resampling);
-    if (strcmp(argv[1], "read_plateaux") != 0) {
+    if (misstuning_correction) {
         for (int j = 0; j < Njack;j++) {
             amu_sd_sphys[j] += (dHVP[es][eSD][es][etm][j] + dHVP[es][eSD][ec][etm][j]);
         }
@@ -3228,7 +3284,7 @@ int main(int argc, char** argv) {
     asd_vec[0] = amu_Weq_simp_s;
     asd_vec[1] = amu_Weq_simp_s1;
     amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{W}_(eq,MK)", resampling);
-    if (strcmp(argv[1], "read_plateaux") != 0) {
+    if (misstuning_correction) {
         for (int j = 0; j < Njack;j++) {
             amu_sd_sphys[j] += (dHVP[es][eW][es][eOS][j] + dHVP[es][eW][ec][eOS][j]);
         }
@@ -3254,7 +3310,7 @@ int main(int argc, char** argv) {
     asd_vec[1] = amu_Wop_simp_s1;
 
     amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{W}_(op,MK)", resampling);
-    if (strcmp(argv[1], "read_plateaux") != 0) {
+    if (misstuning_correction) {
         for (int j = 0; j < Njack;j++) {
             amu_sd_sphys[j] += (dHVP[es][eW][es][etm][j] + dHVP[es][eW][ec][etm][j]);
         }
@@ -3308,7 +3364,7 @@ int main(int argc, char** argv) {
     asd_vec[1] = amu_LDeq_simp_s1;
 
     amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{LD}_(eq,MK)", resampling);
-    if (strcmp(argv[1], "read_plateaux") != 0) {
+    if (misstuning_correction) {
         for (int j = 0; j < Njack;j++) {
             amu_sd_sphys[j] += (dHVP[es][eLD][es][eOS][j] + dHVP[es][eLD][ec][eOS][j]);
         }
@@ -3322,7 +3378,7 @@ int main(int argc, char** argv) {
     asd_vec[1] = amu_LDop_simp_s1;
 
     amu_sd_sphys = interpol_Z(Nstrange, Njack, vec_ms, asd_vec, phys_ms, outfile, "amu_{LD}_(op,MK)", resampling);
-    if (strcmp(argv[1], "read_plateaux") != 0) {
+    if (misstuning_correction) {
         for (int j = 0; j < Njack;j++) {
             amu_sd_sphys[j] += (dHVP[es][eLD][es][etm][j] + dHVP[es][eLD][ec][etm][j]);
         }
@@ -3398,7 +3454,7 @@ int main(int argc, char** argv) {
 
 
     amu_sd_sphys = interpol_Z(Ncharm_inter, Njack, mc, amusd_c_vec[0], phys_mc, outfile, "amu_{sd}_(eq,MDs)", resampling);
-    if (strcmp(argv[1], "read_plateaux") != 0) {
+    if (misstuning_correction) {
         for (int j = 0; j < Njack;j++) {
             amu_sd_sphys[j] += (dHVP[ec][eSD][es][eOS][j] + dHVP[ec][eSD][ec][eOS][j]);
         }
@@ -3409,7 +3465,7 @@ int main(int argc, char** argv) {
     check_correlatro_counter(183);
 
     amu_sd_sphys = interpol_Z(Ncharm_inter, Njack, mc, amusd_c_vec[1], phys_mc, outfile, "amu_{sd}_(op,MDs)", resampling);
-    if (strcmp(argv[1], "read_plateaux") != 0) {
+    if (misstuning_correction) {
         for (int j = 0; j < Njack;j++) {
             amu_sd_sphys[j] += (dHVP[ec][eSD][es][etm][j] + dHVP[ec][eSD][ec][etm][j]);
         }
@@ -3430,18 +3486,77 @@ int main(int argc, char** argv) {
     printf("%g   %g\n", mc[1][Njack - 1], myres->comp_error(mc[1]));
     printf("%g   %g\n", mc[2][Njack - 1], myres->comp_error(mc[2]));
     amu_sd_sphys = interpol_Z(Ncharm_inter, Njack, mc, amuW_c_vec[0], phys_mc, outfile, "amu_{W}_(eq,MDs)", resampling);
-    if (strcmp(argv[1], "read_plateaux") != 0) {
+    if (misstuning_correction) {
         for (int j = 0; j < Njack;j++) {
             amu_sd_sphys[j] += (dHVP[ec][eW][es][eOS][j] + dHVP[ec][eW][ec][eOS][j]);
         }
     }
+    printf("after corr = %.12g  %.12g\n", myres->mean(amu_sd_sphys), myres->comp_error(amu_sd_sphys));
+    // {
+    //      data_all jackall;
+    //     jackall.resampling = resampling;
+    //     jackall.ens = Ncharm_inter;
+    //     jackall.en = new data_single[jackall.ens];
+    //     for (int i = 0;i < jackall.ens;i++) {
+    //         // jackall.en[i].header = header;
+    //         jackall.en[i].Nobs = 1;
+    //         jackall.en[i].Njack = Njack;
+    //         jackall.en[i].jack = (double**)malloc(sizeof(double*) * 1);
+    //     }
+    //     for (size_t i = 0; i < Ncharm_inter; i++) {
+    //         jackall.en[i].jack[0] = amuW_c_vec[0][i];
+    //     }
+    //     fit_type fit_info;
+    //     // fit in sigma
+    //     fit_info.restore_default();
+    //     fit_info.Npar = 3;
+    //     fit_info.Nvar = 1;
+    //     fit_info.Njack = header.Njack;
+    //     fit_info.N = 1;
+    //     fit_info.myen = std::vector<int>(Ncharm_inter);
+    //     for (size_t i = 0; i < Ncharm_inter; i++)fit_info.myen[i] = i;
+    //     fit_info.entot = fit_info.myen.size() * fit_info.N;
+    //     fit_info.malloc_x();
+    //     count = 0;
+    //     for (int j = 0;j < fit_info.Njack;j++) {
+    //         for (size_t i = 0; i < Ncharm_inter; i++) {
+    //             fit_info.x[0][i][j] = mc[i][j]; // mul1 
+    //         }
+
+    //     }
+    //     count++;
+
+    //     fit_info.corr_id = { 0 };
+    //     fit_info.function = [](int n, int Nvar, double* x, int Npar, double* P) -> double {
+    //         return P[0] + P[1]*x[0]+P[2]*x[0]*x[0];
+    //      } ;//constant_fit;
+    //     fit_info.linear_fit = true;
+    //     fit_info.covariancey = false;
+    //     fit_info.verbosity = 0;
+    //     char namefit[NAMESIZE];
+    //     mysprintf(namefit, NAMESIZE, "interpol_c/%s_%s",  lattL.c_str(), argv[1]);
+    //     printf("writing %s\n",namefit);
+    //     char** temp_argv = malloc_2<char>(5, NAMESIZE);
+    //     mysprintf(temp_argv[1], NAMESIZE, "%s", resampling);// resampling
+    //     mysprintf(temp_argv[3], NAMESIZE, "%s/out", option[3]);// resampling
+
+    //     fit_result fit_Z0_sigma = fit_all_data(temp_argv, jackall, lhs_identity, fit_info, namefit);
+    //     fit_info.band_range = {mc[0][j]-0.01,mc[2][j]+0.01 };
+    //     print_fit_band(temp_argv, jackall, fit_info, fit_info, namefit, "mc", fit_Z0_sigma, fit_Z0_sigma, 0, fit_info.myen.size() - 1, 0.0002);
+
+
+    // }
+
+
+
+    // exit(1);
     write_jack(amu_sd_sphys, Njack, jack_file);
     printf("amu_{W}_(eq,MDs) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
     check_correlatro_counter(185);
 
     amu_sd_sphys = interpol_Z(Ncharm_inter, Njack, mc, amuW_c_vec[1], phys_mc, outfile, "amu_{W}_(op,MDs)", resampling);
-    if (strcmp(argv[1], "read_plateaux") != 0) {
+    if (misstuning_correction) {
         for (int j = 0; j < Njack;j++) {
             amu_sd_sphys[j] += (dHVP[ec][eW][es][etm][j] + dHVP[ec][eW][ec][etm][j]);
 
@@ -3569,26 +3684,28 @@ int main(int argc, char** argv) {
 
 
     amu_sd_sphys = interpol_Z(Ncharm, Njack, mc, amuLD_c_vec[0], phys_mc, outfile, "amu_{LD}_(eq,MDs)", resampling);
-    if (strcmp(argv[1], "read_plateaux") != 0) {
+    if (misstuning_correction) {
         for (int j = 0; j < Njack;j++) {
             // amu_sd_sphys[j] += (dHVPc_s_LD_OS[j] + dHVPc_c_LD_OS[j]);
             amu_sd_sphys[j] += (dHVP[ec][eLD][es][eOS][j] + dHVP[ec][eLD][ec][eOS][j]);
 
         }
+        printf("after the correction %.12g  %.12g\n", myres->mean(amu_sd_sphys), myres->comp_error(amu_sd_sphys));
     }
     write_jack(amu_sd_sphys, Njack, jack_file);
-    printf("amu_{LD}_(eq,MDs) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
+    // printf("amu_{LD}_(eq,MDs) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
     check_correlatro_counter(207);
 
     amu_sd_sphys = interpol_Z(Ncharm, Njack, mc, amuLD_c_vec[1], phys_mc, outfile, "amu_{LD}_(op,MDs)", resampling);
-    if (strcmp(argv[1], "read_plateaux") != 0) {
+    if (misstuning_correction) {
         for (int j = 0; j < Njack;j++) {
             amu_sd_sphys[j] += (dHVP[ec][eLD][es][etm][j] + dHVP[ec][eLD][ec][etm][j]);
         }
+        printf("after the correction %.12g  %.12g\n", myres->mean(amu_sd_sphys), myres->comp_error(amu_sd_sphys));
     }
     write_jack(amu_sd_sphys, Njack, jack_file);
-    printf("amu_{LD}_(op,MDs) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
+    // printf("amu_{LD}_(op,MDs) = %g  %g\n", amu_sd_sphys[Njack - 1], error_jackboot(resampling, Njack, amu_sd_sphys));
     free(amu_sd_sphys);
     check_correlatro_counter(208);
 

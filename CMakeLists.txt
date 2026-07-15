@@ -156,3 +156,6 @@ target_link_libraries(fit_all_gm2 PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIB
 add_executable(scale_setting_rew scale_setting_rew.cpp)
 target_link_libraries(scale_setting_rew PUBLIC functions_gm2_analysis)
 target_link_libraries(scale_setting_rew PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
+
+add_executable(interpolate_HVP_charm_fpi interpolate_HVP_charm_fpi.cpp)
+target_link_libraries(interpolate_HVP_charm_fpi PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})

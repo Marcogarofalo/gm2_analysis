@@ -3282,6 +3282,12 @@ void set_a_ml_ms_mc(char* argv_i, double* a, double* phys_ml, double* phys_ms, d
             }
             printf("Reading lattice parameters from %s\n", namefile);
             LatticeData data = parseLatticeFile(namefile);
+
+            printf("2024 params:\n");
+            printf("a = %g  %g\n",myres->mean(a), myres->comp_error(a));
+            printf("ml = %g  %g\n",myres->mean(phys_ml), myres->comp_error(phys_ml));
+            printf("ms = %g  %g\n",myres->mean(phys_ms), myres->comp_error(phys_ms));
+            printf("mc = %g  %g\n",myres->mean(phys_mc), myres->comp_error(phys_mc));
  
             myres->change_mean_and_error(a, data.params["a [fm]"], data.params["error on a [fm]"]);
             myres->change_mean_and_error(phys_ml, data.params["a*mu_l"], data.params["error on a*mu_l"]);
