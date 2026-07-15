@@ -41,6 +41,7 @@ nudge<- rep(c(0.00002,0,0.00002,0),2)
 ratio<-smallV[, idy]/bigV[,idy]
 pool<- (smallV[,idy]-bigV[,idy])/sqrt(smallV[,idy+1]^2+bigV[,idy+1]^2)
 pool <- abs(smallV[,idy]-bigV[,idy])*erf(abs(pool)/sqrt(2))
+cat("delta FVE pool = ",pool,"\n" )
 error<- (smallV[, idy+1]/bigV[,idy]) +(smallV[, idy]/bigV[,idy]^2)*bigV[,idy+1]
 gg <- myggplot()
 gg<- gg + geom_hline(yintercept = 1, color="black")

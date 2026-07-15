@@ -40,3 +40,69 @@ gg<- myggplot()
 gg<- gg + geom_pointrange(aes(x=mc , y =data[,1], ymin=data[,1]-data[,2],ymax=data[,1]+data[,2]))
 fig<-myplotly(gg,"","mc_val","amu_HVP_c")
 ```
+
+
+```{r, echo=FALSE, results='asis'}
+gg <- myggplot()
+###########################################
+dir <- "/home/garofalo/analysis/g-2_new_stat/out/interpol_c/"
+namefit <- paste0(dir, "C80_read_plateaux")
+file <- paste0(namefit, "_fit_P.dat")
+fit <- read_fit_P_file(file)
+cat("\n\n")
+dt <- make_table_fit_result(fit)
+
+print(dt)
+gg <- plot_fit(
+  basename = namefit,
+  var = "mc",
+  id_x = 1,
+  data_type = c("2024"),
+  width = 1e-4,
+  gg = gg, 
+  labelfit = "",
+  # , single_name_for_fit = "fit"
+  # , nolabel_for_fit = TRUE
+  noline = TRUE
+)
+
+gg<- gg+ geom_vline(xintercept =   0.198487  - 0.000638623  )
+gg<- gg+ geom_vline(xintercept =   0.198487 +  0.000638623  )
+myx=0.198487
+myy=3.81220417476167e-10
+ey=3.55865709373285e-13
+gg<- gg+ geom_pointrange(aes(x=!!myx, y=!!myy, ymin=!!(myy-ey), ymax=!!(myy+ey)), color="black")
+
+##################
+dir <- "/home/garofalo/analysis/g-2_new_stat/out/interpol_c/"
+namefit <- paste0(dir, "C80_130.5")
+file <- paste0(namefit, "_fit_P.dat")
+fit <- read_fit_P_file(file)
+cat("\n\n")
+dt <- make_table_fit_result(fit)
+
+print(dt)
+gg <- plot_fit(
+  basename = namefit,
+  var = "mc",
+  id_x = 1,
+  data_type = c("2026 new"),
+  width = 1e-4,
+  gg = gg, 
+  labelfit = "",
+  # , single_name_for_fit = "fit"
+  # , nolabel_for_fit = TRUE
+  noline = TRUE
+)
+
+gg<- gg+ geom_vline(xintercept =   0.197318 -  0.000474147 , color="blue" )
+gg<- gg+ geom_vline(xintercept =   0.197318 +  0.000474147 , color="blue" )
+myx=0.197318
+myy=3.82687028350546e-10
+ey= 6.5501491424035e-13
+gg<- gg+ geom_pointrange(aes(x=!!myx, y=!!myy, ymin=!!(myy-ey), ymax=!!(myy+ey)), color="blue")
+
+fig <- myplotly(gg, "", "m_c", "a_mu(c)", to_print = TRUE)
+
+
+```

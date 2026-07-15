@@ -130,12 +130,11 @@ plot_all_fits <- function(name, Wind, quark, myyrange = NULL, quark_full_name = 
     print(df$fit[a])
     df <- df[-a, ]
   }
-  # print(length(df$res))
   ave_AIC <- AIC2(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity = df$mult)
   if (to_plot) {
     df$AIC <- ave_AIC$AIC
-    # for (i in c(1, 2, 50)) {
-    for (i in seq_along(df$fit)) {
+    for (i in c( 1+3*length(list_a))) {
+    #for (i in seq_along(df$fit)) {
       namefile <- paste0(dir, df$fit[i])
       mydata <- c("OS", "TM")
       if (str_detect(df$fit[i], "onlyOS")) mydata <- c("OS")
@@ -328,7 +327,7 @@ plot_all_fits <- function(name, Wind, quark, myyrange = NULL, quark_full_name = 
     )
     plot(gg2)
     dev.off()
-    tools::texi2dvi(texfile, texi2dvi = "pdflatex", pdf = TRUE)
+    tools::texi2dvi(texfile, texi2dvi = "pdflatex", pdf = TRUE,clean = TRUE)
   }
 
   ave_AIC$df <- df

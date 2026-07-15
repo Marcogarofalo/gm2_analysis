@@ -32,104 +32,380 @@ source("plot_paper_sc/functions.R")
 
 ## strange
 
-## SD
+### SD
 
-```{r}
+```{r, echo=FALSE, results='asis', warning=FALSE}
 cat("2024\n")
 df<-plot_all_fits("SDcor","SD","s",quark_full_name="strange", to_plot = FALSE, fpi="")
-cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
 cat("2026\n")
 df<-plot_all_fits("SD","SD","s",quark_full_name="strange", to_plot = FALSE, fpi="130.5")
-cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
 
+gg<-myggplot()
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat//fit_all_strange/amu_SDcor_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2024"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2024",
+        noribbon = FALSE, noline = TRUE
+      )
+
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_strange/amu_SD_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2026"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2026",
+        noribbon = FALSE, noline = TRUE
+      )
+
+fig<-myplotly(gg, to_print = TRUE)
 ```
 
-## W
+### W
 
-```{r}
+```{r, echo=FALSE, results='asis', warning=FALSE}
 cat("2024\n")
 df<-plot_all_fits("Wcor","W","s",quark_full_name="strange", to_plot = FALSE, fpi="")
-cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
 cat("2026\n")
 df<-plot_all_fits("W","W","s",quark_full_name="strange", to_plot = FALSE, fpi="130.5")
-cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+gg<-myggplot()
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat//fit_all_strange/amu_Wcor_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2024"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2024",
+        noribbon = FALSE, noline = TRUE
+      )
 
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_strange/amu_W_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2026"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2026",
+        noribbon = FALSE, noline = TRUE
+      )
+
+fig<-myplotly(gg, to_print = TRUE)
 ```
 
-## LD
+### LD
 
-```{r}
+```{r, echo=FALSE, results='asis', warning=FALSE}
 cat("2024\n")
 df<-plot_all_fits("LDcor","LD","s",quark_full_name="strange", to_plot = FALSE, fpi="")
-cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
 cat("2026\n")
 df<-plot_all_fits("LD","LD","s",quark_full_name="strange", to_plot = FALSE, fpi="130.5")
-cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+gg<-myggplot()
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat//fit_all_strange/amu_LDcor_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2024"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2024",
+        noribbon = FALSE, noline = TRUE
+      )
 
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_strange/amu_LD_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2026"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2026",
+        noribbon = FALSE, noline = TRUE
+      )
+
+fig<-myplotly(gg, to_print = TRUE)
 ```
 
-## full
+### full
 
-```{r}
+```{r, echo=FALSE, results='asis', warning=FALSE}
 cat("2024\n")
 df<-plot_all_fits("SDpWpLDcor","LD","s",quark_full_name="strange", to_plot = FALSE, fpi="")
-cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
 cat("2026\n")
 df<-plot_all_fits("SDpWpLD","LD","s",quark_full_name="strange", to_plot = FALSE, fpi="130.5")
-cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+gg<-myggplot()
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat//fit_all_strange/amu_SDpWpLDcor_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2024"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2024",
+        noribbon = FALSE, noline = TRUE
+      )
 
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_strange/amu_SDpWpLD_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2026"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2026",
+        noribbon = FALSE, noline = TRUE
+      )
+
+fig<-myplotly(gg, to_print = TRUE)
 ```
 
 
 
 ## charm
 
-## SD
+### SD
 
-```{r}
+```{r, echo=FALSE, results='asis', warning=FALSE}
 cat("2024\n")
 df<-plot_all_fits("SDcor","SD","c",quark_full_name="charm", to_plot = FALSE, fpi="")
-cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
 cat("2026\n")
 df<-plot_all_fits("SD","SD","c",quark_full_name="charm", to_plot = FALSE, fpi="130.5")
-cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+gg<-myggplot()
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat//fit_all_charm/amu_SDcor_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2024"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2024",
+        noribbon = FALSE, noline = TRUE
+      )
 
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_charm/amu_SD_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2026"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2026",
+        noribbon = FALSE, noline = TRUE
+      )
+
+fig<-myplotly(gg, to_print = TRUE)
 ```
 
-## W
+### W
 
-```{r}
+```{r, echo=FALSE, results='asis', warning=FALSE}
 cat("2024\n")
 df<-plot_all_fits("Wcor","W","c",quark_full_name="charm", to_plot = FALSE, fpi="")
-cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
 cat("2026\n")
 df<-plot_all_fits("W","W","c",quark_full_name="charm", to_plot = FALSE, fpi="130.5")
-cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+gg<-myggplot()
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat//fit_all_charm/amu_Wcor_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2024"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2024",
+        noribbon = FALSE, noline = TRUE
+      )
 
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_charm/amu_W_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2026"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2026",
+        noribbon = FALSE, noline = TRUE
+      )
+
+fig<-myplotly(gg, to_print = TRUE)
 ```
 
-## LD
+### LD
 
-```{r}
+```{r, echo=FALSE, results='asis', warning=FALSE}
 cat("2024\n")
 df<-plot_all_fits("LDcor","LD","c",quark_full_name="charm", to_plot = FALSE, fpi="")
-cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
 cat("2026\n")
 df<-plot_all_fits("LD","LD","c",quark_full_name="charm", to_plot = FALSE, fpi="130.5")
-cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+gg<-myggplot()
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat//fit_all_charm/amu_LDcor_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2024"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2024",
+        noribbon = FALSE, noline = TRUE
+      )
 
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_charm/amu_LD_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2026"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2026",
+        noribbon = FALSE, noline = TRUE
+      )
+
+fig<-myplotly(gg, to_print = TRUE)
 ```
 
-## full
+### full
 
-```{r}
+```{r, echo=FALSE, results='asis', warning=FALSE}
 cat("2024\n")
-df<-plot_all_fits("SDpWpLDcor","LD","c",quark_full_name="charm", to_plot = FALSE, fpi="")
-cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+df<-plot_all_fits("SDpWpLDcor","SDpWpLDcor","c",quark_full_name="charm", to_plot = FALSE, fpi="")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+cat("2026\n")
+df<-plot_all_fits("SDpWpLD","SDpWpLD","c",quark_full_name="charm", to_plot = FALSE, fpi="130.5")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+gg<-myggplot()
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat//fit_all_charm/amu_SDpWpLDcor_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2024"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2024",
+        noribbon = FALSE, noline = TRUE
+      )
+
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_charm/amu_SDpWpLD_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2026"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2026",
+        noribbon = FALSE, noline = TRUE
+      )
+
+fig<-myplotly(gg, to_print = TRUE)
+```
+
+
+
+
+
+## charm fpi=131.3
+
+### SD
+
+```{r, echo=FALSE, results='asis', warning=FALSE}
+cat("2026\n")
+df<-plot_all_fits("SD","SD","c",quark_full_name="charm", to_plot = FALSE, fpi="131.3")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+gg<-myggplot()
+
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_charm/amu_SD_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2026"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2026",
+        noribbon = FALSE, noline = TRUE
+      )
+fig<-myplotly(gg, to_print = TRUE)
+```
+
+### W
+
+```{r, echo=FALSE, results='asis', warning=FALSE}
+cat("2026\n")
+df<-plot_all_fits("W","W","c",quark_full_name="charm", to_plot = FALSE, fpi="131.3")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+gg<-myggplot()
+
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_charm/amu_W_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2026"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2026",
+        noribbon = FALSE, noline = TRUE
+      )
+
+fig<-myplotly(gg, to_print = TRUE)
+```
+
+### LD
+
+```{r, echo=FALSE, results='asis', warning=FALSE}
+cat("2026\n")
+df<-plot_all_fits("LD","LD","c",quark_full_name="charm", to_plot = FALSE, fpi="131.3")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+gg<-myggplot()
+
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_charm/amu_LD_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2026"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2026",
+        noribbon = FALSE, noline = TRUE
+      )
+
+fig<-myplotly(gg, to_print = TRUE)
+```
+
+### full
+
+```{r, echo=FALSE, results='asis', warning=FALSE}
 cat("2026\n")
 df<-plot_all_fits("SDpWpLD","LD","c",quark_full_name="charm", to_plot = FALSE, fpi="130.5")
-cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n")
+cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+gg<-myggplot()
 
+gg <- plot_fit(
+        basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_charm/amu_SDpWpLD_3b_BOS_BTM_a4OS_a4TM",
+        var = "afm",
+        id_x = 1,
+        data_type = c("2026"),
+        width = 1e-4,
+        gg = gg,
+        single_name_for_fit = "2026",
+        noribbon = FALSE, noline = TRUE
+      )
+
+fig<-myplotly(gg, to_print = TRUE)
 ```
-
-
