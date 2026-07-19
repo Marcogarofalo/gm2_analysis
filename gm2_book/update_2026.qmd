@@ -34,7 +34,7 @@ source("plot_paper_sc/functions.R")
 
 ### SD
 
-```{r, echo=FALSE, results='asis', warning=FALSE}
+```{r, echo=FALSE, results='asis', warning=FALSE }
 cat("2024\n")
 df<-plot_all_fits("SDcor","SD","s",quark_full_name="strange", to_plot = FALSE, fpi="")
 cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
@@ -70,7 +70,7 @@ fig<-myplotly(gg, to_print = TRUE)
 
 ### W
 
-```{r, echo=FALSE, results='asis', warning=FALSE}
+```{r, echo=FALSE, results='asis', warning=FALSE }
 cat("2024\n")
 df<-plot_all_fits("Wcor","W","s",quark_full_name="strange", to_plot = FALSE, fpi="")
 cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
@@ -105,7 +105,7 @@ fig<-myplotly(gg, to_print = TRUE)
 
 ### LD
 
-```{r, echo=FALSE, results='asis', warning=FALSE}
+```{r, echo=FALSE, results='asis', warning=FALSE }
 cat("2024\n")
 df<-plot_all_fits("LDcor","LD","s",quark_full_name="strange", to_plot = FALSE, fpi="")
 cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
@@ -140,7 +140,7 @@ fig<-myplotly(gg, to_print = TRUE)
 
 ### full
 
-```{r, echo=FALSE, results='asis', warning=FALSE}
+```{r, echo=FALSE, results='asis', warning=FALSE }
 cat("2024\n")
 df<-plot_all_fits("SDpWpLDcor","LD","s",quark_full_name="strange", to_plot = FALSE, fpi="")
 cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
@@ -180,12 +180,18 @@ fig<-myplotly(gg, to_print = TRUE)
 ### SD
 
 ```{r, echo=FALSE, results='asis', warning=FALSE}
+
 cat("2024\n")
 df<-plot_all_fits("SDcor","SD","c",quark_full_name="charm", to_plot = FALSE, fpi="")
 cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+x1<-df$m
+e1<-df$dm
 cat("2026\n")
 df<-plot_all_fits("SD","SD","c",quark_full_name="charm", to_plot = FALSE, fpi="130.5")
 cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+x2<-df$m
+e2<-df$dm
+cat("deviation of ",abs(x1-x2)/sqrt(e1^2+e2^2)," sigma (sum squared)\n\n")
 gg<-myggplot()
 gg <- plot_fit(
         basename = "/home/garofalo/analysis/g-2_new_stat//fit_all_charm/amu_SDcor_3b_BOS_BTM_a4OS_a4TM",
@@ -218,9 +224,14 @@ fig<-myplotly(gg, to_print = TRUE)
 cat("2024\n")
 df<-plot_all_fits("Wcor","W","c",quark_full_name="charm", to_plot = FALSE, fpi="")
 cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+x1<-df$m
+e1<-df$dm
 cat("2026\n")
 df<-plot_all_fits("W","W","c",quark_full_name="charm", to_plot = FALSE, fpi="130.5")
 cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+x2<-df$m
+e2<-df$dm
+cat("deviation of ",abs(x1-x2)/sqrt(e1^2+e2^2)," sigma (sum squared)\n\n")
 gg<-myggplot()
 gg <- plot_fit(
         basename = "/home/garofalo/analysis/g-2_new_stat//fit_all_charm/amu_Wcor_3b_BOS_BTM_a4OS_a4TM",
@@ -253,9 +264,14 @@ fig<-myplotly(gg, to_print = TRUE)
 cat("2024\n")
 df<-plot_all_fits("LDcor","LD","c",quark_full_name="charm", to_plot = FALSE, fpi="")
 cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+x1<-df$m
+e1<-df$dm
 cat("2026\n")
 df<-plot_all_fits("LD","LD","c",quark_full_name="charm", to_plot = FALSE, fpi="130.5")
 cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+x2<-df$m
+e2<-df$dm
+cat("deviation of ",abs(x1-x2)/sqrt(e1^2+e2^2)," sigma (sum squared)\n\n")
 gg<-myggplot()
 gg <- plot_fit(
         basename = "/home/garofalo/analysis/g-2_new_stat//fit_all_charm/amu_LDcor_3b_BOS_BTM_a4OS_a4TM",
@@ -288,9 +304,14 @@ fig<-myplotly(gg, to_print = TRUE)
 cat("2024\n")
 df<-plot_all_fits("SDpWpLDcor","SDpWpLDcor","c",quark_full_name="charm", to_plot = FALSE, fpi="")
 cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+x1<-df$m
+e1<-df$dm
 cat("2026\n")
 df<-plot_all_fits("SDpWpLD","SDpWpLD","c",quark_full_name="charm", to_plot = FALSE, fpi="130.5")
 cat("mean ",df$m," (", df$stat, ") (", df$syst  ,") = ", mean_print(df$m,df$dm),"\n\n")
+x2<-df$m
+e2<-df$dm
+cat("deviation of ",abs(x1-x2)/sqrt(e1^2+e2^2)," sigma (sum squared)\n\n")
 gg<-myggplot()
 gg <- plot_fit(
         basename = "/home/garofalo/analysis/g-2_new_stat//fit_all_charm/amu_SDpWpLDcor_3b_BOS_BTM_a4OS_a4TM",
