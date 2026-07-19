@@ -453,8 +453,19 @@ int main(int argc, char** argv) {
     fit_info.restore_default();
     std::string namefit;
 
+    int NiW = 28;
+    std::vector<double*> ave_BAIC(NiW);
+    int Nfits =105;
+    for (int iW = 0;iW < NiW;iW++) {
+        std::vector<std::vector<double>> fit_res(Nfits,std::vector<double>(myres->Njack));
+        std::vector<std::string> fit_name(Nfits);
+        std::vector<double> fit_chi2(Nfits);
+        std::vector<int> fit_npar(Nfits);
+        std::vector<int> fit_ndata(Nfits);
+        std::vector<int> fit_dof(Nfits);
+        std::vector<int> fit_mult(Nfits);
+        int count_aic = 0;
 
-    for (int iW = 0;iW < 28;iW++) {
         for (int ie = 0;ie < 14;ie++) {
 
             std::vector<int> fi_list;
@@ -852,10 +863,40 @@ int main(int argc, char** argv) {
                 //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
                 print_fit_band(argv, jackextra, fit_info, fit_info, namefit.c_str(), "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0002, xcont);
 
+                if (ie < 13){
+                    fit_name[count_aic] = namefit;
+                    for(int j=0;j<Njack;j++){
+                        fit_res[count_aic][j]=amu_SD_l_common_a4.P[0][j];
+                        fit_chi2[count_aic]=myres->mean(amu_SD_l_common_a4.chi2);
+                    }
+                    fit_npar[count_aic] = fit_info.Npar;
+                    fit_ndata[count_aic] = fit_info.entot;
+                    fit_dof[count_aic] = fit_info.entot - fit_info.Npar;
+                    if(namefit.find("log") != std::string::npos)
+                        fit_mult[count_aic]=3;
+                    else
+                        fit_mult[count_aic]=1;
+                    count_aic++;
+                }
+
                 free_fit_result(fit_info, amu_SD_l_common_a4);
                 // if (namefit.compare())
             }
         }
+        ave_BAIC[iW] = BAIC(fit_res, fit_chi2, fit_npar, fit_ndata, fit_dof, fit_mult);
+        if(iW==NiW-1){
+            for (auto n :fit_name){
+                printf("%s\n",n.c_str());
+            }
+        }
+    }
+
+    for (int iW =0; iW < NiW; iW++) {
+        printf("ave_BAIC[%d] = %g +- %g\n", iW, myres->mean(ave_BAIC[iW]), myres->comp_error(ave_BAIC[iW]));
+        std::string name_ave = std::string(argv[3]) + "/ave_BAIC_s_" + std::to_string(iW) + "_" + std::to_string(myres->Njack) + ".jack";
+        printf("writing %s\n", name_ave.c_str());
+        myres->write_jack_in_file( ave_BAIC[iW],name_ave.c_str());
+
     }
 
     //////////////////////////////////////////////////////////////

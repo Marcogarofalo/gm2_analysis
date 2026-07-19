@@ -3364,6 +3364,63 @@ void set_a_ml_ms_mc(char* argv_i, double* a, double* phys_ml, double* phys_ms, d
 }
 
 
+double *BAIC(std::vector<std::vector<double>> fit_res,
+std::vector<double> fit_chi2,
+std::vector<int> fit_npar,
+std::vector<int> fit_ndata,
+std::vector<int> fit_dof,
+std::vector<int> fit_mult){
+
+
+    std::vector<double> w(fit_res.size());
+    double sum=0;
+    for (size_t i = 0; i < w.size(); i++)
+    {
+        w[i] = exp(-0.5*(fit_chi2[i]*fit_dof[i]+2*fit_npar[i]-2*fit_ndata[i]))/fit_mult[i];
+        sum += w[i];
+        // printf("fit %ld: chi2=%g, npar=%d, ndata=%d, dof=%d, mult=%d, weight=%g\n", i, fit_chi2[i], fit_npar[i], fit_ndata[i], fit_dof[i], fit_mult[i], w[i]);
+    }
+    // printf("sum of weights = %g\n", sum);
+    for (size_t i = 0; i < w.size(); i++)
+    {
+        w[i] /= sum;
+        // printf("fit %ld: chi2=%g, npar=%d, ndata=%d, dof=%d, mult=%d, weight=%g\n", i, fit_chi2[i], fit_npar[i], fit_ndata[i], fit_dof[i], fit_mult[i], w[i]);
+    }
+    double *avej = myres->create_zero();  
+    for(int j=0; j < myres->Njack;j++){
+        double m=0;
+        for (size_t i = 0; i < w.size(); i++)
+        {
+            avej[j] += w[i]*fit_res[i][j];
+        }
+    }
+
+
+    double m=0;
+    for (size_t i = 0; i < fit_res.size(); i++){
+        m += w[i]*myres->mean(fit_res[i].data());
+    }
+    std::vector<double> err(fit_res.size());
+    for (size_t i = 0; i < err.size(); i++){
+        err[i] = myres->comp_error(fit_res[i].data());
+    }
+    double stat=0;
+    for (size_t i = 0; i < w.size(); i++)
+    {
+        stat += w[i]*err[i]*err[i];
+    }  
+    double syst=0;
+    for (size_t i = 0; i < w.size(); i++)
+    {
+        syst += w[i]*(myres->mean(fit_res[i].data())-m)*(myres->mean(fit_res[i].data())-m);
+    }
+    double dm = sqrt(stat+syst);
+    printf("jack BAIC = %g  %g\n", myres->mean(avej), myres->comp_error(avej));
+    printf("BAIC: %g +- %g  (stat=%g, syst=%g)\n", m, dm, sqrt(stat), sqrt(syst));
+    myres->change_mean_and_error(avej, m, dm);
+    return avej;
+}
+
 // void set_a_ml_ms_mc(char* argv_i, double* a, double* phys_ml, double* phys_ms, double* phys_mc, std::string& latt) {
 //     if (strcmp("cA.53.24", argv_i) == 0 || strcmp("cA.40.24", argv_i) == 0 || strcmp("cA.30.32", argv_i) == 0) {
 //         myres->read_jack_from_file(a, "../../g-2_new_stat/out/a_fm_A_A12_noC20_unitary.txt");

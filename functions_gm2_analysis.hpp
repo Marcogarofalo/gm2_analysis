@@ -259,5 +259,10 @@ double rhs_amu_a4_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_amu_alog_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_amu_alog2_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P);
 double rhs_amu_alog3_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P);
-
+double *BAIC(std::vector<std::vector<double>> fit_res,
+std::vector<double> fit_chi2,
+std::vector<int> fit_npar,
+std::vector<int> fit_ndata,
+std::vector<int> fit_dof,
+std::vector<int> fit_mult);
 #endif

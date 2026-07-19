@@ -189,62 +189,6 @@ void sum_lsc(data_all in, const char* outpath, const char* filename) {
 
 }
 
-double *BAIC(std::vector<std::vector<double>> fit_res,
-std::vector<double> fit_chi2,
-std::vector<int> fit_npar,
-std::vector<int> fit_ndata,
-std::vector<int> fit_dof,
-std::vector<int> fit_mult){
-
-
-    std::vector<double> w(fit_res.size());
-    double sum=0;
-    for (size_t i = 0; i < w.size(); i++)
-    {
-        w[i] = exp(-0.5*(fit_chi2[i]*fit_dof[i]+2*fit_npar[i]-2*fit_ndata[i]))/fit_mult[i];
-        sum += w[i];
-        // printf("fit %ld: chi2=%g, npar=%d, ndata=%d, dof=%d, mult=%d, weight=%g\n", i, fit_chi2[i], fit_npar[i], fit_ndata[i], fit_dof[i], fit_mult[i], w[i]);
-    }
-    // printf("sum of weights = %g\n", sum);
-    for (size_t i = 0; i < w.size(); i++)
-    {
-        w[i] /= sum;
-        // printf("fit %ld: chi2=%g, npar=%d, ndata=%d, dof=%d, mult=%d, weight=%g\n", i, fit_chi2[i], fit_npar[i], fit_ndata[i], fit_dof[i], fit_mult[i], w[i]);
-    }
-    double *avej = myres->create_zero();  
-    for(int j=0; j < myres->Njack;j++){
-        double m=0;
-        for (size_t i = 0; i < w.size(); i++)
-        {
-            avej[j] += w[i]*fit_res[i][j];
-        }
-    }
-
-
-    double m=0;
-    for (size_t i = 0; i < fit_res.size(); i++){
-        m += w[i]*myres->mean(fit_res[i].data());
-    }
-    std::vector<double> err(fit_res.size());
-    for (size_t i = 0; i < err.size(); i++){
-        err[i] = myres->comp_error(fit_res[i].data());
-    }
-    double stat=0;
-    for (size_t i = 0; i < w.size(); i++)
-    {
-        stat += w[i]*err[i]*err[i];
-    }  
-    double syst=0;
-    for (size_t i = 0; i < w.size(); i++)
-    {
-        syst += w[i]*(myres->mean(fit_res[i].data())-m)*(myres->mean(fit_res[i].data())-m);
-    }
-    double dm = sqrt(stat+syst);
-    printf("jack BAIC = %g  %g\n", myres->mean(avej), myres->comp_error(avej));
-    printf("BAIC: %g +- %g  (stat=%g, syst=%g)\n", m, dm, sqrt(stat), sqrt(syst));
-    myres->change_mean_and_error(avej, m, dm);
-    return avej;
-}
 
 
 
@@ -823,8 +767,14 @@ int main(int argc, char** argv) {
         //     printf("fit %ld: %s\n", i, fit_name[i].c_str());
         // }
         ave_BAIC[iW] = BAIC(fit_res, fit_chi2, fit_npar, fit_ndata, fit_dof, fit_mult);
+        if(iW==iWs.back()){
+            for (auto n :fit_name){
+                printf("%s\n",n.c_str());
+            }
+        }
         // exit(1);
     }
+    
     for (int iW : iWs) {
         printf("ave_BAIC[%d] = %g +- %g\n", iW, myres->mean(ave_BAIC[iW]), myres->comp_error(ave_BAIC[iW]));
         std::string name_ave = std::string(argv[3]) + "/ave_BAIC_" + std::to_string(iW) + "_" + std::to_string(myres->Njack) + ".jack";
@@ -832,4 +782,77 @@ int main(int argc, char** argv) {
         myres->write_jack_in_file( ave_BAIC[iW],name_ave.c_str());
 
     }
+
+
+    //////////////////////////////////////////////////////////////
+    // fit for printing
+    //////////////////////////////////////////////////////////////
+    {
+        namefit = "printing_SDpWpLD_c";
+        fit_info.corr_id = { 183, 184, 185, 186,  207, 208 };
+        fit_info.Nxen = { { B72_64,  C06, C112 ,D54, E112},
+                          {B72_64,  C06, C112, D54, E112} };
+        fit_info.N = fit_info.Nxen.size();
+        namefit = namefit + "";
+        fit_info.Npar = 3;
+        fit_info.function = rhs_amu_common;
+        fit_info.Nvar = 8;
+        fit_info.Njack = Njack;
+        fit_info.init_N_etot_form_Nxen();
+        fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+
+
+        count = 0;
+        for (int n = 0;n < fit_info.N;n++) {
+            for (int e : fit_info.Nxen[n]) {
+                for (int j = 0;j < Njack;j++) {
+                    fit_info.x[0][count][j] = pow(jackall.en[e].jack[41][j], 2); // a^2
+                    if(e==C112)
+                    fit_info.x[0][count][j] += 1e-4; // a^2
+
+                    fit_info.x[1][count][j] = jackall.en[e].jack[58][j];  // Delta_FV_GS
+                    fit_info.x[2][count][j] = jackall.en[e].jack[1][j];  //Mpi
+                    fit_info.x[3][count][j] = jack_Mpi_MeV_exp[j];
+                    fit_info.x[4][count][j] = 0/* l */ + 1e-6;
+                    fit_info.x[5][count][j] = 0/* a */ + 1e-6;
+                    fit_info.x[6][count][j] = 0 + 1e-6;
+                    fit_info.x[7][count][j] = 0/* w */ + 1e-6;
+                }
+                count++;
+            }
+        }
+
+        fit_info.linear_fit = true;
+        // fit_info.acc= 1e-6;
+        // fit_info.chi2_gap_jackboot=0.1;
+        // fit_info.guess_per_jack=5;
+        // fit_info.repeat_start=5;
+        fit_info.verbosity = 0;
+        fit_info.covariancey = true;
+        fit_info.compute_cov_fit(argv, jackextra, lhs_sum);
+        int ide = 0, ide1 = 0;
+        for (int n = 0;n < fit_info.Nxen.size();n++) {
+            for (int e : fit_info.Nxen[n]) {
+                ide1 = 0;
+                for (int n1 = 0;n1 < fit_info.Nxen.size();n1++) {
+                    for (int e1 : fit_info.Nxen[n1]) {
+                        if (e != e1)   fit_info.cov[ide][ide1] = 0;
+                        ide1++;
+                    }
+                }
+                ide++;
+            }
+        }
+        fit_info.compute_cov1_fit();
+        fit_result amu_SD_l_common_a4 = fit_all_data(argv, jackextra, lhs_sum, fit_info, namefit.c_str());
+        fit_info.band_range = { 0,0.0081 };
+        std::vector<double> xcont = { 0, 0 /*Delta*/, 0, 0,/*l, a,m*/ fit_info.x[4][0][Njack - 1],
+                fit_info.x[5][0][Njack - 1] , fit_info.x[6][0][Njack - 1], fit_info.x[7][0][Njack - 1] };
+
+
+        //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
+        print_fit_band(argv, jackextra, fit_info, fit_info, namefit.c_str(), "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0002, xcont);
+
+    }
+
 }

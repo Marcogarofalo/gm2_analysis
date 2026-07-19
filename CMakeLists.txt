@@ -159,3 +159,6 @@ target_link_libraries(scale_setting_rew PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${A
 
 add_executable(interpolate_HVP_charm_fpi interpolate_HVP_charm_fpi.cpp)
 target_link_libraries(interpolate_HVP_charm_fpi PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
+
+add_executable(interpolate_HVP_strange_fpi interpolate_HVP_strange_fpi.cpp)
+target_link_libraries(interpolate_HVP_strange_fpi PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})

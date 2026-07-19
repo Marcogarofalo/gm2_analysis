@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
   jackall.ens = 2;
   jackall.en = new data_single[jackall.ens];
   int count = 0;
-  int Nobs = std::ranges::max(iWs)+1;
+  int Nobs = std::ranges::max(iWs) + 1;
   std::vector<double> fpi = {130.5, 131.1};
   for (int e = 0; e < jackall.ens; e++) {
 
@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
     // for (int obs = 0; obs < dj.Nobs; obs++) {
     for (int obs : iWs) {
       mysprintf(namefile, NAMESIZE,
-                "../../g-2_new_stat/%.1f/fit_all_charm//ave_BAIC_%d_%d.jack",
+                "../../g-2_new_stat/%.1f/fit_all_strange/ave_BAIC_s_%d_%d.jack",
                 fpi[e], obs, Njack);
       printf("reading %s\n", namefile);
       myres->read_jack_from_file(dj.jack[obs], namefile);
@@ -138,8 +138,10 @@ int main(int argc, char **argv) {
       interp[j] = fit_out.P[0][j] + fpi_wp25[j] * fit_out.P[1][j];
       /* code */
     }
-    printf("obs = %-4d  value = %-15.12g  %-15.12g\n", obs, myres->mean(interp),
-           myres->comp_error(interp));
+    printf("obs = %-4d  interpolated at fpi= %.2f (%g) value = %-15.12g  "
+           "%-15.12g\n",
+           obs, myres->mean(fpi_wp25), myres->comp_error(fpi_wp25),
+           myres->mean(interp), myres->comp_error(interp));
     fit_info.restore_default();
   }
 }

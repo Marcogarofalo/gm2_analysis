@@ -1668,8 +1668,8 @@ int main(int argc, char** argv) {
 
         for (int reg = 0;reg < 2;reg++) {
             for (int t = 0;t < T_small;t++) {
-                dHVP_l[es][reg][t][j] *= 0.0; // I think the factor here should be  (9.0/1.0)* 1e-10 /(alpha_em^2 Z^2)//    deltamu[el][j] * (9.0/1.0);
-                dHVP_l[ec][reg][t][j] *= deltamu[el][j] ;//* (9.0/4.0);
+                dHVP_l[es][reg][t][j] *= deltamu[el][j]; // I think the factor here should be  (9.0/1.0)* 1e-10 /(alpha_em^2 Z^2)//    deltamu[el][j] * (9.0/1.0);
+                dHVP_l[ec][reg][t][j] *= deltamu[el][j];//* (9.0/4.0);
             }
         }
 
