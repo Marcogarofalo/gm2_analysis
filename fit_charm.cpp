@@ -734,6 +734,20 @@ int main(int argc, char** argv) {
                         ide++;
                     }
                 }
+                ide = 0;
+                for (int n = 0;n < fit_info.Nxen.size();n++) {
+                    for (int e : fit_info.Nxen[n]) {
+                        ide1 = 0;
+                        for (int n1 = 0;n1 < fit_info.Nxen.size();n1++) {
+                            for (int e1 : fit_info.Nxen[n1]) {
+                                printf("%-15g ",fit_info.cov[ide][ide1]/sqrt(fit_info.cov[ide][ide]*fit_info.cov[ide1][ide1]));
+                                ide1++;
+                            }
+                        }
+                        ide++;
+                        printf("\n");
+                    }
+                }
                 fit_info.compute_cov1_fit();
                 fit_result amu_SD_l_common_a4 = fit_all_data(argv, jackextra, lhs_fun, fit_info, namefit.c_str());
                 fit_info.band_range = { 0,0.0081 };
@@ -761,6 +775,13 @@ int main(int argc, char** argv) {
                 }
 
                 free_fit_result(fit_info, amu_SD_l_common_a4);  
+                // if (iW==1){
+                    
+                //     if (namefit == "amu_W_3b_BOS_BTM") {
+                //         std::cout << "Match found!" << std::endl;
+                //         exit(1);
+                //     }
+                // }
             }
         }
         // for (size_t i = 0; i < fit_name.size(); i++){

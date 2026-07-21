@@ -1492,18 +1492,22 @@ int main(int argc, char** argv) {
     if (latt == "B") {
         lattL = "B64";
         T_small = 64 * 2;
+        srand(400);
     }
     else if (latt == "C") {
         lattL = "C80";
         T_small = 80 * 2;
+        srand(402);
     }
     else if (latt == "D") {
         lattL = "D96";
         T_small = 96 * 2;
+        srand(403);
     }
     else if (latt == "E") {
         lattL = "E112";
         T_small = 112 * 2;
+        srand(404);
     }
 
     bool misstuning_correction = (!lattL.empty()) && strcmp(argv[1], "read_plateaux") != 0;
@@ -3475,16 +3479,13 @@ int main(int argc, char** argv) {
     free(amu_sd_sphys);
     check_correlatro_counter(184);
 
-    printf("interpolation eq\n");
-    printf("%g   %g\n", amuW_c_vec[0][0][Njack - 1], myres->comp_error(amuW_c_vec[0][0]));
-    printf("%g   %g\n", amuW_c_vec[0][1][Njack - 1], myres->comp_error(amuW_c_vec[0][1]));
-    printf("%g   %g\n", amuW_c_vec[0][2][Njack - 1], myres->comp_error(amuW_c_vec[0][2]));
+    printf("interpolation eq amu_{W}_(eq)  to mc_phys from  MDs\n");
     printf("mcphys\n");
     printf("%g   %g\n", phys_mc[Njack - 1], myres->comp_error(phys_mc));
-    printf("mc\n");
-    printf("%g   %g\n", mc[0][Njack - 1], myres->comp_error(mc[0]));
-    printf("%g   %g\n", mc[1][Njack - 1], myres->comp_error(mc[1]));
-    printf("%g   %g\n", mc[2][Njack - 1], myres->comp_error(mc[2]));
+    printf("mc_val      a_mu^W  err   \n");
+    printf("%g   %g   %g\n", amuW_c_vec[0][0][Njack - 1], mc[0][Njack - 1], myres->comp_error(mc[0]));
+    printf("%g   %g   %g\n", amuW_c_vec[0][1][Njack - 1], mc[1][Njack - 1], myres->comp_error(mc[1]));
+    printf("%g   %g   %g\n", amuW_c_vec[0][2][Njack - 1], mc[2][Njack - 1], myres->comp_error(mc[2]));
     amu_sd_sphys = interpol_Z(Ncharm_inter, Njack, mc, amuW_c_vec[0], phys_mc, outfile, "amu_{W}_(eq,MDs)", resampling);
     if (misstuning_correction) {
         for (int j = 0; j < Njack;j++) {

@@ -234,7 +234,8 @@ e2<-df$dm
 cat("deviation of ",abs(x1-x2)/sqrt(e1^2+e2^2)," sigma (sum squared)\n\n")
 gg<-myggplot()
 gg <- plot_fit(
-        basename = "/home/garofalo/analysis/g-2_new_stat//fit_all_charm/amu_Wcor_3b_BOS_BTM_a4OS_a4TM",
+        # basename = "/home/garofalo/analysis/g-2_new_stat//fit_all_charm/amu_Wcor_3b_BOS_BTM_a4OS_a4TM",
+        basename = "/home/garofalo/analysis/g-2_new_stat//fit_all_charm/amu_Wcor_3b_BOS_BTM",
         var = "afm",
         id_x = 1,
         data_type = c("2024"),
@@ -245,7 +246,8 @@ gg <- plot_fit(
       )
 
 gg <- plot_fit(
-        basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_charm/amu_W_3b_BOS_BTM_a4OS_a4TM",
+        # basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_charm/amu_W_3b_BOS_BTM_a4OS_a4TM",
+        basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_charm/amu_W_3b_BOS_BTM",
         var = "afm",
         id_x = 1,
         data_type = c("2026"),
