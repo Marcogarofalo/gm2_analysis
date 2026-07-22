@@ -719,6 +719,7 @@ int main(int argc, char** argv) {
                 // fit_info.guess_per_jack=5;
                 // fit_info.repeat_start=5;
                 fit_info.verbosity = 0;
+                fit_info.precision_sum = 2;
                 fit_info.covariancey = true;
                 fit_info.compute_cov_fit(argv, jackextra, lhs_fun);
                 int ide = 0, ide1 = 0;
@@ -749,6 +750,9 @@ int main(int argc, char** argv) {
                     }
                 }
                 fit_info.compute_cov1_fit();
+                
+                // fit_info.covariancey = false;
+
                 fit_result amu_SD_l_common_a4 = fit_all_data(argv, jackextra, lhs_fun, fit_info, namefit.c_str());
                 fit_info.band_range = { 0,0.0081 };
                 std::vector<double> xcont = { 0, 0 /*Delta*/, 0, 0,/*l, a,m*/ fit_info.x[4][0][Njack - 1],
@@ -775,8 +779,7 @@ int main(int argc, char** argv) {
                 }
 
                 free_fit_result(fit_info, amu_SD_l_common_a4);  
-                // if (iW==1){
-                    
+                // if (iW==1){                   
                 //     if (namefit == "amu_W_3b_BOS_BTM") {
                 //         std::cout << "Match found!" << std::endl;
                 //         exit(1);

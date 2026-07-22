@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
   // fits
   /////////////////////////////////////////////////////////////////////////////////////////////////
   fit_type fit_info;
-  double *fpi_wp25 = myres->create_fake_exact(131.09, 0.25, 1);
+  double *fpi_wp25 = myres->create_fake_exact(131.09, 0.25, 500);
   double *interp = myres->create_zero();
 
   // for (int obs = 0; obs < jackall.en[0].Nobs; obs++) {

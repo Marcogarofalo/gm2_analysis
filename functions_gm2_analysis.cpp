@@ -3263,7 +3263,7 @@ void set_a_ml_ms_mc(char* argv_i, double* a, double* phys_ml, double* phys_ms, d
             char path[NAMESIZE];
             mysprintf(path, NAMESIZE, "/home/garofalo/analysis/g-2_new_stat/iso_params/fpi_%s_MeV", fpi);
             char namefile[NAMESIZE];
-            int seed = 123;
+            int seed = 600;
             if (strcmp("cB.72.64", argv_i) == 0 || strcmp("cB.72.96", argv_i) == 0) {
                 mysprintf(namefile, NAMESIZE, "%s/B64_iso_parameters.txt", path);
                 seed += 1;
