@@ -644,6 +644,50 @@ double* create_misstuning(std::string filename, std::string latt, std::string re
     }
     return r;
 }
+double* create_misstuning_august2026(std::string filename, std::string latt, std::string reg) {
+    std::ifstream file(filename.c_str());
+    std::vector<DataPoint> entries;
+    std::string line;
+
+    std::cout << "Reading file: " << filename << std::endl;
+    if (!file.is_open()) {
+        std::cerr << "Unable to open file: " << filename << std::endl;
+        exit(1);
+    }
+
+    // no header here
+
+    // Read row by row
+    std::string ens, reg_in;
+    double der, err;
+    while (file >> ens >> reg_in >> der >> err) {
+        entries.push_back({ ens, reg_in, der, err });
+    }
+
+    // Print first entry to verify
+    // if (!entries.empty()) {
+    //     std::cout << "First row: " << entries[0].ens << " | " << entries[0].reg << " | " << entries[0].der << std::endl;
+    // }
+
+    double* r;
+    bool found = false;
+    for (int i = 0; i < entries.size(); i++) {
+        // printf("Checking entry %d: ens=%s, reg=%s      matching %s  %s\n", i, entries[i].ens.c_str(), entries[i].reg.c_str(), latt.c_str(), reg.c_str());
+        if (entries[i].ens == latt && entries[i].reg == reg) {
+            double* result = (double*)malloc(2 * sizeof(double));
+            result[0] = entries[i].der * 1e-10;
+            result[1] = entries[i].err * 1e-10;
+            r = myres->create_fake_exact(result[0], result[1], -1);
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        std::cerr << "No matching entry found for lattice: " << latt << " and regularization: " << reg << std::endl;
+        exit(1);
+    }
+    return r;
+}
 
 double** read_light_corr(std::string filename, int T) {
     FILE* f = fopen(filename.c_str(), "r");
@@ -668,7 +712,7 @@ double** read_light_corr(std::string filename, int T) {
     }
     for (int t = 0; t < T / 2 + 1; t++) {
         double val;
-        fi += fscanf(f, "%lf", &boot[t][lines - 1]);    
+        fi += fscanf(f, "%lf", &boot[t][lines - 1]);
         boot[t][lines - 1] *= 1e-10;
     }
     fi += fscanf(f, "%s", tmp);
@@ -1511,23 +1555,23 @@ int main(int argc, char** argv) {
     }
 
     bool misstuning_correction = (!lattL.empty()) && strcmp(argv[1], "read_plateaux") != 0;
-    printf("misstuing correction?  %d    (true =%d, false =%d)\n", misstuning_correction,true,false);
+    printf("misstuing correction?  %d    (true =%d, false =%d)\n", misstuning_correction, true, false);
     double***** dHVP = malloc_5<double>(3, 4, 3, 2, Njack);
     std::string path("/home/garofalo/analysis/gm2_analysis/build/misstuning/");
     if (!misstuning_correction) {
         for (int i = 1;i < 3;i++) {
-            for (int q = 0; q<4;q++){
+            for (int q = 0; q < 4;q++) {
                 for (int k = 0;k < 3;k++) {
                     for (int l = 0;l < 2;l++) {
                         for (int j = 0; j < Njack;j++) {
-                            dHVP[i][q][k][l][j] =0.0;
+                            dHVP[i][q][k][l][j] = 0.0;
                         }
                     }
                 }
             }
         }
     }
-    else{
+    else {
 
         // strange
         dHVP[es][eSD][es][eOS] = create_misstuning(path + "amu_s_sea_mus_derivatives_SD.txt", lattL, "OS");
@@ -1560,8 +1604,47 @@ int main(int argc, char** argv) {
         dHVP[ec][efull][es][etm] = create_misstuning(path + "amu_c_sea_mus_derivatives_full.txt", lattL, "tm");
         dHVP[ec][efull][ec][eOS] = create_misstuning(path + "amu_c_sea_muc_derivatives_full.txt", lattL, "OS");
         dHVP[ec][efull][ec][etm] = create_misstuning(path + "amu_c_sea_muc_derivatives_full.txt", lattL, "tm");
+
+
+        // std::string scheme("FLAG");
+        // if (strcmp(argv[1], "130.5") != 0) {
+        //     scheme = "argv[1]";
+        // }
+
+        // // strange
+        // dHVP[es][eSD][es][eOS] = create_misstuning_august2026(path + "HVP_s_SD_sea-mstrange_shift_" + scheme + ".txt", lattL, "OS");
+        // dHVP[es][eSD][es][etm] = create_misstuning_august2026(path + "HVP_s_SD_sea-mstrange_shift_" + scheme + ".txt", lattL, "tm");
+        // dHVP[es][eSD][ec][eOS] = create_misstuning_august2026(path + "HVP_s_SD_sea-mcharm_shift_" + scheme + ".txt", lattL, "OS");
+        // dHVP[es][eSD][ec][etm] = create_misstuning_august2026(path + "HVP_s_SD_sea-mcharm_shift_" + scheme + ".txt", lattL, "tm");
+
+        // dHVP[es][eW][es][eOS] = create_misstuning_august2026(path + "HVP_s_IW_sea-mstrange_shift_" + scheme + ".txt", lattL, "OS");
+        // dHVP[es][eW][es][etm] = create_misstuning_august2026(path + "HVP_s_IW_sea-mstrange_shift_" + scheme + ".txt", lattL, "tm");
+        // dHVP[es][eW][ec][eOS] = create_misstuning_august2026(path + "HVP_s_IW_sea-mcharm_shift_" + scheme + ".txt", lattL, "OS");
+        // dHVP[es][eW][ec][etm] = create_misstuning_august2026(path + "HVP_s_IW_sea-mcharm_shift_" + scheme + ".txt", lattL, "tm");
+
+        // dHVP[es][efull][es][eOS] = create_misstuning_august2026(path + "HVP_s_full_sea-mstrange_shift_" + scheme + ".txt", lattL, "OS");
+        // dHVP[es][efull][es][etm] = create_misstuning_august2026(path + "HVP_s_full_sea-mstrange_shift_" + scheme + ".txt", lattL, "tm");
+        // dHVP[es][efull][ec][eOS] = create_misstuning_august2026(path + "HVP_s_full_sea-mcharm_shift_" + scheme + ".txt", lattL, "OS");
+        // dHVP[es][efull][ec][etm] = create_misstuning_august2026(path + "HVP_s_full_sea-mcharm_shift_" + scheme + ".txt", lattL, "tm");
+
+        // // charm
+        // dHVP[ec][eSD][es][eOS] = create_misstuning_august2026(path + "HVP_c_SD_sea-mstrange_shift_" + scheme + ".txt", lattL, "OS");
+        // dHVP[ec][eSD][es][etm] = create_misstuning_august2026(path + "HVP_c_SD_sea-mstrange_shift_" + scheme + ".txt", lattL, "tm");
+        // dHVP[ec][eSD][ec][eOS] = create_misstuning_august2026(path + "HVP_c_SD_sea-mcharm_shift_" + scheme + ".txt", lattL, "OS");
+        // dHVP[ec][eSD][ec][etm] = create_misstuning_august2026(path + "HVP_c_SD_sea-mcharm_shift_" + scheme + ".txt", lattL, "tm");
+
+        // dHVP[ec][eW][es][eOS] = create_misstuning_august2026(path + "HVP_c_IW_sea-mstrange_shift_" + scheme + ".txt", lattL, "OS");
+        // dHVP[ec][eW][es][etm] = create_misstuning_august2026(path + "HVP_c_IW_sea-mstrange_shift_" + scheme + ".txt", lattL, "tm");
+        // dHVP[ec][eW][ec][eOS] = create_misstuning_august2026(path + "HVP_c_IW_sea-mcharm_shift_" + scheme + ".txt", lattL, "OS");
+        // dHVP[ec][eW][ec][etm] = create_misstuning_august2026(path + "HVP_c_IW_sea-mcharm_shift_" + scheme + ".txt", lattL, "tm");
+
+        // dHVP[ec][efull][es][eOS] = create_misstuning_august2026(path + "HVP_c_full_sea-mstrange_shift_" + scheme + ".txt", lattL, "OS");
+        // dHVP[ec][efull][es][etm] = create_misstuning_august2026(path + "HVP_c_full_sea-mstrange_shift_" + scheme + ".txt", lattL, "tm");
+        // dHVP[ec][efull][ec][eOS] = create_misstuning_august2026(path + "HVP_c_full_sea-mcharm_shift_" + scheme + ".txt", lattL, "OS");
+        // dHVP[ec][efull][ec][etm] = create_misstuning_august2026(path + "HVP_c_full_sea-mcharm_shift_" + scheme + ".txt", lattL, "tm");
+
     }
-    
+
     for (int i = 1;i < 3;i++) {
         for (int k = 1;k < 3;k++) {
             for (int l = 0;l < 2;l++) {
@@ -1604,7 +1687,7 @@ int main(int argc, char** argv) {
             dHVP_l[ec][etm][t] = myres->create_zero();
         }
     }
-    else{
+    else {
         dHVP_l[es][eOS] = read_light_corr(path + lattL + "_vkvk_OS_s_der_sea-ml.boot", T_small);
         dHVP_l[es][etm] = read_light_corr(path + lattL + "_vkvk_tm_s_der_sea-ml.boot", T_small);
 
@@ -1645,10 +1728,10 @@ int main(int argc, char** argv) {
     // myres->sub(dHVPc_c_LD_OS, dHVPc_c_LD_OS, dHVPc_c_SD_OS);
 
     std::vector<double*> amusim(3);
-    if (lattL.empty()){
-        amusim[0] = (double*) malloc(sizeof(double)*Njack);
-        amusim[1] = (double*) malloc(sizeof(double)*Njack);
-        amusim[2] = (double*) malloc(sizeof(double)*Njack);
+    if (lattL.empty()) {
+        amusim[0] = (double*)malloc(sizeof(double) * Njack);
+        amusim[1] = (double*)malloc(sizeof(double) * Njack);
+        amusim[2] = (double*)malloc(sizeof(double) * Njack);
         for (int j = 0; j < Njack;j++) {
             amusim[0][j] = phys_ml[j];
             amusim[1][j] = phys_ms[j];
@@ -1678,25 +1761,25 @@ int main(int argc, char** argv) {
         }
 
         // light correction to amu_HVP strange and charm
-        if (misstuning_correction){
+        if (misstuning_correction) {
             for (int t = 0;t < T_small;t++) {
                 // strange
                 //OS
-                conf_jack[j][2 + 6][t][0] += dHVP_l[es][eOS][t][j] ;
+                conf_jack[j][2 + 6][t][0] += dHVP_l[es][eOS][t][j];
                 conf_jack[j][2 + 12][t][0] += dHVP_l[es][eOS][t][j];
                 //tm
-                conf_jack[j][5 + 6][t][0] += dHVP_l[es][etm][t][j] ;
+                conf_jack[j][5 + 6][t][0] += dHVP_l[es][etm][t][j];
                 conf_jack[j][5 + 12][t][0] += dHVP_l[es][etm][t][j];
 
                 // charm
                 // OS
-                conf_jack[j][2 + 6 * (3 + 0)][t][0] += dHVP_l[ec][eOS][t][j] ;
-                conf_jack[j][2 + 6 * (3 + 1)][t][0] += dHVP_l[ec][eOS][t][j] ;
-                conf_jack[j][2 + 6 * (3 + 2)][t][0] += dHVP_l[ec][eOS][t][j] ;
+                conf_jack[j][2 + 6 * (3 + 0)][t][0] += dHVP_l[ec][eOS][t][j];
+                conf_jack[j][2 + 6 * (3 + 1)][t][0] += dHVP_l[ec][eOS][t][j];
+                conf_jack[j][2 + 6 * (3 + 2)][t][0] += dHVP_l[ec][eOS][t][j];
                 // tm
-                conf_jack[j][2 + 6 * (3 + 0) + 3][t][0] += dHVP_l[ec][etm][t][j] ;
-                conf_jack[j][2 + 6 * (3 + 1) + 3][t][0] += dHVP_l[ec][etm][t][j] ;
-                conf_jack[j][2 + 6 * (3 + 2) + 3][t][0] += dHVP_l[ec][etm][t][j] ;
+                conf_jack[j][2 + 6 * (3 + 0) + 3][t][0] += dHVP_l[ec][etm][t][j];
+                conf_jack[j][2 + 6 * (3 + 1) + 3][t][0] += dHVP_l[ec][etm][t][j];
+                conf_jack[j][2 + 6 * (3 + 2) + 3][t][0] += dHVP_l[ec][etm][t][j];
             }
         }
 
