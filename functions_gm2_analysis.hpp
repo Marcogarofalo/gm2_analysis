@@ -49,7 +49,8 @@ enum  eq {
     es,
     ec
 };
-
+static constexpr double fpi_wp25_val = 131.00;
+static constexpr double fpi_wp25_err = 0.27;
 
 // double integrand_K(double x, void* params);
 // double kernel_K(double z, double epsrel = 1e-7);
