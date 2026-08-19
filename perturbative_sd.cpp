@@ -96,6 +96,7 @@ int main(int argc, char** argv) {
     std::vector<double> En(nenergy);
     std::vector<double> Ru(nenergy);
     std::vector<double> Rd(nenergy);
+    std::vector<double> Rl(nenergy);
     std::vector<double> Rs(nenergy);
     std::vector<double> Rc(nenergy);
     std::vector<double> Rb(nenergy);
@@ -113,6 +114,7 @@ int main(int argc, char** argv) {
         // nlines++;
         std::stringstream ss(line);
         ss >> En[nl] >> Ru[nl] >> Rd[nl] >> Rs[nl] >> Rc[nl] >> Rb[nl] >> Rtot[nl];
+        Rl[nl] = Ru[nl] + Rd[nl];
         nl++;
     }
 
@@ -207,6 +209,46 @@ int main(int argc, char** argv) {
     fclose(out_s);
 
     infile.close();
+
+    //////////////////////////////////////////////////////////////
+    // light
+    //////////////////////////////////////////////////////////////
+
+    par.R = Rl.data();
+
+    name_out_s = "/home/garofalo/analysis/gm2_analysis/gm2_book/amu_SD_l_pert.txt";
+    printf("writing in %s\n", name_out_s.c_str());
+    out_s = open_file(name_out_s.c_str(), "w+");
+    fprintf(out_s, "t_fm     amu_(l)_pert\n");
+
+    par.t_fm = dt; //    , +0.07951, 0.07951*3/2.0,  0.07951*2
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt * 2.0 / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt * 3.0 / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt * 4.0 / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    fclose(out_s);
+
+    infile.close();
     //////////////////////////////////////////////////////////////
     // bar MS
     //////////////////////////////////////////////////////////////
@@ -220,6 +262,7 @@ int main(int argc, char** argv) {
     En.resize(nenergy);
     Ru.resize(nenergy);
     Rd.resize(nenergy);
+    Rl.resize(nenergy);
     Rs.resize(nenergy);
     Rc.resize(nenergy);
     Rb.resize(nenergy);
@@ -235,6 +278,7 @@ int main(int argc, char** argv) {
         // nlines++;
         std::stringstream ss(line);
         ss >> En[nl] >> Ru[nl] >> Rd[nl] >> Rs[nl] >> Rc[nl] >> Rb[nl] >> Rtot[nl];
+        Rl[nl] = Ru[nl] + Rd[nl];
         nl++;
     }
 
@@ -316,6 +360,46 @@ int main(int argc, char** argv) {
 
     infile.close();
 
+//////////////////////////////////////////////////////////////
+    // charm
+    //////////////////////////////////////////////////////////////
+
+    par.R = Rl.data();
+
+    name_out_s = "/home/garofalo/analysis/gm2_analysis/gm2_book/amu_SD_l_pert_barMS.txt";
+    printf("writing in %s\n", name_out_s.c_str());
+    out_s = open_file(name_out_s.c_str(), "w+");
+    fprintf(out_s, "t_fm     amu_(l)_pert\n");
+
+    par.t_fm = dt; //    , +0.07951, 0.07951*3/2.0,  0.07951*2
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt * 2.0 / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt * 3.0 / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt * 4.0 / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    fclose(out_s);
+
+    infile.close();
+
 
 
     //////////////////////////////////////////////////////////////
@@ -332,6 +416,7 @@ int main(int argc, char** argv) {
     En.resize(nenergy);
     Ru.resize(nenergy);
     Rd.resize(nenergy);
+    Rl.resize(nenergy);
     Rs.resize(nenergy);
     Rc.resize(nenergy);
     Rb.resize(nenergy);
@@ -347,6 +432,7 @@ int main(int argc, char** argv) {
         // nlines++;
         std::stringstream ss(line);
         ss >> En[nl] >> Ru[nl] >> Rd[nl] >> Rs[nl] >> Rc[nl] >> Rb[nl] >> Rtot[nl];
+        Rl[nl] = Ru[nl]+ Rd[nl];
         nl++;
     }
 
@@ -390,6 +476,41 @@ int main(int argc, char** argv) {
     fclose(out_s);
     infile.close();
 
+    //// light
+    par.R = Rl.data();
+    name_out_s = "/home/garofalo/analysis/gm2_analysis/gm2_book/amu_SD_l_pert_1.4.txt";
+    printf("writing in %s\n", name_out_s.c_str());
+    out_s = open_file(name_out_s.c_str(), "w+");
+    fprintf(out_s, "t_fm     amu_(l)_pert\n");
+
+    par.t_fm = dt; //    , +0.07951, 0.07951*3/2.0,  0.07951*2
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt * 2.0 / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt * 3.0 / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt * 4.0 / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    fclose(out_s);
+    infile.close();
+
 
 
     infile.open("../RHAD_0.8");// file containing numbers in 3 columns 
@@ -402,6 +523,7 @@ int main(int argc, char** argv) {
     En.resize(nenergy);
     Ru.resize(nenergy);
     Rd.resize(nenergy);
+    Rl.resize(nenergy);
     Rs.resize(nenergy);
     Rc.resize(nenergy);
     Rb.resize(nenergy);
@@ -417,6 +539,7 @@ int main(int argc, char** argv) {
         // nlines++;
         std::stringstream ss(line);
         ss >> En[nl] >> Ru[nl] >> Rd[nl] >> Rs[nl] >> Rc[nl] >> Rb[nl] >> Rtot[nl];
+        Rl[nl] = Ru[nl] + Rd[nl];
         nl++;
     }
 
@@ -460,6 +583,41 @@ int main(int argc, char** argv) {
     fclose(out_s);
     infile.close();
 
+    ///////////// light
+    par.R = Rl.data();
+
+    name_out_s = "/home/garofalo/analysis/gm2_analysis/gm2_book/amu_SD_l_pert_0.8.txt";
+    printf("writing in %s\n", name_out_s.c_str());
+    out_s = open_file(name_out_s.c_str(), "w+");
+    fprintf(out_s, "t_fm     amu_(l)_pert\n");
+
+    par.t_fm = dt; //    , +0.07951, 0.07951*3/2.0,  0.07951*2
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt * 2.0 / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt * 3.0 / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt * 4.0 / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    fclose(out_s);
+    infile.close();
 
     infile.open("../RHAD_0.65");// file containing numbers in 3 columns 
     nlines = 0;
@@ -471,6 +629,7 @@ int main(int argc, char** argv) {
     En.resize(nenergy);
     Ru.resize(nenergy);
     Rd.resize(nenergy);
+    Rl.resize(nenergy);
     Rs.resize(nenergy);
     Rc.resize(nenergy);
     Rb.resize(nenergy);
@@ -486,6 +645,7 @@ int main(int argc, char** argv) {
         // nlines++;
         std::stringstream ss(line);
         ss >> En[nl] >> Ru[nl] >> Rd[nl] >> Rs[nl] >> Rc[nl] >> Rb[nl] >> Rtot[nl];
+        Rl[nl]  =  Ru[nl] + Rd[nl];
         nl++;
     }
 
@@ -569,6 +729,47 @@ int main(int argc, char** argv) {
     fclose(out_s);
 
     infile.close();
+
+     //////////////////////////////////////////////////////////////
+    // light
+    //////////////////////////////////////////////////////////////
+
+    par.R = Rl.data();
+
+    name_out_s = "/home/garofalo/analysis/gm2_analysis/gm2_book/amu_SD_l_pert_0.65.txt";
+    printf("writing in %s\n", name_out_s.c_str());
+    out_s = open_file(name_out_s.c_str(), "w+");
+    fprintf(out_s, "t_fm     amu_(l)_pert\n");
+
+    par.t_fm = dt; //    , +0.07951, 0.07951*3/2.0,  0.07951*2
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt * 2.0 / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt * 3.0 / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    par.t_fm = dt + dt * 4.0 / 2.0;
+    gsl_integration_qags(&F, 0, par.t_fm, 0, epsrel, Maxiter, w, &result, &error);
+    result *= (1000 / hbarc) * 4 * alpha_em * alpha_em / (muon_mass_GeV * muon_mass_GeV);
+    fprintf(out_s, "%-20.12g  %.12g\n", par.t_fm, result);
+
+    fclose(out_s);
+
+    infile.close();
+
 
 
     // ending
