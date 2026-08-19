@@ -3027,19 +3027,28 @@ double rhs_amu_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P) {
 double rhs_amu_alog_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
     double a = x[0];
-    r = P[0] + a * P[1] + P[2] * a / log(a);
+    static constexpr double lam = 300 / hbarc;
+    static constexpr double lam2 = lam * lam;
+
+    r = P[0] + a * P[1] + P[2] * a / pow(log(a*lam2), 1);
     return r;
 }
 double rhs_amu_alog2_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
     double a = x[0];
-    r = P[0] + a * P[1] + P[2] * a / pow(log(a), 2);
+    static constexpr double lam = 300 / hbarc;
+    static constexpr double lam2 = lam * lam;
+
+    r = P[0] + a * P[1] + P[2] * a / pow(log(a*lam2), 2);
     return r;
 }
 double rhs_amu_alog3_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
     double a = x[0];
-    r = P[0] + a * P[1] + P[2] * a / pow(log(a), 3);
+    static constexpr double lam = 300 / hbarc;
+    static constexpr double lam2 = lam * lam;
+    printf("a2= %g    hus=%g\n",a,a / std::pow(std::log(a*lam2), 0.42));
+    r = P[0] + a * P[1] + P[2] * a / pow(-log(a*lam2), 0.42);
     return r;
 }
 
@@ -3284,22 +3293,22 @@ void set_a_ml_ms_mc(char* argv_i, double* a, double* phys_ml, double* phys_ms, d
             LatticeData data = parseLatticeFile(namefile);
 
             printf("2024 params:\n");
-            printf("a = %g  %g\n",myres->mean(a), myres->comp_error(a));
-            printf("ml = %g  %g\n",myres->mean(phys_ml), myres->comp_error(phys_ml));
-            printf("ms = %g  %g\n",myres->mean(phys_ms), myres->comp_error(phys_ms));
-            printf("mc = %g  %g\n",myres->mean(phys_mc), myres->comp_error(phys_mc));
-            
-            double **data_2024 = (double**) malloc(sizeof(double*)*4);
-            data_2024[0]=a;
-            data_2024[1]=phys_ml;
-            data_2024[2]=phys_ms;
-            data_2024[3]=phys_mc;
+            printf("a = %g  %g\n", myres->mean(a), myres->comp_error(a));
+            printf("ml = %g  %g\n", myres->mean(phys_ml), myres->comp_error(phys_ml));
+            printf("ms = %g  %g\n", myres->mean(phys_ms), myres->comp_error(phys_ms));
+            printf("mc = %g  %g\n", myres->mean(phys_mc), myres->comp_error(phys_mc));
+
+            double** data_2024 = (double**)malloc(sizeof(double*) * 4);
+            data_2024[0] = a;
+            data_2024[1] = phys_ml;
+            data_2024[2] = phys_ms;
+            data_2024[3] = phys_mc;
 
             printf("corr 2024\n");
-            double **cov_2024 = myres->comp_cov(4,data_2024);
-            for (int i=0;i<4;i++){
-                for (int k=0;k<4;k++){
-                    printf("%-12.5g ",cov_2024[i][k]/sqrt(cov_2024[i][i]*cov_2024[k][k]));
+            double** cov_2024 = myres->comp_cov(4, data_2024);
+            for (int i = 0;i < 4;i++) {
+                for (int k = 0;k < 4;k++) {
+                    printf("%-12.5g ", cov_2024[i][k] / sqrt(cov_2024[i][i] * cov_2024[k][k]));
                 }
                 printf("\n");
             }
@@ -3309,14 +3318,12 @@ void set_a_ml_ms_mc(char* argv_i, double* a, double* phys_ml, double* phys_ms, d
             myres->change_mean_and_error(phys_ml, data.params["a*mu_l"], data.params["error on a*mu_l"]);
             myres->change_mean_and_error(phys_ms, data.params["a*mu_s"], data.params["error on a*mu_s"]);
             myres->change_mean_and_error(phys_mc, data.params["a*mu_c"], data.params["error on a*mu_c"]);
-            // phys_mc = myres->create_fake(data.params["a*mu_c"],1e-20,-1);
-
 
             printf("corr 2026 as 2024\n");
-            double **cov_2026 = myres->comp_cov(4,data_2024);
-            for (int i=0;i<4;i++){
-                for (int k=0;k<4;k++){
-                    printf("%-12.5g ",cov_2026[i][k]/sqrt(cov_2026[i][i]*cov_2026[k][k]));
+            double** cov_2026 = myres->comp_cov(4, data_2024);
+            for (int i = 0;i < 4;i++) {
+                for (int k = 0;k < 4;k++) {
+                    printf("%-12.5g ", cov_2026[i][k] / sqrt(cov_2026[i][i] * cov_2026[k][k]));
                 }
                 printf("\n");
             }
@@ -3329,28 +3336,34 @@ void set_a_ml_ms_mc(char* argv_i, double* a, double* phys_ml, double* phys_ms, d
                     cov_matrix[i] = data.matrix[i].data();
                 }
                 printf("corr 2026 lorenzo\n");
-                for (int i=0;i<4;i++){
-                    for (int k=0;k<4;k++){
-                        printf("%-12.5g ",cov_matrix[i][k]/sqrt(cov_matrix[i][i]*cov_matrix[k][k]));
+                for (int i = 0;i < 4;i++) {
+                    for (int k = 0;k < 4;k++) {
+                        printf("%-12.5g ", cov_matrix[i][k] / sqrt(cov_matrix[i][i] * cov_matrix[k][k]));
                     }
                     printf("\n");
                 }
                 double** jacks = myres->create_fake_covariance_exact(means.data(), 4, cov_matrix, seed);
-                // double** cov_jack = myres->comp_cov(4, jacks);
-                // double max_diff = compare_matrix(cov_matrix, cov_jack, 4);
-                // while (max_diff > 0.1) {
-                //     printf("Max relative difference in covariance matrix: %g\n", max_diff);
-                //     free(jacks);
-                //     jacks = myres->create_fake_covariance(means.data(), 4, cov_matrix, -1);
-                //     free_2(4, cov_jack);
-                //     cov_jack = myres->comp_cov(4, jacks);
-                //     max_diff = compare_matrix(cov_matrix, cov_jack, 4);
-                // }
+                // double** jacks = myres->create_fake_covariance(means.data(), 4, cov_matrix, seed);
+                double** cov_jack = myres->comp_cov(4, jacks);
+                double max_diff = compare_matrix(cov_matrix, cov_jack, 4);
+                while (max_diff > 0.1) {
+                    printf("Max relative difference in covariance matrix: %g\n", max_diff);
+                    free(jacks);
+                    jacks = myres->create_fake_covariance(means.data(), 4, cov_matrix, -1);
+                    free_2(4, cov_jack);
+                    cov_jack = myres->comp_cov(4, jacks);
+                    max_diff = compare_matrix(cov_matrix, cov_jack, 4);
+                }
+                // jacks[0] = myres->create_fake_exact(data.params["a [fm]"], data.params["error on a [fm]"], -1);
+                // jacks[1] = myres->create_fake_exact(data.params["a*mu_l"], data.params["error on a*mu_l"], -1);
+                // jacks[2] = myres->create_fake_exact(data.params["a*mu_s"], data.params["error on a*mu_s"], -1);
+                // jacks[3] = myres->create_fake_exact(data.params["a*mu_c"], data.params["error on a*mu_c"], -1);
 
                 myres->copy(a, jacks[0]);
                 myres->copy(phys_ml, jacks[1]);
                 myres->copy(phys_ms, jacks[2]);
                 myres->copy(phys_mc, jacks[3]);
+                free_2(4, jacks);
             }
 
 
@@ -3364,57 +3377,52 @@ void set_a_ml_ms_mc(char* argv_i, double* a, double* phys_ml, double* phys_ms, d
 }
 
 
-double *BAIC(std::vector<std::vector<double>> fit_res,
-std::vector<double> fit_chi2,
-std::vector<int> fit_npar,
-std::vector<int> fit_ndata,
-std::vector<int> fit_dof,
-std::vector<int> fit_mult){
+double* BAIC(std::vector<std::vector<double>> fit_res,
+    std::vector<double> fit_chi2,
+    std::vector<int> fit_npar,
+    std::vector<int> fit_ndata,
+    std::vector<int> fit_dof,
+    std::vector<int> fit_mult) {
 
 
     std::vector<double> w(fit_res.size());
-    double sum=0;
-    for (size_t i = 0; i < w.size(); i++)
-    {
-        w[i] = exp(-0.5*(fit_chi2[i]*fit_dof[i]+2*fit_npar[i]-2*fit_ndata[i]))/fit_mult[i];
+    double sum = 0;
+    for (size_t i = 0; i < w.size(); i++) {
+        w[i] = exp(-0.5 * (fit_chi2[i] * fit_dof[i] + 2 * fit_npar[i] - 2 * fit_ndata[i])) / fit_mult[i];
         sum += w[i];
         // printf("fit %ld: chi2=%g, npar=%d, ndata=%d, dof=%d, mult=%d, weight=%g\n", i, fit_chi2[i], fit_npar[i], fit_ndata[i], fit_dof[i], fit_mult[i], w[i]);
     }
     // printf("sum of weights = %g\n", sum);
-    for (size_t i = 0; i < w.size(); i++)
-    {
+    for (size_t i = 0; i < w.size(); i++) {
         w[i] /= sum;
         // printf("fit %ld: chi2=%g, npar=%d, ndata=%d, dof=%d, mult=%d, weight=%g\n", i, fit_chi2[i], fit_npar[i], fit_ndata[i], fit_dof[i], fit_mult[i], w[i]);
     }
-    double *avej = myres->create_zero();  
-    for(int j=0; j < myres->Njack;j++){
-        double m=0;
-        for (size_t i = 0; i < w.size(); i++)
-        {
-            avej[j] += w[i]*fit_res[i][j];
+    double* avej = myres->create_zero();
+    for (int j = 0; j < myres->Njack;j++) {
+        double m = 0;
+        for (size_t i = 0; i < w.size(); i++) {
+            avej[j] += w[i] * fit_res[i][j];
         }
     }
 
 
-    double m=0;
-    for (size_t i = 0; i < fit_res.size(); i++){
-        m += w[i]*myres->mean(fit_res[i].data());
+    double m = 0;
+    for (size_t i = 0; i < fit_res.size(); i++) {
+        m += w[i] * myres->mean(fit_res[i].data());
     }
     std::vector<double> err(fit_res.size());
-    for (size_t i = 0; i < err.size(); i++){
+    for (size_t i = 0; i < err.size(); i++) {
         err[i] = myres->comp_error(fit_res[i].data());
     }
-    double stat=0;
-    for (size_t i = 0; i < w.size(); i++)
-    {
-        stat += w[i]*err[i]*err[i];
-    }  
-    double syst=0;
-    for (size_t i = 0; i < w.size(); i++)
-    {
-        syst += w[i]*(myres->mean(fit_res[i].data())-m)*(myres->mean(fit_res[i].data())-m);
+    double stat = 0;
+    for (size_t i = 0; i < w.size(); i++) {
+        stat += w[i] * err[i] * err[i];
     }
-    double dm = sqrt(stat+syst);
+    double syst = 0;
+    for (size_t i = 0; i < w.size(); i++) {
+        syst += w[i] * (myres->mean(fit_res[i].data()) - m) * (myres->mean(fit_res[i].data()) - m);
+    }
+    double dm = sqrt(stat + syst);
     printf("jack BAIC = %g  %g\n", myres->mean(avej), myres->comp_error(avej));
     printf("BAIC: %g +- %g  (stat=%g, syst=%g)\n", m, dm, sqrt(stat), sqrt(syst));
     myres->change_mean_and_error(avej, m, dm);
