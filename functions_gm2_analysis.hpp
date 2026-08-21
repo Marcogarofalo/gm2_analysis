@@ -266,4 +266,17 @@ std::vector<int> fit_npar,
 std::vector<int> fit_ndata,
 std::vector<int> fit_dof,
 std::vector<int> fit_mult);
+
+
+template <auto gamma>
+double rhs_amu_rlog_common(int n, int Nvar, double* x, int Npar, double* P);
+template <auto gamma>
+double rhs_amu_rlog_a4OS_common(int n, int Nvar, double* x, int Npar, double* P);
+template <auto gamma>
+double rhs_amu_rlog_a4TM_common(int n, int Nvar, double* x, int Npar, double* P);
+template <auto gamma>
+double rhs_amu_rlog_a4OS_a4TM_common(int n, int Nvar, double* x, int Npar, double* P);
+
+
+
 #endif

@@ -1822,6 +1822,61 @@
 
 //     return r;
 // }
+template <auto gamma>
+double rhs_amu_rlog_common(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    static constexpr double lam = 300 / hbarc;
+    static constexpr double lam2 = lam * lam;
+    if (n == 0)      r = P[0] + P[1] * a / std::pow(std::abs(std::log(a * lam2)), gamma);
+    else if (n == 1) r = P[0] + P[2] * a / std::pow(std::abs(std::log(a * lam2)), gamma);
+    return r;
+}
+template double rhs_amu_rlog_common<1>(int n, int Nvar, double* x, int Npar, double* P);
+template double rhs_amu_rlog_common<2>(int n, int Nvar, double* x, int Npar, double* P);
+template double rhs_amu_rlog_common<0.42>(int n, int Nvar, double* x, int Npar, double* P);
+
+template <auto gamma>
+double rhs_amu_rlog_a4OS_common(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    static constexpr double lam = 300 / hbarc;
+    static constexpr double lam2 = lam * lam;
+    if (n == 0)      r = P[0] + P[1] * a / std::pow(std::abs(std::log(a * lam2)), gamma) + a * a * P[3];
+    else if (n == 1) r = P[0] + P[2] * a / std::pow(std::abs(std::log(a * lam2)), gamma);
+    return r;
+}
+template double rhs_amu_rlog_a4OS_common<1>(int n, int Nvar, double* x, int Npar, double* P);
+template double rhs_amu_rlog_a4OS_common<2>(int n, int Nvar, double* x, int Npar, double* P);
+template double rhs_amu_rlog_a4OS_common<0.42>(int n, int Nvar, double* x, int Npar, double* P);
+
+template <auto gamma>
+double rhs_amu_rlog_a4TM_common(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    static constexpr double lam = 300 / hbarc;
+    static constexpr double lam2 = lam * lam;
+    if (n == 0)      r = P[0] + P[1] * a / std::pow(std::abs(std::log(a * lam2)), gamma);
+    else if (n == 1) r = P[0] + P[2] * a / std::pow(std::abs(std::log(a * lam2)), gamma) + a * a * P[3];
+    return r;
+}
+template double rhs_amu_rlog_a4TM_common<1>(int n, int Nvar, double* x, int Npar, double* P);
+template double rhs_amu_rlog_a4TM_common<2>(int n, int Nvar, double* x, int Npar, double* P);
+template double rhs_amu_rlog_a4TM_common<0.42>(int n, int Nvar, double* x, int Npar, double* P);
+
+template <auto gamma>
+double rhs_amu_rlog_a4OS_a4TM_common(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a = x[0];
+    static constexpr double lam = 300 / hbarc;
+    static constexpr double lam2 = lam * lam;
+    if (n == 0)      r = P[0] + P[1] * a / std::pow(std::abs(std::log(a * lam2)), gamma) + a * a * P[3];
+    else if (n == 1) r = P[0] + P[2] * a / std::pow(std::abs(std::log(a * lam2)), gamma) + a * a * P[4];
+    return r;
+}
+template double rhs_amu_rlog_a4OS_a4TM_common<1>(int n, int Nvar, double* x, int Npar, double* P);
+template double rhs_amu_rlog_a4OS_a4TM_common<2>(int n, int Nvar, double* x, int Npar, double* P);
+template double rhs_amu_rlog_a4OS_a4TM_common<0.42>(int n, int Nvar, double* x, int Npar, double* P);
 
 
 // double rhs_amu_common(int n, int Nvar, double* x, int Npar, double* P) {
@@ -3030,7 +3085,7 @@ double rhs_amu_alog_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P) {
     static constexpr double lam = 300 / hbarc;
     static constexpr double lam2 = lam * lam;
 
-    r = P[0] + a * P[1] + P[2] * a / pow(log(a*lam2), 1);
+    r = P[0] + a * P[1] + P[2] * a / pow(log(a * lam2), 1);
     return r;
 }
 double rhs_amu_alog2_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P) {
@@ -3039,7 +3094,7 @@ double rhs_amu_alog2_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P) {
     static constexpr double lam = 300 / hbarc;
     static constexpr double lam2 = lam * lam;
 
-    r = P[0] + a * P[1] + P[2] * a / pow(log(a*lam2), 2);
+    r = P[0] + a * P[1] + P[2] * a / pow(log(a * lam2), 2);
     return r;
 }
 double rhs_amu_alog3_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P) {
@@ -3047,8 +3102,8 @@ double rhs_amu_alog3_onlyOSTM(int n, int Nvar, double* x, int Npar, double* P) {
     double a = x[0];
     static constexpr double lam = 300 / hbarc;
     static constexpr double lam2 = lam * lam;
-    printf("a2= %g    hus=%g\n",a,a / std::pow(std::log(a*lam2), 0.42));
-    r = P[0] + a * P[1] + P[2] * a / pow(-log(a*lam2), 0.42);
+    // printf("a2= %g    hus=%g\n",a,a / std::pow(std::log(a*lam2), 0.42));
+    r = P[0] + a * P[1] + P[2] * a / pow(-log(a * lam2), 0.42);
     return r;
 }
 
@@ -3084,44 +3139,56 @@ double rhs_amu_a4OS_a4TM_common(int n, int Nvar, double* x, int Npar, double* P)
 double rhs_amu_alogOS_common(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
     double a = x[0];
-    if (n == 0)      r = P[0] + a * P[1] + P[3] * a / log(a);
+    static constexpr double lam = 300 / hbarc;
+    static constexpr double lam2 = lam * lam;
+    if (n == 0)      r = P[0] + a * P[1] + P[3] * a / log(a * lam2);
     else if (n == 1) r = P[0] + a * P[2];
     return r;
 }
 double rhs_amu_alogTM_common(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
     double a = x[0];
+    static constexpr double lam = 300 / hbarc;
+    static constexpr double lam2 = lam * lam;
     if (n == 0)      r = P[0] + a * P[1];
-    else if (n == 1) r = P[0] + a * P[2] + P[3] * a / log(a);
+    else if (n == 1) r = P[0] + a * P[2] + P[3] * a / log(a * lam2);
     return r;
 }
 double rhs_amu_alogOS_alogTM_common(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
     double a = x[0];
-    if (n == 0)      r = P[0] + a * P[1] + P[3] * a / log(a);
-    else if (n == 1) r = P[0] + a * P[2] + P[4] * a / log(a);
+    static constexpr double lam = 300 / hbarc;
+    static constexpr double lam2 = lam * lam;
+    if (n == 0)      r = P[0] + a * P[1] + P[3] * a / log(a * lam2);
+    else if (n == 1) r = P[0] + a * P[2] + P[4] * a / log(a * lam2);
     return r;
 }
 
 double rhs_amu_alog2OS_common(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
     double a = x[0];
-    if (n == 0)      r = P[0] + a * P[1] + P[3] * a / pow(log(a), 2);
+    static constexpr double lam = 300 / hbarc;
+    static constexpr double lam2 = lam * lam;
+    if (n == 0)      r = P[0] + a * P[1] + P[3] * a / pow(log(a * lam2), 2);
     else if (n == 1) r = P[0] + a * P[2];
     return r;
 }
 double rhs_amu_alog2TM_common(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
     double a = x[0];
+    static constexpr double lam = 300 / hbarc;
+    static constexpr double lam2 = lam * lam;
     if (n == 0)      r = P[0] + a * P[1];
-    else if (n == 1) r = P[0] + a * P[2] + P[3] * a / pow(log(a), 2);
+    else if (n == 1) r = P[0] + a * P[2] + P[3] * a / pow(log(a * lam2), 2);
     return r;
 }
 double rhs_amu_alog2OS_alog2TM_common(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
     double a = x[0];
-    if (n == 0)      r = P[0] + a * P[1] + P[3] * a / pow(log(a), 2);
-    else if (n == 1) r = P[0] + a * P[2] + P[4] * a / pow(log(a), 2);
+    static constexpr double lam = 300 / hbarc;
+    static constexpr double lam2 = lam * lam;
+    if (n == 0)      r = P[0] + a * P[1] + P[3] * a / pow(log(a * lam2), 2);
+    else if (n == 1) r = P[0] + a * P[2] + P[4] * a / pow(log(a * lam2), 2);
     return r;
 }
 
@@ -3129,22 +3196,28 @@ double rhs_amu_alog2OS_alog2TM_common(int n, int Nvar, double* x, int Npar, doub
 double rhs_amu_alog3OS_common(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
     double a = x[0];
-    if (n == 0)      r = P[0] + a * P[1] + P[3] * a / pow(log(a), 3);
+    static constexpr double lam = 300 / hbarc;
+    static constexpr double lam2 = lam * lam;
+    if (n == 0)      r = P[0] + a * P[1] + P[3] * a / pow(-log(a * lam2), 0.42);
     else if (n == 1) r = P[0] + a * P[2];
     return r;
 }
 double rhs_amu_alog3TM_common(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
     double a = x[0];
+    static constexpr double lam = 300 / hbarc;
+    static constexpr double lam2 = lam * lam;
     if (n == 0)      r = P[0] + a * P[1];
-    else if (n == 1) r = P[0] + a * P[2] + P[3] * a / pow(log(a), 3);
+    else if (n == 1) r = P[0] + a * P[2] + P[3] * a / pow(-log(a * lam2), 0.42);
     return r;
 }
 double rhs_amu_alog3OS_alog3TM_common(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
     double a = x[0];
-    if (n == 0)      r = P[0] + a * P[1] + P[3] * a / pow(log(a), 3);
-    else if (n == 1) r = P[0] + a * P[2] + P[4] * a / pow(log(a), 3);
+    static constexpr double lam = 300 / hbarc;
+    static constexpr double lam2 = lam * lam;
+    if (n == 0)      r = P[0] + a * P[1] + P[3] * a / pow(-log(a * lam2), 0.42);
+    else if (n == 1) r = P[0] + a * P[2] + P[4] * a / pow(-log(a * lam2), 0.42);
     return r;
 }
 

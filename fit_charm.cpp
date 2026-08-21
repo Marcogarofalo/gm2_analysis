@@ -392,10 +392,11 @@ int main(int argc, char** argv) {
     std::string namefit;
 
     std::vector<int> iWs = { 0,1,2,3,5,6,7,8,9,10, 11, 12, 13, 14 }; // only 4 missing = fulltree
-    std::vector<double*> ave_BAIC(iWs.size());
-    int Nfits =105;
+    int maxValue = std::ranges::max(iWs);
+    std::vector<double*> ave_BAIC(maxValue + 1);
+    int Nfits = 105 + 12 * 7 - 14;
     for (int iW : iWs) {
-        std::vector<std::vector<double>> fit_res(Nfits,std::vector<double>(myres->Njack));
+        std::vector<std::vector<double>> fit_res(Nfits, std::vector<double>(myres->Njack));
         std::vector<std::string> fit_name(Nfits);
         std::vector<double> fit_chi2(Nfits);
         std::vector<int> fit_npar(Nfits);
@@ -408,7 +409,7 @@ int main(int argc, char** argv) {
 
             std::vector<int> fi_list;
             if (ie < 7)
-                fi_list = { 0,1,2,3,4,5,6,   10,11,12,13,14,15 };
+                fi_list = { 0,1,2,3,4,5,6,   10,11,12,13,14,15, 18,19,20,21,22,23,24,25,26,27,28,29 };
             else if (ie >= 7 && ie < 13) // only one regularization
                 fi_list = { 7,8,9, 16,17 };
             else if (ie > 12) // with FVE
@@ -463,7 +464,7 @@ int main(int argc, char** argv) {
                     break;
                 case 10:
                     namefit = namefit + "_SDtmin4";
-                    fit_info.corr_id = { 229, 230,id_SD_cor[0], id_SD_cor[1]  }; // SD tmin 4
+                    fit_info.corr_id = { 229, 230,id_SD_cor[0], id_SD_cor[1] }; // SD tmin 4
                     break;
                     //////////////////  corrected
                 case 11:
@@ -681,6 +682,71 @@ int main(int argc, char** argv) {
                     fit_info.Npar = 3;
                     fit_info.function = rhs_amu_alog3_onlyOSTM;
                     break;
+
+                case 18:
+                    namefit = namefit + "_rlog1";
+                    fit_info.Npar = 3;
+                    fit_info.function = rhs_amu_rlog_common<1>;
+                    break;
+                case 19:
+                    namefit = namefit + "_rlog2";
+                    fit_info.Npar = 3;
+                    fit_info.function = rhs_amu_rlog_common<2>;
+                    break;
+                case 20:
+                    namefit = namefit + "_rlog3";
+                    fit_info.Npar = 3;
+                    fit_info.function = rhs_amu_rlog_common<0.42>;
+                    break;
+
+                case 21:
+                    namefit = namefit + "_rlog1_a4OS";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_rlog_a4OS_common<1>;
+                    break;
+                case 22:
+                    namefit = namefit + "_rlog2_a4OS";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_rlog_a4OS_common<2>;
+                    break;
+                case 23:
+                    namefit = namefit + "_rlog3_a4OS";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_rlog_a4OS_common<0.42>;
+                    break;
+
+                case 24:
+                    namefit = namefit + "_rlog1_a4TM";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_rlog_a4TM_common<1>;
+                    break;
+                case 25:
+                    namefit = namefit + "_rlog2_a4TM";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_rlog_a4TM_common<2>;
+                    break;
+                case 26:
+                    namefit = namefit + "_rlog3_a4TM";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_rlog_a4TM_common<0.42>;
+                    break;
+
+                case 27:
+                    namefit = namefit + "_rlog1_a4OS_a4TM";
+                    fit_info.Npar = 5;
+                    fit_info.function = rhs_amu_rlog_a4OS_a4TM_common<1>;
+                    break;
+                case 28:
+                    namefit = namefit + "_rlog2_a4OS_a4TM";
+                    fit_info.Npar = 5;
+                    fit_info.function = rhs_amu_rlog_a4OS_a4TM_common<2>;
+                    break;
+                case 29:
+                    namefit = namefit + "_rlog3_a4OS_a4TM";
+                    fit_info.Npar = 5;
+                    fit_info.function = rhs_amu_rlog_a4OS_a4TM_common<0.42>;
+                    break;
+
                 default:
                     break;
                 }
@@ -750,7 +816,7 @@ int main(int argc, char** argv) {
                 //     }
                 // }
                 fit_info.compute_cov1_fit();
-                
+
                 // fit_info.covariancey = false;
 
                 fit_result amu_SD_l_common_a4 = fit_all_data(argv, jackextra, lhs_fun, fit_info, namefit.c_str());
@@ -762,31 +828,31 @@ int main(int argc, char** argv) {
                 //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
                 print_fit_band(argv, jackextra, fit_info, fit_info, namefit.c_str(), "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0002, xcont);
 
-                if (ie < 13){
+                if (ie < 7) {
                     fit_name[count_aic] = namefit;
-                    for(int j=0;j<Njack;j++){
-                        fit_res[count_aic][j]=amu_SD_l_common_a4.P[0][j];
-                        fit_chi2[count_aic]=myres->mean(amu_SD_l_common_a4.chi2);
+                    for (int j = 0;j < Njack;j++) {
+                        fit_res[count_aic][j] = amu_SD_l_common_a4.P[0][j];
+                        fit_chi2[count_aic] = myres->mean(amu_SD_l_common_a4.chi2);
                     }
                     fit_npar[count_aic] = fit_info.Npar;
                     fit_ndata[count_aic] = fit_info.entot;
                     fit_dof[count_aic] = fit_info.entot - fit_info.Npar;
-                    if(namefit.find("log") != std::string::npos)
-                        fit_mult[count_aic]=3;
+                    if (namefit.find("log") != std::string::npos)
+                        fit_mult[count_aic] = 3;
                     else
-                        fit_mult[count_aic]=1;
+                        fit_mult[count_aic] = 1;
                     count_aic++;
                 }
 
                 printf("%g   %g\n", myres->mean(amu_SD_l_common_a4.P[0]), myres->comp_error(amu_SD_l_common_a4.P[0]));
-                free_fit_result(fit_info, amu_SD_l_common_a4);  
+                free_fit_result(fit_info, amu_SD_l_common_a4);
                 // if (iW==1){                   
                 //     if (namefit == "amu_W_3b_BOS_BTM") {
                 //         std::cout << "Match found!" << std::endl;
                 //         exit(1);
                 //     }
                 // }
-                
+
                 // if (iW==5){                   
                 //     if (namefit == "amu_SDpWpLD_4b_onlyTM_alog3") {
                 //         std::cout << "Match found!" << std::endl;
@@ -801,19 +867,26 @@ int main(int argc, char** argv) {
         //     printf("fit %ld: %s\n", i, fit_name[i].c_str());
         // }
         ave_BAIC[iW] = BAIC(fit_res, fit_chi2, fit_npar, fit_ndata, fit_dof, fit_mult);
-        if(iW==iWs.back()){
-            for (auto n :fit_name){
-                printf("%s\n",n.c_str());
+        if (iW == iWs.back()) {
+            for (auto n : fit_name) {
+                printf("f\"%s\",\n", n.c_str());
             }
+        }
+        if (iW==5){
+            for (int n=0;n< fit_name.size();n++) {
+                // printf("f\"%s\",\n", n.c_str());
+                printf("%d   %s   %g\n",n, fit_name[n].c_str(),fit_res[n][Njack-1] );
+            }
+            exit(1);
         }
         // exit(1);
     }
-    
+
     for (int iW : iWs) {
         printf("ave_BAIC[%d] = %g +- %g\n", iW, myres->mean(ave_BAIC[iW]), myres->comp_error(ave_BAIC[iW]));
         std::string name_ave = std::string(argv[3]) + "/ave_BAIC_" + std::to_string(iW) + "_" + std::to_string(myres->Njack) + ".jack";
         printf("writing %s\n", name_ave.c_str());
-        myres->write_jack_in_file( ave_BAIC[iW],name_ave.c_str());
+        myres->write_jack_in_file(ave_BAIC[iW], name_ave.c_str());
 
     }
 
@@ -841,8 +914,8 @@ int main(int argc, char** argv) {
             for (int e : fit_info.Nxen[n]) {
                 for (int j = 0;j < Njack;j++) {
                     fit_info.x[0][count][j] = pow(jackall.en[e].jack[41][j], 2); // a^2
-                    if(e==C112)
-                    fit_info.x[0][count][j] += 1e-4; // a^2
+                    if (e == C112)
+                        fit_info.x[0][count][j] += 1e-4; // a^2
 
                     fit_info.x[1][count][j] = jackall.en[e].jack[58][j];  // Delta_FV_GS
                     fit_info.x[2][count][j] = jackall.en[e].jack[1][j];  //Mpi
