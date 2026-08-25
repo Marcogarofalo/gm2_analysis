@@ -455,9 +455,10 @@ int main(int argc, char** argv) {
 
     int NiW = 28;
     std::vector<double*> ave_BAIC(NiW);
-    int Nfits =105;
-    for (int iW = 0;iW < NiW;iW++) {
-        std::vector<std::vector<double>> fit_res(Nfits,std::vector<double>(myres->Njack));
+    int Nfits = 91; //105 ;
+    for (int iW = 1;iW < NiW;iW++) {
+
+        std::vector<std::vector<double>> fit_res(Nfits, std::vector<double>(myres->Njack));
         std::vector<std::string> fit_name(Nfits);
         std::vector<double> fit_chi2(Nfits);
         std::vector<int> fit_npar(Nfits);
@@ -476,7 +477,7 @@ int main(int argc, char** argv) {
             else if (ie > 12) // with FVE
                 fi_list = { 0,1,2,3,4,5,6,   10,11,12,13,14,15 };
 
-
+            if (ie >= 7) continue;
 
             for (int fi : fi_list) {
 
@@ -863,19 +864,20 @@ int main(int argc, char** argv) {
                 //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
                 print_fit_band(argv, jackextra, fit_info, fit_info, namefit.c_str(), "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0002, xcont);
 
-                if (ie < 13){
+                if (ie < 13) {
+                    printf("count aic = %d\n",count_aic);
                     fit_name[count_aic] = namefit;
-                    for(int j=0;j<Njack;j++){
-                        fit_res[count_aic][j]=amu_SD_l_common_a4.P[0][j];
-                        fit_chi2[count_aic]=myres->mean(amu_SD_l_common_a4.chi2);
+                    for (int j = 0;j < Njack;j++) {
+                        fit_res[count_aic][j] = amu_SD_l_common_a4.P[0][j];
+                        fit_chi2[count_aic] = myres->mean(amu_SD_l_common_a4.chi2);
                     }
                     fit_npar[count_aic] = fit_info.Npar;
                     fit_ndata[count_aic] = fit_info.entot;
                     fit_dof[count_aic] = fit_info.entot - fit_info.Npar;
-                    if(namefit.find("log") != std::string::npos)
-                        fit_mult[count_aic]=3;
+                    if (namefit.find("log") != std::string::npos)
+                        fit_mult[count_aic] = 3;
                     else
-                        fit_mult[count_aic]=1;
+                        fit_mult[count_aic] = 1;
                     count_aic++;
                 }
 
@@ -884,18 +886,526 @@ int main(int argc, char** argv) {
             }
         }
         ave_BAIC[iW] = BAIC(fit_res, fit_chi2, fit_npar, fit_ndata, fit_dof, fit_mult);
-        if(iW==NiW-1){
-            for (auto n :fit_name){
-                printf("%s\n",n.c_str());
+        if (iW == NiW - 1) {
+            for (auto n : fit_name) {
+                printf("%s\n", n.c_str());
             }
         }
     }
 
-    for (int iW =0; iW < NiW; iW++) {
+    //////////////////////////////////////////////////////////////
+    // SD
+    //////////////////////////////////////////////////////////////
+
+    // SD
+    Nfits = 105 + 12 * 7 - 14;
+    for (int iW = 0;iW < 1;iW++) {
+        std::vector<std::vector<double>> fit_res(Nfits, std::vector<double>(myres->Njack));
+        std::vector<std::string> fit_name(Nfits);
+        std::vector<double> fit_chi2(Nfits);
+        std::vector<int> fit_npar(Nfits);
+        std::vector<int> fit_ndata(Nfits);
+        std::vector<int> fit_dof(Nfits);
+        std::vector<int> fit_mult(Nfits);
+        int count_aic = 0;
+
+        for (int ie = 0;ie < 14;ie++) {
+
+            std::vector<int> fi_list;
+            if (ie < 7)
+                fi_list = { 0,1,2,3,4,5,6,   10,11,12,13,14,15, 18,19,20,21,22,23,24,25,26,27,28,29 };
+            else if (ie >= 7 && ie < 13) // only one regularization
+                fi_list = { 7,8,9, 16,17 };
+            else if (ie > 12) // with FVE
+                fi_list = { 0,1,2,3,4,5,6,   10,11,12,13,14,15 };
+
+            if (ie >= 7) continue;
+
+
+            for (int fi : fi_list) {
+
+                namefit = "amu";
+
+                switch (iW) {
+                case 0:
+                    namefit = namefit + "_SD";
+                    fit_info.corr_id = { 167, 168 };
+                    break;
+                case 1:
+                    namefit = namefit + "_W";
+                    fit_info.corr_id = { 169, 170 };
+                    break;
+                case 2:
+                    namefit = namefit + "_LD";
+                    fit_info.corr_id = { 175, 176 };
+                    break;
+                case 3:
+                    namefit = namefit + "_full";
+                    fit_info.corr_id = { 146, 147 };
+                    break;
+                case 4:
+                    namefit = namefit + "_fulltree";
+                    fit_info.corr_id = { 181, 182 };
+                    break;
+                case 5:
+                    namefit = namefit + "_SDpWpLD";
+                    fit_info.corr_id = { 167, 168,169, 170, 175, 176 };
+                    break;
+                case 6:
+                    namefit = namefit + "_SDtmin0";
+                    fit_info.corr_id = { 211, 212 , id_SD_cor[0], id_SD_cor[1] }; // SD tmin 0
+                    break;
+                case 7:
+                    namefit = namefit + "_SDtmin1";
+                    fit_info.corr_id = { 213, 214 , id_SD_cor[0], id_SD_cor[1] }; // SD tmin 1
+                    break;
+                case 8:
+                    namefit = namefit + "_SDtmin2";
+                    fit_info.corr_id = { 215, 216 , id_SD_cor[0], id_SD_cor[1] }; // SD tmin 2
+                    break;
+                case 9:
+                    namefit = namefit + "_SDtmin3";
+                    fit_info.corr_id = { 217, 218 , id_SD_cor[0], id_SD_cor[1] }; // SD tmin 3
+                    break;
+                case 10:
+                    namefit = namefit + "_SDtmin4";
+                    fit_info.corr_id = { 219, 220 , id_SD_cor[0], id_SD_cor[1] }; // SD tmin 4
+                    break;
+                    //////////////////  corrected
+                case 11:
+                    namefit = namefit + "_SDcor";
+                    fit_info.corr_id = { id_SD[0], id_SD[1],id_SD_cor[0], id_SD_cor[1] };
+                    break;
+                case 12:
+                    namefit = namefit + "_Wcor";
+                    fit_info.corr_id = { id_W[0], id_W[1], id_W_cor[0], id_W_cor[1] };
+                    break;
+                case 13:
+                    namefit = namefit + "_LDcor";
+                    fit_info.corr_id = { id_LD[0], id_LD[1], id_LD_cor[0], id_LD_cor[1] };
+                    break;
+                case 14:
+                    namefit = namefit + "_SDpWpLDcor";
+                    fit_info.corr_id = { id_SD[0], id_SD[1],id_W[0], id_W[1], id_LD[0], id_LD[1], id_full_cor[0], id_full_cor[1] };
+                    // fit_info.corr_id = { id_SD[0], id_SD[1], id_SD_cor[0], id_SD_cor[1],id_W[0], id_W[1], id_W_cor[0], id_W_cor[1], id_LD[0], id_LD[1], id_LD_cor[0], id_LD_cor[1] };
+                    // fit_info.corr_id = {id_LD_cor[0], id_LD_cor[1]      , id_LD[0], id_LD[1], id_LD[0], id_LD[1], id_W_cor[0], id_W_cor[1], id_SD_cor[1],id_W[0], id_W[1],
+                    //  id_SD[0], id_SD[1], id_SD_cor[0]  };
+                    break;
+                case 15:
+                    namefit = namefit + "_SDetas";
+                    fit_info.corr_id = { id_SDeta[0], id_SDeta[1], id_SD_cor[0], id_SD_cor[1] };
+                    break;
+                case 16:
+                    namefit = namefit + "_Wetas";
+                    fit_info.corr_id = { id_Weta[0], id_Weta[1], id_W_cor[0], id_W_cor[1] };
+                    break;
+                case 17:
+                    namefit = namefit + "_LDetas";
+                    fit_info.corr_id = { id_LDeta[0], id_LDeta[1], id_LD_cor[0], id_LD_cor[1] };
+                    break;
+                case 18:
+                    namefit = namefit + "_SDpWpLDetas";
+                    fit_info.corr_id = { id_SDeta[0], id_SDeta[1],id_Weta[0], id_Weta[1], id_LDeta[0], id_LDeta[1] ,id_full_cor[0], id_full_cor[1] };
+                    break;
+                case 19:
+                    namefit = namefit + "_SDetasFVE";
+                    fit_info.corr_id = { id_SD_FVE[0], id_SD_FVE[1], id_SD_cor[0], id_SD_cor[1] };
+                    break;
+                case 20:
+                    namefit = namefit + "_WetasFVE";
+                    fit_info.corr_id = { id_W_FVE[0], id_W_FVE[1], id_W_cor[0], id_W_cor[1] };
+                    break;
+                case 21:
+                    namefit = namefit + "_LDetasFVE";
+                    fit_info.corr_id = { id_LD_FVE[0], id_LD_FVE[1], id_LD_cor[0], id_LD_cor[1] };
+                    break;
+                case 22:
+                    namefit = namefit + "_SDpWpLDetasFVE";
+                    fit_info.corr_id = { id_SD_FVE[0], id_SD_FVE[1],id_W_FVE[0], id_W_FVE[1], id_LD_FVE[0], id_LD_FVE[1] ,id_full_cor[0], id_full_cor[1] };
+                    break;
+                case 23:
+                    namefit = namefit + "_SDetasNoCor";
+                    fit_info.corr_id = { id_SDeta[0], id_SDeta[1] };
+                    break;
+                case 24:
+                    namefit = namefit + "_WetasNoCor";
+                    fit_info.corr_id = { id_Weta[0], id_Weta[1] };
+                    break;
+                case 25:
+                    namefit = namefit + "_LDetasNoCor";
+                    fit_info.corr_id = { id_LDeta[0], id_LDeta[1] };
+                    break;
+                case 26:
+                    namefit = namefit + "_SDpWpLDetasNoCor";
+                    fit_info.corr_id = { id_SDeta[0], id_SDeta[1],id_Weta[0], id_Weta[1], id_LDeta[0], id_LDeta[1] };
+                    break;
+                case 27:
+                    namefit = namefit + "_SDetasFVENoCor";
+                    fit_info.corr_id = { id_SD_FVE[0], id_SD_FVE[1] };
+                    break;
+                    // case 15:
+                    //     namefit = namefit + "_SDtmin0cor";
+                    //     fit_info.corr_id = { id_SDtmin0_cor[0], id_SDtmin0_cor[1] }; // SD tmin 0
+                    //     break;
+                    // case 16:
+                    //     namefit = namefit + "_SDtmin1cor";
+                    //     fit_info.corr_id = { id_SDtmin1_cor[0], id_SDtmin1_cor[1] };
+                    //     break;
+                    // case 17:
+                    //     namefit = namefit + "_SDtmin2cor";
+                    //     fit_info.corr_id = { id_SDtmin2_cor[0], id_SDtmin2_cor[1] };
+                    //     break;
+                    // case 18:
+                    //     namefit = namefit + "_SDtmin3cor";
+                    //     fit_info.corr_id = { id_SDtmin3_cor[0], id_SDtmin3_cor[1] };
+                    //     break;
+                    // case 19:
+                    //     namefit = namefit + "_SDtmin4cor";
+                    //     fit_info.corr_id = { id_SDtmin4_cor[0], id_SDtmin4_cor[1] };
+                    //     break;
+                default: break;
+                }
+
+
+                // if fititng only the TM we need to put the id only in the even slots so that 
+                // the function lhs_sum sum them when n=0
+                if (ie == 8 || ie == 10 || ie == 12) {
+                    for (int i = 0;i < fit_info.corr_id.size() / 2;i++)
+                        fit_info.corr_id[i * 2] = fit_info.corr_id[i * 2 + 1];
+                }
+
+                // if fitting the sum SD+W+LD we need to select lhs function to sum
+                double (*lhs_fun)(int, int, int, data_all, struct fit_type) = lhs_sum;
+                // if (iW == 5 || iW == 14 || iW == 18) lhs_fun = lhs_sum;
+                // else lhs_fun = lhs_amu;
+
+
+                switch (ie) {
+                case 0:
+                    namefit = namefit + "_3b";
+                    fit_info.Nxen = { {  C06 ,D54, E112},
+                                      { C06, D54, E112} };
+                    break;
+                case 1:
+                    namefit = namefit + "_3b_BOS";
+                    fit_info.Nxen = { { B72_64, C06 ,D54, E112},
+                                      { C06, D54, E112} };
+                    break;
+                case 2:
+                    namefit = namefit + "_3b_BTM";
+                    fit_info.Nxen = { {  C06 ,D54, E112},
+                                      {B72_64, C06, D54, E112} };
+                    break;
+                case 3:
+                    namefit = namefit + "_3b_BOS_BTM";
+                    fit_info.Nxen = { { B72_64, C06 ,D54, E112},
+                                      {B72_64, C06, D54, E112} };
+                    break;
+                case 4:
+                    namefit = namefit + "_3b_noC";
+                    fit_info.Nxen = { {  B72_64 ,D54, E112},
+                                      { B72_64, D54, E112} };
+                    break;
+                case 5:
+                    namefit = namefit + "_3b_noC_BOS";
+                    fit_info.Nxen = { { B72_64, C06 ,D54, E112},
+                                      { B72_64, D54, E112} };
+                    break;
+                case 6:
+                    namefit = namefit + "_3b_noC_BTM";
+                    fit_info.Nxen = { {  B72_64 ,D54, E112},
+                                      {B72_64, C06, D54, E112} };
+                    break;
+                case 7:
+                    namefit = namefit + "_3b_onlyOS";
+                    fit_info.Nxen = { {  C06 ,D54, E112} };
+                    break;
+                case 8:
+                    namefit = namefit + "_3b_onlyTM";
+                    fit_info.Nxen = { {  C06 ,D54, E112} };
+                    break;
+                case 9:
+                    namefit = namefit + "_4b_onlyOS";
+                    fit_info.Nxen = { { B72_64, C06 ,D54, E112} };
+                    break;
+                case 10:
+                    namefit = namefit + "_4b_onlyTM";
+                    fit_info.Nxen = { { B72_64, C06 ,D54, E112} };
+                    break;
+                case 11:
+                    namefit = namefit + "_3b_noC_onlyOS";
+                    fit_info.Nxen = { {  B72_64 ,D54, E112} };
+                    break;
+                case 12:
+                    namefit = namefit + "_3b_noC_onlyTM";
+                    fit_info.Nxen = { {  B72_64 ,D54, E112} };
+                    break;
+                case 13:
+                    namefit = namefit + "_3b_BOS_BTM_FVE";
+                    fit_info.Nxen = { { B72_64, B72_96, C06, C112 ,D54, E112},
+                                      { B72_64, B72_96, C06, C112, D54, E112} };
+                    break;
+                default:
+                    break;
+                }
+                fit_info.N = fit_info.Nxen.size();
+
+
+                switch (fi) {
+                case 0:
+                    namefit = namefit + "";
+                    fit_info.Npar = 3;
+                    fit_info.function = rhs_amu_common;
+                    break;
+                case 1:
+                    namefit = namefit + "_a4OS";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_a4OS_common;
+                    break;
+                case 2:
+                    namefit = namefit + "_a4TM";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_a4TM_common;
+                    break;
+                case 3:
+                    namefit = namefit + "_a4OS_a4TM";
+                    fit_info.Npar = 5;
+                    fit_info.function = rhs_amu_a4OS_a4TM_common;
+                    break;
+                case 4:
+                    namefit = namefit + "_alogOS";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_alogOS_common;
+                    break;
+                case 5:
+                    namefit = namefit + "_alogTM";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_alogTM_common;
+                    break;
+                case 6:
+                    namefit = namefit + "_alogOS_alogTM";
+                    fit_info.Npar = 5;
+                    fit_info.function = rhs_amu_alogOS_alogTM_common;
+                    break;
+                case 7:
+                    namefit = namefit + "";
+                    fit_info.Npar = 2;
+                    fit_info.function = rhs_amu_onlyOSTM;
+                    break;
+                case 8:
+                    namefit = namefit + "_a4";
+                    fit_info.Npar = 3;
+                    fit_info.function = rhs_amu_a4_onlyOSTM;
+                    break;
+                case 9:
+                    namefit = namefit + "_alog";
+                    fit_info.Npar = 3;
+                    fit_info.function = rhs_amu_alog_onlyOSTM;
+                    break;
+                case 10:
+                    namefit = namefit + "_alog2OS";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_alog2OS_common;
+                    break;
+                case 11:
+                    namefit = namefit + "_alog2TM";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_alog2TM_common;
+                    break;
+                case 12:
+                    namefit = namefit + "_alog2OS_alog2TM";
+                    fit_info.Npar = 5;
+                    fit_info.function = rhs_amu_alog2OS_alog2TM_common;
+                    break;
+                case 13:
+                    namefit = namefit + "_alog3OS";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_alog3OS_common;
+                    break;
+                case 14:
+                    namefit = namefit + "_alog3TM";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_alog3TM_common;
+                    break;
+                case 15:
+                    namefit = namefit + "_alog3OS_alog3TM";
+                    fit_info.Npar = 5;
+                    fit_info.function = rhs_amu_alog3OS_alog3TM_common;
+                    break;
+                case 16:
+                    namefit = namefit + "_alog2";
+                    fit_info.Npar = 3;
+                    fit_info.function = rhs_amu_alog2_onlyOSTM;
+                    break;
+                case 17:
+                    namefit = namefit + "_alog3";
+                    fit_info.Npar = 3;
+                    fit_info.function = rhs_amu_alog3_onlyOSTM;
+                    break;
+
+                case 18:
+                    namefit = namefit + "_rlog1";
+                    fit_info.Npar = 3;
+                    fit_info.function = rhs_amu_rlog_common<1>;
+                    break;
+                case 19:
+                    namefit = namefit + "_rlog2";
+                    fit_info.Npar = 3;
+                    fit_info.function = rhs_amu_rlog_common<2>;
+                    break;
+                case 20:
+                    namefit = namefit + "_rlog3";
+                    fit_info.Npar = 3;
+                    fit_info.function = rhs_amu_rlog_common<0.42>;
+                    break;
+
+                case 21:
+                    namefit = namefit + "_rlog1_a4OS";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_rlog_a4OS_common<1>;
+                    break;
+                case 22:
+                    namefit = namefit + "_rlog2_a4OS";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_rlog_a4OS_common<2>;
+                    break;
+                case 23:
+                    namefit = namefit + "_rlog3_a4OS";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_rlog_a4OS_common<0.42>;
+                    break;
+
+                case 24:
+                    namefit = namefit + "_rlog1_a4TM";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_rlog_a4TM_common<1>;
+                    break;
+                case 25:
+                    namefit = namefit + "_rlog2_a4TM";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_rlog_a4TM_common<2>;
+                    break;
+                case 26:
+                    namefit = namefit + "_rlog3_a4TM";
+                    fit_info.Npar = 4;
+                    fit_info.function = rhs_amu_rlog_a4TM_common<0.42>;
+                    break;
+
+                case 27:
+                    namefit = namefit + "_rlog1_a4OS_a4TM";
+                    fit_info.Npar = 5;
+                    fit_info.function = rhs_amu_rlog_a4OS_a4TM_common<1>;
+                    break;
+                case 28:
+                    namefit = namefit + "_rlog2_a4OS_a4TM";
+                    fit_info.Npar = 5;
+                    fit_info.function = rhs_amu_rlog_a4OS_a4TM_common<2>;
+                    break;
+                case 29:
+                    namefit = namefit + "_rlog3_a4OS_a4TM";
+                    fit_info.Npar = 5;
+                    fit_info.function = rhs_amu_rlog_a4OS_a4TM_common<0.42>;
+                    break;
+
+                default:
+                    break;
+                }
+
+
+
+
+                fit_info.Nvar = 8;
+                fit_info.Njack = Njack;
+                fit_info.init_N_etot_form_Nxen();
+                fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+
+                if (fit_info.entot <= fit_info.Npar) continue;
+
+                count = 0;
+                for (int n = 0;n < fit_info.N;n++) {
+                    for (int e : fit_info.Nxen[n]) {
+                        for (int j = 0;j < Njack;j++) {
+                            fit_info.x[0][count][j] = pow(jackall.en[e].jack[41][j], 2); // a^2
+                            // fit_info.x[0][count][j] = pow(jackall.en[e].jack[41][j], 2); // a^2
+                            fit_info.x[1][count][j] = jackall.en[e].jack[58][j];  // Delta_FV_GS
+                            fit_info.x[2][count][j] = jackall.en[e].jack[1][j];  //Mpi
+                            fit_info.x[3][count][j] = jack_Mpi_MeV_exp[j];
+                            fit_info.x[4][count][j] = 0/* l */ + 1e-6;
+                            fit_info.x[5][count][j] = 0/* a */ + 1e-6;
+                            fit_info.x[6][count][j] = 0 + 1e-6;
+                            fit_info.x[7][count][j] = 0/* w */ + 1e-6;
+                        }
+                        count++;
+                    }
+                }
+
+                fit_info.linear_fit = true;
+                // fit_info.acc= 1e-6;
+                // fit_info.chi2_gap_jackboot=0.1;
+                // fit_info.guess_per_jack=5;
+                // fit_info.repeat_start=5;
+                fit_info.verbosity = 0;
+                fit_info.covariancey = true;
+                fit_info.compute_cov_fit(argv, jackextra, lhs_fun);
+                int ide = 0, ide1 = 0;
+                for (int n = 0;n < fit_info.Nxen.size();n++) {
+                    for (int e : fit_info.Nxen[n]) {
+                        ide1 = 0;
+                        for (int n1 = 0;n1 < fit_info.Nxen.size();n1++) {
+                            for (int e1 : fit_info.Nxen[n1]) {
+                                if (e != e1)   fit_info.cov[ide][ide1] = 0;
+                                // printf("%-12.5g ", fit_info.cov[ide][ide1]);
+                                ide1++;
+                            }
+                        }
+                        // printf("\n");
+                        ide++;
+                    }
+                }
+                fit_info.compute_cov1_fit();
+                fit_result amu_SD_l_common_a4 = fit_all_data(argv, jackextra, lhs_fun, fit_info, namefit.c_str());
+                fit_info.band_range = { 0,0.0081 };
+                std::vector<double> xcont = { 0, 0 /*Delta*/, 0, 0,/*l, a,m*/ fit_info.x[4][0][Njack - 1],
+                     fit_info.x[5][0][Njack - 1] , fit_info.x[6][0][Njack - 1], fit_info.x[7][0][Njack - 1] };
+
+
+                //    Mpi:   the index of the parameter do not match!   P[i]*(M_pi- M_pi_phys ) 
+                print_fit_band(argv, jackextra, fit_info, fit_info, namefit.c_str(), "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0002, xcont);
+
+                if (ie < 13) {
+                    fit_name[count_aic] = namefit;
+                    for (int j = 0;j < Njack;j++) {
+                        fit_res[count_aic][j] = amu_SD_l_common_a4.P[0][j];
+                        fit_chi2[count_aic] = myres->mean(amu_SD_l_common_a4.chi2);
+                    }
+                    fit_npar[count_aic] = fit_info.Npar;
+                    fit_ndata[count_aic] = fit_info.entot;
+                    fit_dof[count_aic] = fit_info.entot - fit_info.Npar;
+                    if (namefit.find("log") != std::string::npos)
+                        fit_mult[count_aic] = 3;
+                    else
+                        fit_mult[count_aic] = 1;
+                    count_aic++;
+                }
+
+                free_fit_result(fit_info, amu_SD_l_common_a4);
+                // if (namefit.compare())
+            }
+        }
+        ave_BAIC[iW] = BAIC(fit_res, fit_chi2, fit_npar, fit_ndata, fit_dof, fit_mult);
+        if (iW == 0) {
+            for (auto n : fit_name) {
+                printf("f\"%s\",\n", n.c_str());
+            }
+            printf("Nfit = %ld\n",fit_name.size());
+        }
+    }
+
+    for (int iW = 0; iW < NiW; iW++) {
         printf("ave_BAIC[%d] = %g +- %g\n", iW, myres->mean(ave_BAIC[iW]), myres->comp_error(ave_BAIC[iW]));
         std::string name_ave = std::string(argv[3]) + "/ave_BAIC_s_" + std::to_string(iW) + "_" + std::to_string(myres->Njack) + ".jack";
         printf("writing %s\n", name_ave.c_str());
-        myres->write_jack_in_file( ave_BAIC[iW],name_ave.c_str());
+        myres->write_jack_in_file(ave_BAIC[iW], name_ave.c_str());
 
     }
 
