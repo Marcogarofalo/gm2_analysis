@@ -415,6 +415,7 @@ int main(int argc, char** argv) {
             else if (ie > 12) // with FVE
                 fi_list = { 0,1,2,3,4,5,6,   10,11,12,13,14,15 };
 
+            if (ie>=7) continue; // skippin the onlyTM or OS fits
 
             for (int fi : fi_list) {
 
@@ -871,13 +872,14 @@ int main(int argc, char** argv) {
             for (auto n : fit_name) {
                 printf("f\"%s\",\n", n.c_str());
             }
+            printf("Nfitst = %ld\n",fit_name.size());
         }
         if (iW==5){
             for (int n=0;n< fit_name.size();n++) {
                 // printf("f\"%s\",\n", n.c_str());
                 printf("%d   %s   %g\n",n, fit_name[n].c_str(),fit_res[n][Njack-1] );
             }
-            exit(1);
+            // exit(1);
         }
         // exit(1);
     }
