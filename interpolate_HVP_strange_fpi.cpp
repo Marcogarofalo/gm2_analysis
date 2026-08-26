@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
 
   int Njack = 51;
   myres = new resampling_jack(Njack - 1);
-  std::vector<int> iWs = {0, 1, 2, 3, 5};
+  std::vector<int> iWs = {28, 29, 30, 31};
   //////////////////////////////////////////////////////////////
   //  jackall
   //////////////////////////////////////////////////////////////
