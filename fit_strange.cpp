@@ -219,6 +219,9 @@ double comp_error_pool_func(data_all gjack, fit_type fit_info, double (*lhs_fun)
     return comp_error_pool(j1, j2);
 }
 
+int  get_idcor(int q, int W, int dq, int reg) {
+    return 234 + reg + 2 * (dq + 3 * (W + 4 * q));
+}
 
 
 int main(int argc, char** argv) {
@@ -343,6 +346,24 @@ int main(int argc, char** argv) {
     std::vector<int> id_LD_FVE = { obs + 13, obs + 14 };
     std::vector<int> id_full_FVE = { obs + 15, obs + 16 };
 
+    std::vector<std::vector<int>> id_dSD = {
+        {get_idcor(1,0,0,0),get_idcor(1,0,1,0),get_idcor(1,0,2,0) },
+        {get_idcor(1,0,0,1),get_idcor(1,0,1,1),get_idcor(1,0,2,1) },
+    };
+    std::vector<std::vector<int>> id_dW = {
+        {get_idcor(1,1,0,0),get_idcor(1,1,1,0),get_idcor(1,1,2,0) },
+        {get_idcor(1,1,0,1),get_idcor(1,1,1,1),get_idcor(1,1,2,1) },
+    };
+    std::vector<std::vector<int>> id_dLD = {
+        {get_idcor(1,2,0,0),get_idcor(1,2,1,0),get_idcor(1,2,2,0) },
+        {get_idcor(1,2,0,1),get_idcor(1,2,1,1),get_idcor(1,2,2,1) },
+    };
+    std::vector<std::vector<int>> id_dfull = {
+        {get_idcor(1,3,0,0),get_idcor(1,3,1,0),get_idcor(1,3,2,0) },
+        {get_idcor(1,3,0,1),get_idcor(1,3,1,1),get_idcor(1,3,2,1) },
+    };
+
+
     std::vector<int> ensemble_to_correct = { B72_64, B72_96, C06, C112 ,D54, E112 };
     std::vector<double*> damu_SD(files.size());
     std::vector<double*> damu_W(files.size());
@@ -453,7 +474,7 @@ int main(int argc, char** argv) {
     fit_info.restore_default();
     std::string namefit;
 
-    int NiW = 28;
+    int NiW = 53;
     std::vector<double*> ave_BAIC(NiW);
     int Nfits = 91; //105 ;
     for (int iW = 1;iW < NiW;iW++) {
@@ -478,6 +499,7 @@ int main(int argc, char** argv) {
                 fi_list = { 0,1,2,3,4,5,6,   10,11,12,13,14,15 };
 
             if (ie >= 7) continue;
+            if (iW == 20) continue;
 
             for (int fi : fi_list) {
 
@@ -599,6 +621,22 @@ int main(int argc, char** argv) {
                 case 27:
                     namefit = namefit + "_SDetasFVENoCor";
                     fit_info.corr_id = { id_SD_FVE[0], id_SD_FVE[1] };
+                case 28:
+                    namefit = namefit + "_SDdq";
+                    fit_info.corr_id = { id_SD[0], id_SD[1], id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
+                    break;
+                case 29:
+                    namefit = namefit + "_Wdq";
+                    fit_info.corr_id = { id_W[0], id_W[1],id_dW[0][0],id_dW[1][0], id_dW[0][1],id_dW[1][1], id_dW[0][2],id_dW[1][2] };
+                    break;
+                case 30:
+                    namefit = namefit + "_LDdq";
+                    fit_info.corr_id = { id_LD[0], id_LD[1],id_dLD[0][0],id_dLD[1][0], id_dLD[0][1],id_dLD[1][1], id_dLD[0][2],id_dLD[1][2] };
+                    break;
+                case 31:
+                    namefit = namefit + "_SDpWpLDdq";
+                    fit_info.corr_id = { id_SD[0], id_SD[1],  id_W[0], id_W[1], id_LD[0], id_LD[1] ,id_dfull[0][0],id_dfull[1][0], id_dfull[0][1],id_dfull[1][1], id_dfull[0][2],id_dfull[1][2] };
+                    break;
                     break;
                     // case 15:
                     //     namefit = namefit + "_SDtmin0cor";
@@ -865,7 +903,7 @@ int main(int argc, char** argv) {
                 print_fit_band(argv, jackextra, fit_info, fit_info, namefit.c_str(), "afm", amu_SD_l_common_a4, amu_SD_l_common_a4, 0, fit_info.myen.size() - 1, 0.0002, xcont);
 
                 if (ie < 13) {
-                    printf("count aic = %d\n",count_aic);
+                    printf("count aic = %d\n", count_aic);
                     fit_name[count_aic] = namefit;
                     for (int j = 0;j < Njack;j++) {
                         fit_res[count_aic][j] = amu_SD_l_common_a4.P[0][j];
@@ -899,7 +937,9 @@ int main(int argc, char** argv) {
 
     // SD
     Nfits = 105 + 12 * 7 - 14;
-    for (int iW = 0;iW < 1;iW++) {
+    for (int iW : {0, 28, 32, 33, 34, 35, 36, 37, 38,
+        39, 40, 41, 42, 43, 44, 45,
+        46, 47, 48, 49, 50, 51, 52}) {
         std::vector<std::vector<double>> fit_res(Nfits, std::vector<double>(myres->Njack));
         std::vector<std::string> fit_name(Nfits);
         std::vector<double> fit_chi2(Nfits);
@@ -931,117 +971,98 @@ int main(int argc, char** argv) {
                     namefit = namefit + "_SD";
                     fit_info.corr_id = { 167, 168 };
                     break;
-                case 1:
-                    namefit = namefit + "_W";
-                    fit_info.corr_id = { 169, 170 };
+
+                case 28:
+                    namefit = namefit + "_SDdq";
+                    fit_info.corr_id = { id_SD[0], id_SD[1], id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 2:
-                    namefit = namefit + "_LD";
-                    fit_info.corr_id = { 175, 176 };
+
+                case 32:
+                    namefit = namefit + "_SDdq_tmin0_smooth";
+                    fit_info.corr_id = { 306 + 0 * 2, 307 + 0 * 2, id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 3:
-                    namefit = namefit + "_full";
-                    fit_info.corr_id = { 146, 147 };
+                case 33:
+                    namefit = namefit + "_SDdq_tmin1_smooth";
+                    fit_info.corr_id = { 306 + 1 * 2, 307 + 1 * 2, id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 4:
-                    namefit = namefit + "_fulltree";
-                    fit_info.corr_id = { 181, 182 };
+                case 34:
+                    namefit = namefit + "_SDdq_tmin2_smooth";
+                    fit_info.corr_id = { 306 + 2 * 2, 307 + 2 * 2, id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 5:
-                    namefit = namefit + "_SDpWpLD";
-                    fit_info.corr_id = { 167, 168,169, 170, 175, 176 };
+                case 35:
+                    namefit = namefit + "_SDdq_tmin3_smooth";
+                    fit_info.corr_id = { 306 + 3 * 2, 307 + 3 * 2, id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 6:
-                    namefit = namefit + "_SDtmin0";
-                    fit_info.corr_id = { 211, 212 , id_SD_cor[0], id_SD_cor[1] }; // SD tmin 0
+                case 36:
+                    namefit = namefit + "_SDdq_tmin4_smooth";
+                    fit_info.corr_id = { 306 + 4 * 2, 307 + 4 * 2, id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 7:
-                    namefit = namefit + "_SDtmin1";
-                    fit_info.corr_id = { 213, 214 , id_SD_cor[0], id_SD_cor[1] }; // SD tmin 1
+                case 37:
+                    namefit = namefit + "_SDdq_tmin5_smooth";
+                    fit_info.corr_id = { 306 + 5 * 2, 307 + 5 * 2, id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 8:
-                    namefit = namefit + "_SDtmin2";
-                    fit_info.corr_id = { 215, 216 , id_SD_cor[0], id_SD_cor[1] }; // SD tmin 2
+                case 38:
+                    namefit = namefit + "_SDdq_tmin6_smooth";
+                    fit_info.corr_id = { 306 + 6 * 2, 307 + 6 * 2, id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
+
+                case 39:
+                    namefit = namefit + "_SDdq_tmin0_smooth1";
+                    fit_info.corr_id = { 306 + 0 * 2, 307 + 0 * 2, id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 9:
-                    namefit = namefit + "_SDtmin3";
-                    fit_info.corr_id = { 217, 218 , id_SD_cor[0], id_SD_cor[1] }; // SD tmin 3
+                case 40:
+                    namefit = namefit + "_SDdq_tmin1_smooth1";
+                    fit_info.corr_id = { 306 + 1 * 2, 307 + 1 * 2, id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 10:
-                    namefit = namefit + "_SDtmin4";
-                    fit_info.corr_id = { 219, 220 , id_SD_cor[0], id_SD_cor[1] }; // SD tmin 4
+                case 41:
+                    namefit = namefit + "_SDdq_tmin2_smooth1";
+                    fit_info.corr_id = { 306 + 2 * 2, 307 + 2 * 2, id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                    //////////////////  corrected
-                case 11:
-                    namefit = namefit + "_SDcor";
-                    fit_info.corr_id = { id_SD[0], id_SD[1],id_SD_cor[0], id_SD_cor[1] };
+                case 42:
+                    namefit = namefit + "_SDdq_tmin3_smooth1";
+                    fit_info.corr_id = { 306 + 3 * 2, 307 + 3 * 2, id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 12:
-                    namefit = namefit + "_Wcor";
-                    fit_info.corr_id = { id_W[0], id_W[1], id_W_cor[0], id_W_cor[1] };
+                case 43:
+                    namefit = namefit + "_SDdq_tmin4_smooth1";
+                    fit_info.corr_id = { 306 + 4 * 2, 307 + 4 * 2, id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 13:
-                    namefit = namefit + "_LDcor";
-                    fit_info.corr_id = { id_LD[0], id_LD[1], id_LD_cor[0], id_LD_cor[1] };
+                case 44:
+                    namefit = namefit + "_SDdq_tmin5_smooth1";
+                    fit_info.corr_id = { 306 + 5 * 2, 307 + 5 * 2, id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 14:
-                    namefit = namefit + "_SDpWpLDcor";
-                    fit_info.corr_id = { id_SD[0], id_SD[1],id_W[0], id_W[1], id_LD[0], id_LD[1], id_full_cor[0], id_full_cor[1] };
-                    // fit_info.corr_id = { id_SD[0], id_SD[1], id_SD_cor[0], id_SD_cor[1],id_W[0], id_W[1], id_W_cor[0], id_W_cor[1], id_LD[0], id_LD[1], id_LD_cor[0], id_LD_cor[1] };
-                    // fit_info.corr_id = {id_LD_cor[0], id_LD_cor[1]      , id_LD[0], id_LD[1], id_LD[0], id_LD[1], id_W_cor[0], id_W_cor[1], id_SD_cor[1],id_W[0], id_W[1],
-                    //  id_SD[0], id_SD[1], id_SD_cor[0]  };
+                case 45:
+                    namefit = namefit + "_SDdq_tmin6_smooth1";
+                    fit_info.corr_id = { 306 + 6 * 2, 307 + 6 * 2, id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
+
+
+                case 46:
+                    namefit = namefit + "_SDdqtmin0";
+                    fit_info.corr_id = { 334, 335 , id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 15:
-                    namefit = namefit + "_SDetas";
-                    fit_info.corr_id = { id_SDeta[0], id_SDeta[1], id_SD_cor[0], id_SD_cor[1] };
+                case 47:
+                    namefit = namefit + "_SDdqtmin1";
+                    fit_info.corr_id = { 336, 337 , id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 16:
-                    namefit = namefit + "_Wetas";
-                    fit_info.corr_id = { id_Weta[0], id_Weta[1], id_W_cor[0], id_W_cor[1] };
+                case 48:
+                    namefit = namefit + "_SDdqtmin2";
+                    fit_info.corr_id = { 338, 339 , id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 17:
-                    namefit = namefit + "_LDetas";
-                    fit_info.corr_id = { id_LDeta[0], id_LDeta[1], id_LD_cor[0], id_LD_cor[1] };
+                case 49:
+                    namefit = namefit + "_SDdqtmin3";
+                    fit_info.corr_id = { 340, 341 , id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 18:
-                    namefit = namefit + "_SDpWpLDetas";
-                    fit_info.corr_id = { id_SDeta[0], id_SDeta[1],id_Weta[0], id_Weta[1], id_LDeta[0], id_LDeta[1] ,id_full_cor[0], id_full_cor[1] };
+                case 50:
+                    namefit = namefit + "_SDdqtmin4";
+                    fit_info.corr_id = { 342, 343 , id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 19:
-                    namefit = namefit + "_SDetasFVE";
-                    fit_info.corr_id = { id_SD_FVE[0], id_SD_FVE[1], id_SD_cor[0], id_SD_cor[1] };
+                case 51:
+                    namefit = namefit + "_SDdqtmin6";
+                    fit_info.corr_id = { 344, 345 , id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 20:
-                    namefit = namefit + "_WetasFVE";
-                    fit_info.corr_id = { id_W_FVE[0], id_W_FVE[1], id_W_cor[0], id_W_cor[1] };
+                case 52:
+                    namefit = namefit + "_SDdqtmin7";
+                    fit_info.corr_id = { 346, 347 , id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
                     break;
-                case 21:
-                    namefit = namefit + "_LDetasFVE";
-                    fit_info.corr_id = { id_LD_FVE[0], id_LD_FVE[1], id_LD_cor[0], id_LD_cor[1] };
-                    break;
-                case 22:
-                    namefit = namefit + "_SDpWpLDetasFVE";
-                    fit_info.corr_id = { id_SD_FVE[0], id_SD_FVE[1],id_W_FVE[0], id_W_FVE[1], id_LD_FVE[0], id_LD_FVE[1] ,id_full_cor[0], id_full_cor[1] };
-                    break;
-                case 23:
-                    namefit = namefit + "_SDetasNoCor";
-                    fit_info.corr_id = { id_SDeta[0], id_SDeta[1] };
-                    break;
-                case 24:
-                    namefit = namefit + "_WetasNoCor";
-                    fit_info.corr_id = { id_Weta[0], id_Weta[1] };
-                    break;
-                case 25:
-                    namefit = namefit + "_LDetasNoCor";
-                    fit_info.corr_id = { id_LDeta[0], id_LDeta[1] };
-                    break;
-                case 26:
-                    namefit = namefit + "_SDpWpLDetasNoCor";
-                    fit_info.corr_id = { id_SDeta[0], id_SDeta[1],id_Weta[0], id_Weta[1], id_LDeta[0], id_LDeta[1] };
-                    break;
-                case 27:
-                    namefit = namefit + "_SDetasFVENoCor";
-                    fit_info.corr_id = { id_SD_FVE[0], id_SD_FVE[1] };
+
                     break;
                     // case 15:
                     //     namefit = namefit + "_SDtmin0cor";
@@ -1393,18 +1414,18 @@ int main(int argc, char** argv) {
             }
         }
         ave_BAIC[iW] = BAIC(fit_res, fit_chi2, fit_npar, fit_ndata, fit_dof, fit_mult);
-        if (iW == 0) {
+        if (iW == 28) {
             for (auto n : fit_name) {
                 printf("f\"%s\",\n", n.c_str());
             }
-            printf("Nfit = %ld\n",fit_name.size());
+            printf("Nfit = %ld\n", fit_name.size());
         }
     }
 
     for (int iW = 0; iW < NiW; iW++) {
-        printf("ave_BAIC[%d] = %g +- %g\n", iW, myres->mean(ave_BAIC[iW]), myres->comp_error(ave_BAIC[iW]));
+        printf("ave_BAIC[%d] = %g  %g\n", iW, myres->mean(ave_BAIC[iW]), myres->comp_error(ave_BAIC[iW]));
         std::string name_ave = std::string(argv[3]) + "/ave_BAIC_s_" + std::to_string(iW) + "_" + std::to_string(myres->Njack) + ".jack";
-        printf("writing %s\n", name_ave.c_str());
+        // printf("writing %s\n", name_ave.c_str());
         myres->write_jack_in_file(ave_BAIC[iW], name_ave.c_str());
 
     }

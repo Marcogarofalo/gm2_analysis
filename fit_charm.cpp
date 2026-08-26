@@ -190,7 +190,9 @@ void sum_lsc(data_all in, const char* outpath, const char* filename) {
 }
 
 
-
+int  get_idcor(int q, int W, int dq, int reg) {
+    return 234 + reg + 2 * (dq + 3 * (W + 4 * q));
+}
 
 int main(int argc, char** argv) {
     error(argc != 4, 1, "main ",
@@ -313,6 +315,23 @@ int main(int argc, char** argv) {
     std::vector<int> id_SDtmin4_cor = { obs + 19, obs + 20 };
 
 
+    std::vector<std::vector<int>> id_dSD = {
+        {get_idcor(2,0,0,0),get_idcor(2,0,1,0),get_idcor(2,0,2,0) },
+        {get_idcor(2,0,0,1),get_idcor(2,0,1,1),get_idcor(2,0,2,1) },
+    };
+    std::vector<std::vector<int>> id_dW = {
+        {get_idcor(2,1,0,0),get_idcor(2,1,1,0),get_idcor(2,1,2,0) },
+        {get_idcor(2,1,0,1),get_idcor(2,1,1,1),get_idcor(2,1,2,1) },
+    };
+    std::vector<std::vector<int>> id_dLD = {
+        {get_idcor(2,2,0,0),get_idcor(2,2,1,0),get_idcor(2,2,2,0) },
+        {get_idcor(2,2,0,1),get_idcor(2,2,1,1),get_idcor(2,2,2,1) },
+    };
+    std::vector<std::vector<int>> id_dfull = {
+        {get_idcor(2,3,0,0),get_idcor(2,3,1,0),get_idcor(2,3,2,0) },
+        {get_idcor(2,3,0,1),get_idcor(2,3,1,1),get_idcor(2,3,2,1) },
+    };
+
     std::vector<int> ensemble_to_correct = { B72_64, B72_96, C06, C112 ,D54, E112 };
     std::vector<double*> damu_SD(files.size());
     std::vector<double*> damu_W(files.size());
@@ -391,7 +410,7 @@ int main(int argc, char** argv) {
     fit_info.restore_default();
     std::string namefit;
 
-    std::vector<int> iWs = { 0,1,2,3,5,6,7,8,9,10, 11, 12, 13, 14 }; // only 4 missing = fulltree
+    std::vector<int> iWs = { 0,1,2,3,5,6,7,8,9,10, 11, 12, 13, 14, 15,16,17,18 }; // only 4 missing = fulltree
     int maxValue = std::ranges::max(iWs);
     std::vector<double*> ave_BAIC(maxValue + 1);
     int Nfits = 105 + 12 * 7 - 14;
@@ -415,7 +434,7 @@ int main(int argc, char** argv) {
             else if (ie > 12) // with FVE
                 fi_list = { 0,1,2,3,4,5,6,   10,11,12,13,14,15 };
 
-            if (ie>=7) continue; // skippin the onlyTM or OS fits
+            if (ie >= 7) continue; // skippin the onlyTM or OS fits
 
             for (int fi : fi_list) {
 
@@ -484,6 +503,25 @@ int main(int argc, char** argv) {
                     namefit = namefit + "_SDpWpLDcor";
                     fit_info.corr_id = { id_SD[0], id_SD[1],id_W[0], id_W[1], id_LD[0], id_LD[1], id_full_cor[0], id_full_cor[1] };
                     break;
+                case 15:
+                    namefit = namefit + "_SDdq";
+                    fit_info.corr_id = { id_SD[0], id_SD[1], id_dSD[0][0],id_dSD[1][0], id_dSD[0][1],id_dSD[1][1], id_dSD[0][2],id_dSD[1][2] };
+                    break;
+                case 16:
+                    namefit = namefit + "_Wdq";
+                    fit_info.corr_id = { id_W[0], id_W[1],id_dW[0][0],id_dW[1][0], id_dW[0][1],id_dW[1][1], id_dW[0][2],id_dW[1][2] };
+                    break;
+                case 17:
+                    namefit = namefit + "_LDdq";
+                    fit_info.corr_id = { id_LD[0], id_LD[1],id_dLD[0][0],id_dLD[1][0], id_dLD[0][1],id_dLD[1][1], id_dLD[0][2],id_dLD[1][2] };
+                    break;
+                case 18:
+                    namefit = namefit + "_SDpWpLDdq";
+                    fit_info.corr_id = {id_SD[0], id_SD[1],  id_W[0], id_W[1], id_LD[0], id_LD[1] ,id_dfull[0][0],id_dfull[1][0], id_dfull[0][1],id_dfull[1][1], id_dfull[0][2],id_dfull[1][2] };
+                    break;
+
+
+
                     // case 15:
                     //     namefit = namefit + "_SDtmin0cor";
                     //     fit_info.corr_id = { id_SDtmin0_cor[0], id_SDtmin0_cor[1] }; // SD tmin 0
@@ -872,12 +910,12 @@ int main(int argc, char** argv) {
             for (auto n : fit_name) {
                 printf("f\"%s\",\n", n.c_str());
             }
-            printf("Nfitst = %ld\n",fit_name.size());
+            printf("Nfitst = %ld\n", fit_name.size());
         }
-        if (iW==5){
-            for (int n=0;n< fit_name.size();n++) {
+        if (iW == 5) {
+            for (int n = 0;n < fit_name.size();n++) {
                 // printf("f\"%s\",\n", n.c_str());
-                printf("%d   %s   %g\n",n, fit_name[n].c_str(),fit_res[n][Njack-1] );
+                printf("%d   %s   %g\n", n, fit_name[n].c_str(), fit_res[n][Njack - 1]);
             }
             // exit(1);
         }
