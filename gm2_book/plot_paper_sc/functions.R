@@ -33,8 +33,8 @@ plot_all_fits <- function(name, Wind, quark, myyrange = NULL, quark_full_name = 
   list_lat <- c(
     "_3b", "_3b_BOS", "_3b_BTM", "_3b_BOS_BTM",
     "_3b_noC", "_3b_noC_BOS", "_3b_noC_BTM",
-    "_3b_onlyOS", "_3b_onlyTM", "_4b_onlyOS", "_4b_onlyTM",
-    "_3b_noC_onlyOS", "_3b_noC_onlyTM"
+    #"_3b_onlyOS", "_3b_onlyTM", "_4b_onlyOS", "_4b_onlyTM",
+    #"_3b_noC_onlyOS", "_3b_noC_onlyTM"
   )
   list_a <- c(
     "", "_a4OS", "_a4TM", "_a4OS_a4TM",
@@ -42,7 +42,11 @@ plot_all_fits <- function(name, Wind, quark, myyrange = NULL, quark_full_name = 
     "_alog2OS", "_alog2TM", "_alog2OS_alog2TM",
     "_alog3OS", "_alog3TM", "_alog3OS_alog3TM",
     "_a4",
-    "_alog", "_alog2", "_alog3"
+    "_alog", "_alog2", "_alog3",
+    "_rlog1","_rlog1_a4OS", "_rlog1_a4TM","_rlog1_a4OS_a4TM",
+    "_rlog2","_rlog2_a4OS", "_rlog2_a4TM","_rlog2_a4OS_a4TM",
+    "_rlog3","_rlog3_a4OS", "_rlog3_a4TM","_rlog3_a4OS_a4TM"
+    
   )
   source("/home/garofalo/programs/Rose/R/read_block.R")
   source("/home/garofalo/programs/Rose/R/plot_routines.R")

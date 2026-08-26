@@ -254,3 +254,8 @@ gg <- gg + theme(text = element_text(size = 15))
 fig <- myplotly(gg, "", "$t_\\mathrm{min}$~[fm]", "$a_\\mu^{\\rm HVP, SD}(s,t_\\mathrm{min})$", to_print = FALSE,
                 save_pdf = "amu_SDtmin_s", legend_position = c(0.2,0.5),
                 yrange = c(0,1.6)*10e-10 )
+
+
+fig <- myplotly(gg, "", "$t_\\mathrm{min}$~[fm]", "$a_\\mu^{\\rm HVP, SD}(s,t_\\mathrm{min})$", to_print = FALSE,
+                save_pdf = "amu_SDtmin_s_zoom", legend_position = c(0.2,0.5),
+                yrange = c(0.6,0.9)*10e-10 )

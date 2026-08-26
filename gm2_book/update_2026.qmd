@@ -39,7 +39,7 @@ cat("2024\n")
 df <- plot_all_fits("SDcor", "SD", "s", quark_full_name = "strange", to_plot = FALSE, fpi = "")
 cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm), "\n\n")
 cat("2026\n")
-df <- plot_all_fits("SD", "SD", "s", quark_full_name = "strange", to_plot = FALSE, fpi = "130.5")
+df <- plot_all_fits("SDdq", "SDdq", "s", quark_full_name = "strange", to_plot = FALSE, fpi = "130.5")
 cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm), "\n\n")
 
 gg <- myggplot()
@@ -75,8 +75,12 @@ cat("2024\n")
 df <- plot_all_fits("Wcor", "W", "s", quark_full_name = "strange", to_plot = FALSE, fpi = "")
 cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm), "\n\n")
 cat("2026\n")
-df <- plot_all_fits("W", "W", "s", quark_full_name = "strange", to_plot = FALSE, fpi = "130.5")
+df <- plot_all_fits("Wdq", "Wdq", "s", quark_full_name = "strange", to_plot = FALSE, fpi = "130.5")
 cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm), "\n\n")
+# cat("2026 131.0\n")
+# df <- plot_all_fits("W", "W", "s", quark_full_name = "strange", to_plot = FALSE, fpi = "131.0")
+# cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm), "\n\n")
+
 gg <- myggplot()
 gg <- plot_fit(
   basename = "/home/garofalo/analysis/g-2_new_stat//fit_all_strange/amu_Wcor_3b_BOS_BTM_a4OS_a4TM",
@@ -90,7 +94,8 @@ gg <- plot_fit(
 )
 
 gg <- plot_fit(
-  basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_strange/amu_W_3b_BOS_BTM_a4OS_a4TM",
+  # basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_strange/amu_W_3b_BOS_BTM_a4OS_a4TM",
+  basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_strange/amu_Wdq_3b_noC_a4OS",
   var = "afm",
   id_x = 1,
   data_type = c("2026"),
@@ -99,6 +104,7 @@ gg <- plot_fit(
   single_name_for_fit = "2026",
   noribbon = FALSE, noline = TRUE
 )
+
 
 fig <- myplotly(gg, to_print = TRUE)
 ```
@@ -110,7 +116,7 @@ cat("2024\n")
 df <- plot_all_fits("LDcor", "LD", "s", quark_full_name = "strange", to_plot = FALSE, fpi = "")
 cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm), "\n\n")
 cat("2026\n")
-df <- plot_all_fits("LD", "LD", "s", quark_full_name = "strange", to_plot = FALSE, fpi = "130.5")
+df <- plot_all_fits("LDdq", "LDdq", "s", quark_full_name = "strange", to_plot = FALSE, fpi = "130.5")
 cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm), "\n\n")
 gg <- myggplot()
 gg <- plot_fit(
@@ -145,7 +151,7 @@ cat("2024\n")
 df <- plot_all_fits("SDpWpLDcor", "LD", "s", quark_full_name = "strange", to_plot = FALSE, fpi = "")
 cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm), "\n\n")
 cat("2026\n")
-df <- plot_all_fits("SDpWpLD", "LD", "s", quark_full_name = "strange", to_plot = FALSE, fpi = "130.5")
+df <- plot_all_fits("SDpWpLDdq", "LDdq", "s", quark_full_name = "strange", to_plot = FALSE, fpi = "130.5")
 cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm), "\n\n")
 cat("131.1\n")
 df <- plot_all_fits("SDpWpLD", "LD", "s", quark_full_name = "strange", to_plot = FALSE, fpi = "131.1")
@@ -190,7 +196,7 @@ cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm
 x1 <- df$m
 e1 <- df$dm
 cat("2026\n")
-df <- plot_all_fits("SD", "SD", "c", quark_full_name = "charm", to_plot = FALSE, fpi = "130.5")
+df <- plot_all_fits("SDdq", "SDdq", "c", quark_full_name = "charm", to_plot = FALSE, fpi = "130.5")
 cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm), "\n\n")
 x2 <- df$m
 e2 <- df$dm
@@ -230,7 +236,7 @@ cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm
 x1 <- df$m
 e1 <- df$dm
 cat("2026\n")
-df <- plot_all_fits("W", "W", "c", quark_full_name = "charm", to_plot = FALSE, fpi = "130.5")
+df <- plot_all_fits("Wdq", "Wdq", "c", quark_full_name = "charm", to_plot = FALSE, fpi = "130.5")
 cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm), "\n\n")
 x2 <- df$m
 e2 <- df$dm
@@ -249,7 +255,7 @@ gg <- plot_fit(
 )
 
 gg <- plot_fit(
-  basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_charm/amu_W_3b_BOS_BTM_a4OS_a4TM",
+  basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_charm/amu_Wdq_3b_BOS_BTM_a4OS_a4TM",
   # basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_charm/amu_W_3b_BOS_BTM",
   var = "afm",
   id_x = 1,
@@ -271,12 +277,17 @@ df <- plot_all_fits("LDcor", "LD", "c", quark_full_name = "charm", to_plot = FAL
 cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm), "\n\n")
 x1 <- df$m
 e1 <- df$dm
+###
 cat("2026\n")
-df <- plot_all_fits("LD", "LD", "c", quark_full_name = "charm", to_plot = FALSE, fpi = "130.5")
+df <- plot_all_fits("LDdq", "LDdq", "c", quark_full_name = "charm", to_plot = FALSE, fpi = "130.5")
 cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm), "\n\n")
 x2 <- df$m
 e2 <- df$dm
 cat("deviation of ", abs(x1 - x2) / sqrt(e1^2 + e2^2), " sigma (sum squared)\n\n")
+cat("2026 131.0\n")
+df <- plot_all_fits("LDdq", "LDdq", "c", quark_full_name = "charm", to_plot = FALSE, fpi = "131.0")
+cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm), "\n\n")
+
 gg <- myggplot()
 gg <- plot_fit(
   basename = "/home/garofalo/analysis/g-2_new_stat//fit_all_charm/amu_LDcor_3b_BOS_BTM_a4OS_a4TM",
@@ -332,12 +343,18 @@ df <- plot_all_fits("SDpWpLD", "SDpWpLD", "c", quark_full_name = "charm", to_plo
 cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm), "\n\n")
 #####
 cat("2026 current\n")
-df <- plot_all_fits("SDpWpLD", "SDpWpLD", "c", quark_full_name = "charm", to_plot = FALSE, fpi = "130.5")
+df <- plot_all_fits("SDpWpLDdq", "SDpWpLDdq", "c", quark_full_name = "charm", to_plot = FALSE, fpi = "130.5")
 cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm), "\n\n")
 #####
 x2 <- df$m
 e2 <- df$dm
 cat("deviation of ", abs(x1 - x2) / sqrt(e1^2 + e2^2), " sigma (sum squared)\n\n")
+#####
+cat("2026 current 131.0\n")
+df <- plot_all_fits("SDpWpLD", "SDpWpLD", "c", quark_full_name = "charm", to_plot = FALSE, fpi = "131.0")
+cat("mean ", df$m, " (", df$stat, ") (", df$syst, ") = ", mean_print(df$m, df$dm), "\n\n")
+#####
+
 # print(df$df[,c(1,2,3,4)])
 gg <- myggplot()
 gg <- plot_fit(
@@ -478,4 +495,89 @@ gg <- plot_fit(
 )
 
 fig <- myplotly(gg, to_print = TRUE)
+```
+
+
+## tmin
+
+```{r}
+
+gg <- myggplot()
+
+
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_strange/amu_SDdq_tmin0_smooth_3b_BOS_BTM_rlog3_a4OS_a4TM",
+  var = "afm",
+  id_x = 1,
+  data_type = c("tmin 0"),
+  width = 1e-4,
+  gg = gg,
+  single_name_for_fit = "tmin 0",
+  noribbon = FALSE, noline = TRUE
+)
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_strange/amu_SDdq_tmin1_smooth_3b_BOS_BTM_rlog3_a4OS_a4TM",
+  var = "afm",
+  id_x = 1,
+  data_type = c("tmin 1"),
+  width = 1e-4,
+  gg = gg,
+  single_name_for_fit = "tmin 1",
+  noribbon = FALSE, noline = TRUE
+)
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_strange/amu_SDdq_tmin2_smooth_3b_BOS_BTM_rlog3_a4OS_a4TM",
+  var = "afm",
+  id_x = 1,
+  data_type = c("tmin 2"),
+  width = 1e-4,
+  gg = gg,
+  single_name_for_fit = "tmin 2",
+  noribbon = FALSE, noline = TRUE
+)
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_strange/amu_SDdq_tmin3_smooth_3b_BOS_BTM_rlog3_a4OS_a4TM",
+  var = "afm",
+  id_x = 1,
+  data_type = c("tmin 3"),
+  width = 1e-4,
+  gg = gg,
+  single_name_for_fit = "tmin 3",
+  noribbon = FALSE, noline = TRUE
+)
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_strange/amu_SDdq_tmin4_smooth_3b_BOS_BTM_rlog3_a4OS_a4TM",
+  var = "afm",
+  id_x = 1,
+  data_type = c("tmin 4"),
+  width = 1e-4,
+  gg = gg,
+  single_name_for_fit = "tmin 4",
+  noribbon = FALSE, noline = TRUE
+)
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_strange/amu_SDdq_tmin5_smooth_3b_BOS_BTM_rlog3_a4OS_a4TM",
+  var = "afm",
+  id_x = 1,
+  data_type = c("tmin 5"),
+  width = 1e-4,
+  gg = gg,
+  single_name_for_fit = "tmin 5",
+  noribbon = FALSE, noline = TRUE
+)
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_strange/amu_SDdq_tmin6_smooth_3b_BOS_BTM_rlog3_a4OS_a4TM",
+  var = "afm",
+  id_x = 1,
+  data_type = c("tmin 6"),
+  width = 1e-4,
+  gg = gg,
+  single_name_for_fit = "tmin 6",
+  noribbon = FALSE, noline = TRUE
+)
+
+
+
+fig <- myplotly(gg, to_print = TRUE)
+```
 ```
