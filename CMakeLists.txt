@@ -162,3 +162,7 @@ target_link_libraries(interpolate_HVP_charm_fpi PUBLIC ${ANALYSIS_PROGRAM_LIBRAR
 
 add_executable(interpolate_HVP_strange_fpi interpolate_HVP_strange_fpi.cpp)
 target_link_libraries(interpolate_HVP_strange_fpi PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
+
+
+add_executable(test_integral test_integral.cpp)
+target_link_libraries(test_integral PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES} ${ARB_LIBS})
