@@ -476,7 +476,7 @@ int main(int argc, char** argv) {
 
     int NiW = 53;
     std::vector<double*> ave_BAIC(NiW);
-    int Nfits = 91; //105 ;
+    int Nfits = 91; 
     for (int iW = 1;iW < NiW;iW++) {
 
         std::vector<std::vector<double>> fit_res(Nfits, std::vector<double>(myres->Njack));
@@ -936,7 +936,7 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
 
     // SD
-    Nfits = 105 + 12 * 7 - 14;
+    Nfits = 105 + 12 * 7 - 14;// = 175;
     for (int iW : {0, 28, 32, 33, 34, 35, 36, 37, 38,
         39, 40, 41, 42, 43, 44, 45,
         46, 47, 48, 49, 50, 51, 52}) {

@@ -4235,7 +4235,7 @@ int main(int argc, char** argv) {
             fprintf(outfile, "%.15g   %.15g\t", 0.0, 0.0);
             fprintf(outfile, "%.15g   %.15g\n", 0.0, 0.0);
         }
-        mysprintf(name_sd, NAMESIZE, "tmin_ref%d", tmin);
+        mysprintf(name_sd, NAMESIZE, "s_tmin_ref%d", tmin);
         fprintf(outfile, "\n\n #%s fit in [%d,%d] chi2=%.5g  %.5g\n", name_sd, 0, T / 2, 0.0, 0.0);
         fprintf(outfile, "   %.15g   %15.g\n", tmin_ref[tmin][Njack - 1], 0.0);
     }
