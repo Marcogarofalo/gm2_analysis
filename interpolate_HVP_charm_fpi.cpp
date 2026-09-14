@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
   jackall.en = new data_single[jackall.ens];
   int count = 0;
   int Nobs = std::ranges::max(iWs)+1;
-  std::vector<double> fpi = {130.5, 131.1};
+  std::vector<double> fpi = {130.5, 131.0};
   for (int e = 0; e < jackall.ens; e++) {
 
     data_single dj;
